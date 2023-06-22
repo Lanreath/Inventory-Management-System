@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class CRUDUtil {
 
     public static Object read(String tableName, String fieldName, int fieldDataType,
-                              String indexFieldName, int indexDataType, Object index) {
+            String indexFieldName, int indexDataType, Object index) {
         StringBuilder queryBuilder = new StringBuilder("Select ");
         queryBuilder.append(fieldName);
         queryBuilder.append(" from ");
@@ -32,7 +32,8 @@ public class CRUDUtil {
                     case Types.VARCHAR:
                         return rs.getString(fieldName);
                     default:
-                        throw new IllegalArgumentException("Index type " + indexDataType + " from sql.Types is not yet supported.");
+                        throw new IllegalArgumentException(
+                                "Index type " + indexDataType + " from sql.Types is not yet supported.");
                 }
             }
         } catch (SQLException exception) {
@@ -45,7 +46,7 @@ public class CRUDUtil {
     }
 
     public static int update(String tableName, String[] columns, Object[] values, int[] types,
-                             String indexFieldName, int indexDataType, Object index) {
+            String indexFieldName, int indexDataType, Object index) {
 
         int number = Math.min(Math.min(columns.length, values.length), types.length);
 
@@ -54,7 +55,8 @@ public class CRUDUtil {
             queryBuilder.append(columns[i]);
             queryBuilder.append(" = ");
             queryBuilder.append(convertObjectToSQLField(values[i], types[i]));
-            if (i < number - 1) queryBuilder.append(", ");
+            if (i < number - 1)
+                queryBuilder.append(", ");
         }
         queryBuilder.append(" WHERE ");
         queryBuilder.append(indexFieldName);
@@ -63,12 +65,12 @@ public class CRUDUtil {
 
         try (Connection conn = Database.connect()) {
             PreparedStatement pstmt = conn.prepareStatement(queryBuilder.toString());
-
-            return pstmt.executeUpdate(); //number of affected rows
+            return pstmt.executeUpdate(); // number of affected rows
         } catch (SQLException ex) {
             Logger.getAnonymousLogger().log(
                     Level.SEVERE,
-                    LocalDateTime.now() + ": Could not add customer to database");
+                    "Could not update " + tableName + " by index " + index +
+                            " and columns " + columns);
             return -1;
         }
     }
@@ -79,7 +81,8 @@ public class CRUDUtil {
         StringBuilder queryBuilder = new StringBuilder("INSERT INTO " + tableName + " (");
         for (int i = 0; i < number; i++) {
             queryBuilder.append(columns[i]);
-            if (i < number - 1) queryBuilder.append(", ");
+            if (i < number - 1)
+                queryBuilder.append(", ");
         }
         queryBuilder.append(") ");
         queryBuilder.append(" VALUES (");
@@ -99,9 +102,10 @@ public class CRUDUtil {
                     queryBuilder.append("'");
                     break;
                 default:
-                        throw new IllegalArgumentException("Field type of " + types[i] + "is not yet supported.");
+                    throw new IllegalArgumentException("Field type of " + types[i] + "is not yet supported.");
             }
-            if (i < number - 1) queryBuilder.append(", ");
+            if (i < number - 1)
+                queryBuilder.append(", ");
         }
         queryBuilder.append(");");
 
@@ -147,7 +151,7 @@ public class CRUDUtil {
     public static void createTable(Class<?> model) {
         Field[] fields = model.getDeclaredFields();
         StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-        queryBuilder.append(model.getSimpleName() +  " (\n");
+        queryBuilder.append(model.getSimpleName() + " (\n");
         for (int i = 0; i < fields.length; i++) {
             Field f = fields[i];
             queryBuilder.append(" " + f.getName().toUpperCase());
@@ -158,9 +162,6 @@ public class CRUDUtil {
                     break;
                 case "Integer":
                     queryBuilder.append(" INTEGER");
-                    break;
-                case "Optional":
-                    queryBuilder.append("ID INTEGER");
                     break;
                 case "LocalDateTime":
                     queryBuilder.append(" TIMESTAMP");
@@ -175,9 +176,10 @@ public class CRUDUtil {
                     queryBuilder.append("ID INTEGER");
                     break;
                 default:
-                    throw new IllegalArgumentException("Type " + f.getType().getSimpleName() + " is not yet supported.");
+                    throw new IllegalArgumentException(
+                            "Type " + f.getType().getSimpleName() + " is not yet supported.");
             }
-            if (f.getName().substring(f.getName().length()-2).equals("Id")) {
+            if (f.getName().substring(f.getName().length() - 2).equals("Id")) {
                 queryBuilder.append(" PRIMARY KEY AUTOINCREMENT");
             } else if (!f.getName().equals("defaultPart")) {
                 queryBuilder.append(" NOT NULL");

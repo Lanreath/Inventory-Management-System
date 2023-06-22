@@ -17,7 +17,7 @@ import com.ils.models.Product;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
+import javafx.collections.transformation.FilteredList;
 
 public class PartDAO {
     private static final String tableName = "PART";
@@ -34,8 +34,8 @@ public class PartDAO {
         updatePartsFromDB();
     }
 
-    protected static ObservableList<Part> getParts() {
-        return FXCollections.unmodifiableObservableList(parts);
+    protected static FilteredList<Part> getParts() {
+        return new FilteredList<>(parts);
     }
 
     private static void updatePartsFromDB() {
@@ -72,6 +72,10 @@ public class PartDAO {
 
     public static Optional<Part> getPart(int id) {
         return parts.stream().filter(part -> part.getId() == id).findFirst();
+    }
+
+    public static Optional<Part> getPartByNameAndProduct(String partName, Product product) {
+        return parts.stream().filter(part -> part.getPartName().equals(partName) && part.getProduct().equals(product)).findFirst();
     }
 
     public static void insertPart(String partName, int quantity, Product product) {

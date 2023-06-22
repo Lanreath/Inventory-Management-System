@@ -84,31 +84,6 @@ public class ReadUtil {
         }
     }
 
-    public static ResultSet readProducts(String username, String password) {
-        String query = "SELECT p.PRODUCTNAME, c.CUSTOMERNAME FROM PRODUCT p, CUSTOMER c WHERE p.CUSTOMERID = c.CUSTOMERID";
-        Connection conn;
-        try {
-            conn = Oracle.connect(username, password);
-            return conn.createStatement().executeQuery(query);
-        } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not retrieve products from Oracle database." + e.getMessage());
-            return null;
-        }
-    }
-
-    public static ResultSet readProductsFromCustomer(String username, String password, int customerId) {
-        String query = "SELECT * FROM PRODUCT WHERE CUSTOMERID = " + customerId;
-        try (Connection conn = Oracle.connect(username, password)) {
-            return conn.createStatement().executeQuery(query);
-        } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not retrieve products with customer id " + String.valueOf(customerId)
-                            + " from Oracle database.");
-            return null;
-        }
-    }
-
     public static ResultSet readTransfersByDate(String username, String password, LocalDate date) {
         Connection conn;
         String query = "select " + customerName + customerAlias + productName + productAlias + productNameMap

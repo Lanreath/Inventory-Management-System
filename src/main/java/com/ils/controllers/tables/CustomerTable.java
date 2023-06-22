@@ -15,9 +15,7 @@ import javafx.scene.layout.Priority;
 import com.ils.logic.Logic;
 import com.ils.models.Customer;
 
-public class CustomerTable extends Table<Customer>{
-    private Logic logic;
-
+public class CustomerTable extends Table {
     @FXML
     TextField customerNameSearchField;
 
@@ -32,7 +30,6 @@ public class CustomerTable extends Table<Customer>{
 
     public CustomerTable(Logic logic) {
         super("CustomerTable.fxml", logic);
-        this.logic = logic;
         customerTable.setPrefWidth(200);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         customerNameColumn.setCellValueFactory(new PropertyValueFactory<>("customerName"));

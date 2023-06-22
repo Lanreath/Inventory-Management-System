@@ -19,7 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 
-public class ProductTable extends Table{
+public class ProductPartTable extends Table{
     @FXML
     TextField productNameSearchField;
 

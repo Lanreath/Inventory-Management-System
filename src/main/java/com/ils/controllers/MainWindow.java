@@ -1,6 +1,8 @@
 package com.ils.controllers;
 
 import com.ils.controllers.tables.CustomerTable;
+import com.ils.controllers.tables.PartTable;
+import com.ils.controllers.tables.ProductPartTable;
 import com.ils.controllers.tables.ProductTable;
 import com.ils.controllers.tables.TransferTable;
 import com.ils.logic.Logic;
@@ -16,7 +18,7 @@ public class MainWindow extends Component<Stage> {
 
     private ActionBar actionBar;
     private CustomerTable customerTable;
-    private ProductTable productTable;
+    private ProductPartTable productPartTable;
     private TransferTable transferTable;
     private InputBar inputBar;
 

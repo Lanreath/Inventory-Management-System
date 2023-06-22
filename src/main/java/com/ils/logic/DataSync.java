@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import com.ils.db.Database;
 import com.ils.models.Customer;
+import com.ils.models.Part;
 import com.ils.models.Product;
 import com.ils.models.Transfer;
 import com.ils.oracle.Oracle;
@@ -46,72 +47,49 @@ public class DataSync {
             Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Customers from database " + e.getMessage());
         }
     }
-
-    protected void syncProducts(){
-        ResultSet products = ReadUtil.readProducts(oracleUsername, oraclePassword);
-        Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getProductName);
-        try {
-            while (products.next()) {
-                String curr = products.getString("PRODUCTNAME").split("_")[0];
-                String customer = products.getString("CUSTOMERNAME");
-                if (savedProducts.get().noneMatch((s) -> s.equals(curr))) {
-                    Optional<Customer> c = CustomerDAO.getCustomer(customer);
-                    c.ifPresent((cust) -> ProductDAO.insertProduct(curr, cust));
-                    c.orElseThrow(() -> new SQLException("Could not find Customer " + customer + " in database"));
-                }
-            }
-        } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Products from database: " + e.getMessage());
-        }
-    }
-
-    protected void syncProductsByCustomer(Customer customer) {
-        ResultSet products = ReadUtil.readProductsFromCustomer(oracleUsername, oraclePassword, customer.getId());
-        Stream<String> savedProducts = ProductDAO.getProductsByCustomer(customer).map(Product::getProductName);
-        try {
-            while (products.next()) {
-                String curr = products.getString("PRODUCTNAME").split("_")[0];
-                if (savedProducts.noneMatch((s) -> s.equals(curr))) {
-                    ProductDAO.insertProduct(curr, customer);
-                }
-            }
-        } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Products from database " + e.getMessage());
-        }
-    }
     
-    // public void syncParts(Product product) {};
-
     protected void syncTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readTransfersByDate(oracleUsername, oraclePassword, date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getProductName);
+        Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
         Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
                 String product = transfers.getString("PRODUCT");
-                // String vaultName = transfers.getString("VAULTNAME");
                 int quantity = transfers.getInt("QUANTITY");
 
-                // if (savedTransfers.noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
-                //     t.getPart().getProduct().getProductName().equals(product) &&
-                //     t.getQuantity() == quantity &&
-                //     t.getTransferType() == Transfer.Action.WITHDRAW)) {
-                //     Product p = ProductDAO.getProductByName(product).get();    
-                //     TransferDAO.insertTransfer(p.getDefaultPart(), quantity, Transfer.Action.WITHDRAW);
-                // }
                 if (savedProducts.get().noneMatch((p) -> p.equals(product))) {
+                    // Product does not exist in database
                     Optional<Customer> c = CustomerDAO.getCustomer(customer);
                     c.ifPresent((cust) -> ProductDAO.insertProduct(product, cust));
                     c.orElseThrow(() -> new IllegalStateException("Could not find Customer " + customer + " in database"));
                 }
-                if (savedTransfers.get().noneMatch((t) -> t.getProduct().getCustomer().getCustomerName().equals(customer) &&
-                    t.getProduct().getProductName().equals(product) &&
+                // Product
+                Optional<Product> p = ProductDAO.getProductByName(product);
+                p.orElseThrow(() -> new IllegalStateException("Could not find Product " + product + " in database"));
+                Product prod = p.get();
+                if (savedParts.get().noneMatch((pt) -> pt.getProduct().equals(prod))) {
+                    // Part does not exist in database
+                    PartDAO.insertPart("Default", 0, prod);
+                }
+                // Part
+                Part part = prod.getDefaultPart();
+                if (part == null) {
+                    // Product does not have a default part
+                    Optional<Part> dflt = PartDAO.getPartByNameAndProduct("Default", prod);
+                    dflt.orElseThrow(() -> new IllegalStateException("Could not find Part Default in database"));
+                    // Update Product with default part
+                    Product newProd = new Product(prod.getProductName(), prod.getCreationDateTime(), prod.getCustomer(), dflt.get(), prod.getId());
+                    ProductDAO.updateProduct(newProd);
+                    part = dflt.get();
+                }
+                if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
+                    t.getPart().getProduct().getProductName().equals(product) &&
                     t.getTransferQuantity() == quantity &&
-                    // t.getTransferDateTime().toLocalDate().isEqual(date.toLocalDate()) &&
+                    t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.WITHDRAW)) {
-                    Product p = ProductDAO.getProductByName(product).get();
-                    TransferDAO.insertTransfer(p, quantity, Transfer.Action.WITHDRAW);
+                    TransferDAO.insertTransfer(part, quantity, Transfer.Action.WITHDRAW);
                 }
             }
         } catch (SQLException e) {

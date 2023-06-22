@@ -21,8 +21,6 @@ test {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'org.controlsfx:controlsfx:11.1.2'
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
     implementation 'com.oracle.database.jdbc:ojdbc8:23.2.0.0'

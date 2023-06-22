@@ -17,9 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-public class TransferTable extends Table<Transfer> {
-    private Logic logic;
-
+public class TransferTable extends Table {
     @FXML
     DatePicker transferDatePicker;
 
@@ -43,7 +41,6 @@ public class TransferTable extends Table<Transfer> {
 
     public TransferTable(Logic logic) {
         super("TransferTable.fxml", logic);
-        this.logic=logic;
         transferTable.setPrefWidth(400);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         transferDateTimeColumn.setCellValueFactory(new PropertyValueFactory<>("transferDateTime"));

@@ -48,14 +48,16 @@ public class ProductDAO {
             products.clear();
             while (rs.next()) {
                 Integer customerId = rs.getInt(customerIdColumn);
+                Integer defaultPartId = rs.getInt(defaultPartIdColumn);
                 Optional<Customer> customer = CustomerDAO.getCustomer(customerId);
-                Optional<Part> defaultPart = PartDAO.getPart(rs.getInt(defaultPartIdColumn));
+                Optional<Part> defaultPart = PartDAO.getPart(defaultPartId);
                 customer.orElseThrow(() -> new IllegalStateException("Could not find Customer with id " + customerId));
+                defaultPart.orElseThrow(() -> new IllegalStateException("Could not find Part with id " + defaultPartId));
                 products.add(new Product(
                     rs.getString(nameColumn),
                     LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
                     customer.get(),
-                    defaultPart,
+                    defaultPart.get(),
                     rs.getInt(idColumn)
                 ));
             } 
@@ -83,7 +85,7 @@ public class ProductDAO {
     public static void insertProduct(String productName, Customer customer) {
         LocalDateTime now = LocalDateTime.now();
         int id = (int) CRUDUtil.create(tableName, new String[]{nameColumn, creationDateTimeColumn, customerIdColumn}, new Object[]{productName, now, customer.getId()}, new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
-        products.add(new Product(productName, now, customer, Optional.empty(), id));
+        products.add(new Product(productName, now, customer, id));
     }
 
     public static void updateProduct(Product newProduct) {

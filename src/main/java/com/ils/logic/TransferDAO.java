@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import com.ils.db.CRUDUtil;
 import com.ils.db.Database;
-import com.ils.models.Product;
+import com.ils.models.Part;
 import com.ils.models.Transfer;
 
 import javafx.collections.FXCollections;
@@ -24,8 +24,7 @@ import javafx.collections.transformation.FilteredList;
 public class TransferDAO {
     private static final String tableName = "TRANSFER";
     private static final String transferTimeColumn = "TRANSFERDATETIME";
-    // private static final String partIdColumn = "PARTID";
-    private static final String productIdColumn = "PRODUCTID";
+    private static final String partIdColumn = "PARTID";
     private static final String quantityColumn = "TRANSFERQUANTITY";
     private static final String transferTypeColumn = "TRANSFERTYPE";
     private static final String idColumn = "TRANSFERID";
@@ -44,32 +43,16 @@ public class TransferDAO {
     private static void updateTransfersFromDB() {
         String query = "SELECT * FROM " + tableName + " LIMIT 500";
         try (Connection connection = Database.connect()) {
-            // Bug here
             PreparedStatement statement = connection.prepareStatement(query); 
             ResultSet rs = statement.executeQuery();
             transfers.clear();
             while (rs.next()) {
-                // Optional<Part> part = PartDAO.getPart(rs.getInt(partIdColumn));
-                // if (!part.isPresent()) {
-                //     Logger.getAnonymousLogger().log(
-                //         Level.SEVERE,
-                //         LocalDateTime.now() + ": Could not load Part with id " + rs.getInt(partIdColumn) + " from database"
-                //     );
-                //     continue;
-                // }
-                // transfers.add(new Transfer(
-                //     rs.getTimestamp(transferTimeColumn).toLocalDateTime(),
-                //     part.get(),
-                //     rs.getInt(quantityColumn),
-                //     Transfer.Action.valueOf(rs.getString(transferTypeColumn)),
-                //     rs.getInt(idColumn)
-                // ));
-                Integer productId = rs.getInt(productIdColumn);
-                Optional<Product> product = ProductDAO.getProduct(productId);
-                product.orElseThrow(() -> new IllegalStateException("Could not find Product with id " + productId));
+                Integer partId = rs.getInt(partIdColumn);
+                Optional<Part> part = PartDAO.getPart(partId);
+                part.orElseThrow(() -> new IllegalStateException("Could not find Part with id " + partId));
                 transfers.add(new Transfer(
                     LocalDateTime.parse(rs.getString(transferTimeColumn)),
-                    product.get(),
+                    part.get(),
                     rs.getInt(quantityColumn),
                     Transfer.Action.valueOf(rs.getString(transferTypeColumn)),
                     rs.getInt(idColumn)
@@ -92,38 +75,22 @@ public class TransferDAO {
         return transfers.stream().filter(t -> t.getTransferDateTime().toLocalDate().equals(date));
     }
 
-    public static void insertTransfer(Product product, int quantity, Transfer.Action transferType) {
+    public static void insertTransfer(Part part, int quantity, Transfer.Action transferType) {
         LocalDateTime transferDateTime = LocalDateTime.now();
-        // int id = (int) CRUDUtil.create(
-        //     tableName,
-        //     new String[] { transferTimeColumn, partIdColumn, quantityColumn, transferTypeColumn },
-        //     new Object[] { transferDateTime, part.getId(), quantity, transferType.name() },
-        //     new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.VARCHAR }
-        // );
-        // transfers.add(new Transfer(transferDateTime, part, quantity, transferType, id));
         int id = (int) CRUDUtil.create(
             tableName,
-            new String[] { transferTimeColumn, productIdColumn, quantityColumn, transferTypeColumn },
-            new Object[] { transferDateTime, product.getId(), quantity, transferType.name() },
+            new String[] { transferTimeColumn, partIdColumn, quantityColumn, transferTypeColumn },
+            new Object[] { transferDateTime, part.getId(), quantity, transferType.name() },
             new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.VARCHAR }
         );
-        transfers.add(new Transfer(transferDateTime, product, quantity, transferType, id));
+        transfers.add(new Transfer(transferDateTime, part, quantity, transferType, id));
     }
 
     public static void updateTransfer(Transfer newTransfer) {
-        // int rows = CRUDUtil.update(
-        //     tableName,
-        //     new String[] { transferTimeColumn, partIdColumn, quantityColumn, transferTypeColumn },
-        //     new Object[] { newTransfer.getTransferDateTime(), newTransfer.getPart().getId(), newTransfer.getQuantity(), newTransfer.getTransferType().name() },
-        //     new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.VARCHAR },
-        //     idColumn,
-        //     Types.INTEGER,
-        //     newTransfer.getId()
-        // );
         int rows = CRUDUtil.update(
             tableName,
-            new String[] { transferTimeColumn, productIdColumn, quantityColumn, transferTypeColumn },
-            new Object[] { newTransfer.getTransferDateTime(), newTransfer.getProduct().getId(), newTransfer.getTransferQuantity(), newTransfer.getTransferType().name() },
+            new String[] { transferTimeColumn, partIdColumn, quantityColumn, transferTypeColumn },
+            new Object[] { newTransfer.getTransferDateTime(), newTransfer.getPart().getId(), newTransfer.getTransferQuantity(), newTransfer.getTransferType().name() },
             new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.VARCHAR },
             idColumn,
             Types.INTEGER,

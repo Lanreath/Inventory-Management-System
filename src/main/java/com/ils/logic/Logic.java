@@ -5,8 +5,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import java.time.LocalDate;
-import java.util.function.Predicate;
-import java.util.logging.Logger;
 
 import com.ils.models.Customer;
 import com.ils.models.Part;
@@ -16,10 +14,11 @@ import com.ils.models.Transfer;
 public class Logic {
     private FilteredList<Customer> customerFilteredList;
     private FilteredList<Product> productFilteredList;
-    // private FilteredList<Part> partList;
+    private FilteredList<Part> partFilteredList;
     private FilteredList<Transfer> transferFilteredList;
     private SortedList<Customer> customerSortedList;
     private SortedList<Product> productSortedList;
+    private SortedList<Part> partSortedList;
     private SortedList<Transfer> transferSortedList;
     private DataSync sync;
     private Filters filters;
@@ -28,10 +27,11 @@ public class Logic {
         this.filters = new Filters();
         this.customerFilteredList = CustomerDAO.getCustomers();
         this.productFilteredList = ProductDAO.getProducts();
-        // this.partList = PartDAO.getParts();
+        this.partFilteredList = PartDAO.getParts();
         this.transferFilteredList = TransferDAO.getTransfers();
         this.customerSortedList = new SortedList<>(customerFilteredList);
         this.productSortedList = new SortedList<>(productFilteredList);
+        this.partSortedList = new SortedList<>(partFilteredList);
         this.transferSortedList = new SortedList<>(transferFilteredList);
         initFilters();
     }
@@ -42,6 +42,10 @@ public class Logic {
 
     public SortedList<Product> getProducts() {
         return this.productSortedList;
+    }
+
+    public SortedList<Part> getParts() {
+        return this.partSortedList;
     }
 
     public SortedList<Transfer> getTransfers() {
@@ -106,8 +110,9 @@ public class Logic {
 
     public void syncData(String username, String password, LocalDate date) throws IllegalArgumentException {
         sync = new DataSync(username, password);
-        // sync.syncCustomers();
-        // sync.syncProducts();
+        if (this.customerFilteredList.isEmpty()) {
+            sync.syncCustomers();
+        }
         sync.syncTransfers(date);
     }
 }

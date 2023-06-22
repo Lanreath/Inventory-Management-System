@@ -11,16 +11,14 @@ public class Transfer {
     }
 
     private final LocalDateTime transferDateTime;
-    // private final Part part;
-    private final Product product;
+    private final Part part;
     private final Integer transferQuantity;
     private final Action transferType;
     private final Integer transferId;
 
-    public Transfer(LocalDateTime transferDateTime, Product product, int quantity, Action transferType, int id) {
+    public Transfer(LocalDateTime transferDateTime, Part part, int quantity, Action transferType, int id) {
         this.transferDateTime = transferDateTime;
-        // this.part = part;
-        this.product = product;
+        this.part = part;
         this.transferQuantity = quantity;
         this.transferType = transferType;
         this.transferId = id;
@@ -34,12 +32,8 @@ public class Transfer {
         return transferDateTime;
     }
 
-    // public Part getPart() {
-    //     return part;
-    // }
-
-    public Product getProduct() {
-        return product;
+    public Part getPart() {
+        return part;
     }
 
     public Integer getTransferQuantity() {
@@ -52,7 +46,6 @@ public class Transfer {
 
     @Override
     public String toString() {
-        // return "Transfer [" + transferDateTime + ", " + part + ", " + transferQuantity + ", " + transferType.name() + "]";
-        return "Transfer [" + transferDateTime + ", " + product + ", " + transferQuantity + ", " + transferType.name() + "]";
+        return "Transfer [" + transferDateTime + ", " + part + ", " + transferQuantity + ", " + transferType.name() + "]";
     }
 }

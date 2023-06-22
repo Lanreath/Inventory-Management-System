@@ -107,10 +107,10 @@ public class Filters {
     }
 
     protected void filterTransferByCustomer(Customer c) {
-        transferCustomerFilter.set(transfer -> transfer.getProduct().getCustomer().equals(c));
+        transferCustomerFilter.set(transfer -> transfer.getPart().getProduct().getCustomer().equals(c));
     }
 
     protected void filterTransferByProduct(Product p) {
-        transferProductFilter.set(transfer -> transfer.getProduct().equals(p));
+        transferProductFilter.set(transfer -> transfer.getPart().getProduct().equals(p));
     }
 }

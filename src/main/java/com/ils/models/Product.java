@@ -1,20 +1,27 @@
 package com.ils.models;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class Product {
     private final String productName;
     private final LocalDateTime creationDateTime;
     private final Customer customer;
     private final Integer productId;
-    private final Optional<Part> defaultPart;
+    private final Part defaultPart;
 
-    public Product(String productName, LocalDateTime creationDateTime, Customer customer, Optional<Part> defaultPart, int id) {
+    public Product(String productName, LocalDateTime creationDateTime, Customer customer, Part defaultPart, int id) {
         this.productName = productName;
         this.creationDateTime = creationDateTime;
         this.customer = customer;
         this.defaultPart = defaultPart;
+        this.productId = id;
+    }
+
+    public Product(String productName, LocalDateTime creationDateTime, Customer customer, int id) {
+        this.productName = productName;
+        this.creationDateTime = creationDateTime;
+        this.customer = customer;
+        this.defaultPart = null;
         this.productId = id;
     }
 
@@ -35,7 +42,7 @@ public class Product {
     }
 
     public Part getDefaultPart() {
-        return defaultPart.orElse(null);
+        return defaultPart;
     }
 
     @Override
