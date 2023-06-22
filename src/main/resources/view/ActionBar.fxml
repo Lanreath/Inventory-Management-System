@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ToolBar?>
+
+<ToolBar xmlns="http//javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
+    <items>
+        <Button fx:id="addCustomerBtn">
+        </Button>
+        <Button fx:id="addProductBtn">
+        </Button>
+        <!-- <Button fx:id="addPartBtn">
+        </Button> -->
+        <Button fx:id="addTransferBtn">
+        </Button>
+        <TextField fx:id="username">
+        </TextField>
+        <PasswordField fx:id="password">
+        </PasswordField>
+        <DatePicker fx:id="syncDate">
+        </DatePicker>
+        <Button fx:id="syncBtn">
+        </Button>
+        <Label fx:id="status">
+        </Label>
+    </items>
+</ToolBar>

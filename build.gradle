@@ -1,0 +1,45 @@
+plugins {
+  id 'application'
+  id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = "17.0.7"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+application {
+    mainClass = 'com.ils.MainApp'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation 'org.controlsfx:controlsfx:11.1.2'
+    implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
+    implementation 'com.oracle.database.jdbc:ojdbc8:23.2.0.0'
+}
+
+project.configurations.implementation.setCanBeResolved(true)
+
+compileJava {
+    options.release = 8
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': application.mainClass,
+                'Class-Path': configurations.implementation.collect { it.name }.join(' ')
+        )
+    }
+    dependsOn ('dependencies')
+}

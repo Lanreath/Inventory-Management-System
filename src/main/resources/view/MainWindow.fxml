@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.Scene?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<fx:root type="javafx.stage.Stage" xmlns="http//javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml"
+    title="ILS">
+    <scene>
+        <Scene>
+            <stylesheets>
+                <URL value="@styles.css"/>
+            </stylesheets>
+
+            <BorderPane fx:id="layout">
+                <top>
+                    <StackPane fx:id="actionBarPlaceholder">
+                    </StackPane>
+                </top>
+                <left>
+                    <StackPane fx:id="customerTablePlaceholder">
+                    </StackPane>
+                </left>
+                <center>
+                    <StackPane fx:id="productTablePlaceholder">
+                    </StackPane>
+                </center>
+                <right>
+                    <StackPane fx:id="transferTablePlaceholder">
+                    </StackPane>
+                </right>
+                <bottom>
+                    <StackPane fx:id="inputBarPlaceholder">
+                    </StackPane>
+                </bottom>
+            </BorderPane>
+        </Scene>
+    </scene>
+</fx:root>
