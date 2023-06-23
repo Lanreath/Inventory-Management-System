@@ -82,8 +82,7 @@ public class ProductPartTable extends Component<Region> {
         defaultPartColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
-                Product product = (Product) rowItem.getValue();
-                return new SimpleStringProperty(product.getDefaultPart().getPartName());
+                return new SimpleStringProperty("Total");
             } else if (rowItem != null && rowItem.getValue() instanceof Part) {
                 Part part = (Part) rowItem.getValue();
                 return new SimpleStringProperty(part.getPartName());
