@@ -29,7 +29,7 @@ public class Part {
         return creationDateTime;
     }
 
-    public int getQuantity() {
+    public int getPartQuantity() {
         return partQuantity;
     }
 

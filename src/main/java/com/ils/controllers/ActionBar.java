@@ -22,7 +22,6 @@ import com.ils.logic.Logic;
 
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
-    private Logic logic;
 
     @FXML
     private Button addCustomerBtn;
@@ -30,8 +29,8 @@ public class ActionBar extends Component<Region> {
     @FXML
     private Button addProductBtn;
 
-    // @FXML
-    // private Button addPartBtn;
+    @FXML
+    private Button addPartBtn;
 
     @FXML
     private Button addTransferBtn;
@@ -58,11 +57,10 @@ public class ActionBar extends Component<Region> {
     private Label status;
 
     public ActionBar(Logic logic) {
-        super(FXML);
-        this.logic = logic;
+        super(FXML, logic);
         ImageView cust = new ImageView("/images/customer-v2.png");
         ImageView prod = new ImageView("/images/product-v2.png");
-        // ImageView part = new ImageView("/images/part-icon.png");
+        ImageView part = new ImageView("/images/part-v2.png");
         ImageView xact = new ImageView("/images/transfer-v2.png");
         ImageView sync = new ImageView("/images/sync-icon.png");
         cust.setPreserveRatio(true);
@@ -73,9 +71,10 @@ public class ActionBar extends Component<Region> {
         prod.setFitHeight(24);
         addProductBtn.setGraphic(prod);
         addProductBtn.setTooltip(new Tooltip("Add product"));
-        // part.setPreserveRatio(true);
-        // part.setFitHeight(24);
-        // addPartBtn.setGraphic(part);
+        part.setPreserveRatio(true);
+        part.setFitHeight(24);
+        addPartBtn.setGraphic(part);
+        addPartBtn.setTooltip(new Tooltip("Add part"));
         xact.setPreserveRatio(true);
         xact.setFitHeight(24);
         addTransferBtn.setGraphic(xact);

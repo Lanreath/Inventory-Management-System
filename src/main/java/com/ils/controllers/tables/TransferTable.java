@@ -2,7 +2,7 @@ package com.ils.controllers.tables;
 
 import java.time.LocalDateTime;
 
-
+import com.ils.controllers.Component;
 import com.ils.logic.Logic;
 import com.ils.models.Transfer;
 
@@ -16,8 +16,9 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Region;
 
-public class TransferTable extends Table {
+public class TransferTable extends Component<Region> {
     @FXML
     DatePicker transferDatePicker;
 

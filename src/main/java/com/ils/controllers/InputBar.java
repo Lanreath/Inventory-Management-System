@@ -7,9 +7,8 @@ import javafx.scene.layout.Region;
 
 import com.ils.logic.Logic;
 
-public class InputBar extends Component<Region>{
+public class InputBar extends Component<Region> {
     private static final String FXML = "InputBar.fxml";
-    private Logic logic;
 
     @FXML
     private TextField inputName;
@@ -21,7 +20,6 @@ public class InputBar extends Component<Region>{
     private Button saveBtn;
 
     public InputBar(Logic logic) {
-        super(FXML);
-        this.logic = logic;
+        super(FXML, logic);
     }
 }

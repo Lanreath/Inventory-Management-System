@@ -1,9 +1,7 @@
 package com.ils.controllers;
 
 import com.ils.controllers.tables.CustomerTable;
-import com.ils.controllers.tables.PartTable;
 import com.ils.controllers.tables.ProductPartTable;
-import com.ils.controllers.tables.ProductTable;
 import com.ils.controllers.tables.TransferTable;
 import com.ils.logic.Logic;
 
@@ -14,13 +12,12 @@ import javafx.stage.Stage;
 public class MainWindow extends Component<Stage> {
     private static final String FXML = "MainWindow.fxml";
     private Stage stage;
-    private Logic logic;
 
     private ActionBar actionBar;
     private CustomerTable customerTable;
     private ProductPartTable productPartTable;
     private TransferTable transferTable;
-    private InputBar inputBar;
+    // private InputBar inputBar;
 
     @FXML
     private StackPane actionBarPlaceholder;
@@ -32,15 +29,14 @@ public class MainWindow extends Component<Stage> {
     private StackPane customerTablePlaceholder;
 
     @FXML
-    private StackPane productTablePlaceholder;
+    private StackPane productPartTablePlaceholder;
 
     @FXML
     private StackPane transferTablePlaceholder;
 
     public MainWindow(Stage stage, Logic logic){
-        super(FXML, stage);
+        super(FXML, stage, logic);
         this.stage = stage;
-        this.logic = logic;
         stage.setMinHeight(600);
         stage.setMinWidth(1000);
     };
@@ -56,13 +52,13 @@ public class MainWindow extends Component<Stage> {
         customerTablePlaceholder.getChildren().add(customerTable.getRoot());
         // inputBar = new InputBar(logic);
         // inputBarPlaceholder.getChildren().add(inputBar.getRoot());
-        fillProductTable();
+        fillProductPartTable();
         fillTransferTable();
     }
 
-    private void fillProductTable() {
-        productTable = new ProductTable(logic);
-        productTablePlaceholder.getChildren().add(productTable.getRoot());
+    private void fillProductPartTable() {
+        productPartTable = new ProductPartTable(logic);
+        productPartTablePlaceholder.getChildren().add(productPartTable.getRoot());
     }
 
     private void fillTransferTable() {

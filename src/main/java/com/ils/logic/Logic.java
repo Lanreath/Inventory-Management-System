@@ -5,6 +5,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
 import com.ils.models.Customer;
 import com.ils.models.Part;
@@ -52,10 +53,31 @@ public class Logic {
         return this.transferSortedList;
     }
 
+    public Integer getProductQuantity(Product product) {
+        // Sum all the transfers of every part of the product
+        return PartDAO.getParts().stream()
+                .filter(part -> part.getProduct().equals(product))
+                .mapToInt(part -> part.getPartQuantity())
+                .sum();
+    }
+
+    public Stream<Part> getProductParts(Product product) {
+        return PartDAO.getParts().stream()
+                .filter(part -> part.getProduct().equals(product));
+    }
+
     private void initFilters() {
         customerFilteredList.predicateProperty().bind(filters.getCustomerNameFilter());
-        productFilteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> filters.getProductNameFilter().get().and(filters.getProductCustomerFilter().get()), filters.getProductNameFilter(), filters.getProductCustomerFilter()));
-        transferFilteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> filters.getTransferDateFilter().get().and(filters.getTransferActionFilter().get()).and(filters.getTransferCustomerFilter().get()).and(filters.getTransferProductFilter().get()), filters.getTransferDateFilter(), filters.getTransferActionFilter(), filters.getTransferCustomerFilter(), filters.getTransferProductFilter()));
+        productFilteredList.predicateProperty()
+                .bind(Bindings.createObjectBinding(
+                        () -> filters.getProductNameFilter().get().and(filters.getProductCustomerFilter().get()),
+                        filters.getProductNameFilter(), filters.getProductCustomerFilter()));
+        transferFilteredList.predicateProperty().bind(Bindings.createObjectBinding(
+                () -> filters.getTransferDateFilter().get().and(filters.getTransferActionFilter().get())
+                        .and(filters.getTransferCustomerFilter().get()).and(filters.getTransferProductFilter().get())
+                        .and(filters.getTransferPartFilter().get()),
+                filters.getTransferDateFilter(), filters.getTransferActionFilter(), filters.getTransferCustomerFilter(),
+                filters.getTransferProductFilter(), filters.getTransferPartFilter()));
     }
 
     public void setSelectedCustomer(Customer customer) {
@@ -74,6 +96,14 @@ public class Logic {
             return;
         }
         filters.filterTransferByProduct(product);
+    }
+
+    public void setSelectedPart(Part part) {
+        if (part == null) {
+            filters.clearTransferPartFilter();
+            return;
+        }
+        filters.filterTransferByPart(part);
     }
 
     public void setCustomerNameFilter(String name) {

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.function.Predicate;
 
 import com.ils.models.Customer;
+import com.ils.models.Part;
 import com.ils.models.Product;
 import com.ils.models.Transfer;
 
@@ -19,6 +20,7 @@ public class Filters {
     private ObjectProperty<Predicate<Transfer>> transferActionFilter;
     private ObjectProperty<Predicate<Transfer>> transferCustomerFilter;
     private ObjectProperty<Predicate<Transfer>> transferProductFilter;
+    private ObjectProperty<Predicate<Transfer>> transferPartFilter;
 
     public Filters() {
         this.customerNameFilter = new SimpleObjectProperty<>(c -> true);
@@ -28,6 +30,7 @@ public class Filters {
         this.transferActionFilter = new SimpleObjectProperty<>(t -> true);
         this.transferCustomerFilter = new SimpleObjectProperty<>(t -> true);
         this.transferProductFilter = new SimpleObjectProperty<>(t -> true);
+        this.transferPartFilter = new SimpleObjectProperty<>(t -> true);
     }
 
     protected ObjectProperty<Predicate<Customer>> getCustomerNameFilter() {
@@ -58,6 +61,10 @@ public class Filters {
         return transferProductFilter;
     }
 
+    protected ObjectProperty<Predicate<Transfer>> getTransferPartFilter() {
+        return transferPartFilter;
+    }
+
     protected void clearCustomerNameFilter() {
         customerNameFilter.set(c -> true);
     }
@@ -86,6 +93,10 @@ public class Filters {
         transferProductFilter.set(t -> true);
     }
 
+    protected void clearTransferPartFilter() {
+        transferPartFilter.set(t -> true);
+    }
+
     protected void filterCustomerByName(String name) {
         customerNameFilter.set(customer -> customer.getCustomerName().toLowerCase().contains(name.toLowerCase()));
     }
@@ -112,5 +123,9 @@ public class Filters {
 
     protected void filterTransferByProduct(Product p) {
         transferProductFilter.set(transfer -> transfer.getPart().getProduct().equals(p));
+    }
+
+    protected void filterTransferByPart(Part p) {
+        transferPartFilter.set(transfer -> transfer.getPart().equals(p));
     }
 }

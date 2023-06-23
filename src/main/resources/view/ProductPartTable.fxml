@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -12,10 +12,11 @@
         <TextField fx:id="productNameSearchField"/>
         <Button fx:id="clearBtn"/>
     </HBox>
-    <TableView fx:id="productTable">
+    <TreeTableView fx:id="treeTable">
         <columns>
-            <TableColumn fx:id="productNameColumn" text="Product Name" />
-            <TableColumn fx:id="defaultPartColumn" text="Default Part" />
+            <TreeTableColumn fx:id="productNameColumn" text="Product Name" />
+            <TreeTableColumn fx:id="defaultPartColumn" text="Part Name" />
+            <TreeTableColumn fx:id="quantityColumn" text="Quantity" />
         </columns>
-    </TableView>
+    </TreeTableView>
 </VBox>

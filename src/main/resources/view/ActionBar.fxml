@@ -14,8 +14,8 @@
         </Button>
         <Button fx:id="addProductBtn">
         </Button>
-        <!-- <Button fx:id="addPartBtn">
-        </Button> -->
+        <Button fx:id="addPartBtn">
+        </Button>
         <Button fx:id="addTransferBtn">
         </Button>
         <TextField fx:id="username">

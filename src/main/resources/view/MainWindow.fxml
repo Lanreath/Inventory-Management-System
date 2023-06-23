@@ -25,7 +25,7 @@
                     </StackPane>
                 </left>
                 <center>
-                    <StackPane fx:id="productTablePlaceholder">
+                    <StackPane fx:id="productPartTablePlaceholder">
                     </StackPane>
                 </center>
                 <right>

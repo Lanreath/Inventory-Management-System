@@ -11,11 +11,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 
+import com.ils.controllers.Component;
 import com.ils.logic.Logic;
 import com.ils.models.Customer;
 
-public class CustomerTable extends Table {
+public class CustomerTable extends Component<Region> {
     @FXML
     TextField customerNameSearchField;
 

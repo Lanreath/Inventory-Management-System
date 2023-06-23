@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import com.ils.MainApp;
+import com.ils.logic.Logic;
 
 import javafx.fxml.FXMLLoader;
 
@@ -16,21 +17,25 @@ public abstract class Component<T> {
 
     private final FXMLLoader fxmlLoader = new FXMLLoader();
 
+    protected Logic logic;
+
 
     public Component(URL fxmlFileUrl) {
         loadFxmlFile(fxmlFileUrl, null);
     }
 
-    public Component(String fxmlFileName) {
+    public Component(String fxmlFileName, Logic logic) {
         this(getFxmlFileUrl(fxmlFileName));
+        this.logic = logic;
     }
 
     public Component(URL fxmlFileUrl, T root) {
         loadFxmlFile(fxmlFileUrl, root);
     }
 
-    public Component(String fxmlFileName, T root) {
+    public Component(String fxmlFileName, T root, Logic logic) {
         this(getFxmlFileUrl(fxmlFileName), root);
+        this.logic = logic;
     }
 
     public T getRoot() {
