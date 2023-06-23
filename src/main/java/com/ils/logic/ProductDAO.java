@@ -50,14 +50,14 @@ public class ProductDAO {
                 Integer customerId = rs.getInt(customerIdColumn);
                 Integer defaultPartId = rs.getInt(defaultPartIdColumn);
                 Optional<Customer> customer = CustomerDAO.getCustomer(customerId);
-                Optional<Part> defaultPart = PartDAO.getPart(defaultPartId);
+                // Part has not init
+                // Optional<Part> defaultPart = PartDAO.getPart(defaultPartId);
                 customer.orElseThrow(() -> new IllegalStateException("Could not find Customer with id " + customerId));
-                defaultPart.orElseThrow(() -> new IllegalStateException("Could not find Part with id " + defaultPartId));
                 products.add(new Product(
                     rs.getString(nameColumn),
                     LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
                     customer.get(),
-                    defaultPart.get(),
+                    new Part(null, null, 0, null, defaultPartId),
                     rs.getInt(idColumn)
                 ));
             } 
@@ -68,6 +68,22 @@ public class ProductDAO {
             );
             products.clear();
         }
+    }
+
+    protected static void updateDefaultParts() {
+        products.forEach((product) -> {
+            Optional<Part> defaultPart = PartDAO.getPart(product.getDefaultPart().getId());
+            defaultPart.ifPresent((part) -> {
+                ProductDAO.updateProduct(new Product(
+                    product.getProductName(),
+                    product.getCreationDateTime(),
+                    product.getCustomer(),
+                    part,
+                    product.getId()
+                ));
+            });
+            defaultPart.orElseThrow(() -> new IllegalStateException("Could not find Part with id " + product.getDefaultPart().getId()));
+        });
     }
 
     public static Optional<Product> getProduct(int id) {

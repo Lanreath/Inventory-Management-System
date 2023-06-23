@@ -7,7 +7,7 @@ public class Product {
     private final LocalDateTime creationDateTime;
     private final Customer customer;
     private final Integer productId;
-    private final Part defaultPart;
+    private Part defaultPart;
 
     public Product(String productName, LocalDateTime creationDateTime, Customer customer, Part defaultPart, int id) {
         this.productName = productName;

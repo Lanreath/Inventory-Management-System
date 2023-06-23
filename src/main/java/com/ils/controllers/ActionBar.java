@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ils.logic.Logic;
+import com.ils.controllers.tables.ProductPartTable;
 
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
@@ -120,5 +121,4 @@ public class ActionBar extends Component<Region> {
                 status.setStyle("-fx-text-fill: #ff0000;");
             }
     };
-
 }

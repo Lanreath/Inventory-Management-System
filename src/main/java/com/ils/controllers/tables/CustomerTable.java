@@ -51,7 +51,12 @@ public class CustomerTable extends Component<Region> {
     };
 
     private void handleSelection(ObservableValue<? extends Customer> observable, Customer oldSelection, Customer newSelection) {
-        this.logic.setSelectedCustomer(newSelection);
+        // Hack to prevent double selection
+        if (newSelection.equals(this.logic.getSelectedCustomer().get())) {
+            this.logic.setSelectedCustomer(null);
+            return;
+        }
+        this.logic.selectCustomer(newSelection);
     }
 
     private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {

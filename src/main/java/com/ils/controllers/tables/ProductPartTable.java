@@ -8,7 +8,6 @@ import com.ils.models.Product;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -53,12 +52,23 @@ public class ProductPartTable extends Component<Region> {
 
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
-        rebuild();
-        this.logic.getProducts().addListener((ListChangeListener.Change<? extends Product> change) -> {
+        treeTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
+        this.logic.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-
-        treeTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
+        this.logic.getProductNameFilter().addListener((observable, oldValue, newValue) -> {
+            rebuild();
+        });
+        this.logic.getSelectedProduct().addListener((observable, oldValue, newValue) -> {
+            treeTable.getSelectionModel().select(root.getChildren().stream().filter(item -> {
+                if (item.getValue() instanceof Product) {
+                    Product product = (Product) item.getValue();
+                    return product.equals(newValue);
+                } else {
+                    return false;
+                }
+            }).findFirst().orElse(null));
+        });
         productNameSearchField.setPromptText("Filter by product name");
         productNameSearchField.textProperty().addListener(this::handleNameFilter);
         HBox.setHgrow(productNameSearchField, Priority.ALWAYS);
@@ -106,7 +116,6 @@ public class ProductPartTable extends Component<Region> {
                 throw new RuntimeException("Unknown row item type");
             }
         });
-
    }
 
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
@@ -118,20 +127,31 @@ public class ProductPartTable extends Component<Region> {
             TreeItem<Object> newSelection) {
         if (newSelection != null && newSelection.getValue() instanceof Product) {
             Product product = (Product) newSelection.getValue();
-            this.logic.setSelectedProduct(product);
-            this.logic.setSelectedPart(null);
+            // Hack to prevent double selection
+            if (product.equals(this.logic.getSelectedProduct().get())) {
+                this.logic.setSelectedProduct(null);
+                return;
+            }
+            this.logic.selectProduct(product);
+            this.logic.selectPart(null);
         } else if (newSelection != null && newSelection.getValue() instanceof Part) {
             Part part = (Part) newSelection.getValue();
-            this.logic.setSelectedPart(part);
-            this.logic.setSelectedProduct(null);
+            this.logic.selectPart(part);
+            this.logic.selectProduct(null);
         } else {
-            this.logic.setSelectedProduct(null);
-            this.logic.setSelectedPart(null);
+            this.logic.selectProduct(null);
+            this.logic.selectPart(null);
         }
+    }
+
+    private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        this.logic.setProductNameFilter(newValue);
+        rebuild();
     }
 
     private void rebuild() {
         TreeItem<Object> root = treeTable.getRoot();
+        root.getChildren().clear();
         for (Product product : this.logic.getProducts()) {
             TreeItem<Object> productItem = new TreeItem<>(product);
             root.getChildren().add(productItem);
@@ -142,7 +162,4 @@ public class ProductPartTable extends Component<Region> {
         }
     }
 
-    private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        this.logic.setProductNameFilter(newValue);
-    }
 }

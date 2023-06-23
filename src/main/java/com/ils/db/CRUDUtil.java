@@ -69,8 +69,7 @@ public class CRUDUtil {
         } catch (SQLException ex) {
             Logger.getAnonymousLogger().log(
                     Level.SEVERE,
-                    "Could not update " + tableName + " by index " + index +
-                            " and columns " + columns);
+                    "Could not update " + tableName + ex.getMessage());
             return -1;
         }
     }

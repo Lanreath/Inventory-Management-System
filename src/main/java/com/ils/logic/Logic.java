@@ -1,10 +1,13 @@
 package com.ils.logic;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import java.time.LocalDate;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.ils.models.Customer;
@@ -21,6 +24,9 @@ public class Logic {
     private SortedList<Product> productSortedList;
     private SortedList<Part> partSortedList;
     private SortedList<Transfer> transferSortedList;
+    private ObjectProperty<Customer> selectedCustomer;
+    private ObjectProperty<Product> selectedProduct;
+    // private ObjectProperty<Part> selectedPart;
     private DataSync sync;
     private Filters filters;
 
@@ -34,6 +40,8 @@ public class Logic {
         this.productSortedList = new SortedList<>(productFilteredList);
         this.partSortedList = new SortedList<>(partFilteredList);
         this.transferSortedList = new SortedList<>(transferFilteredList);
+        this.selectedCustomer = new SimpleObjectProperty<>(null);
+        this.selectedProduct = new SimpleObjectProperty<>(null);
         initFilters();
     }
 
@@ -66,6 +74,30 @@ public class Logic {
                 .filter(part -> part.getProduct().equals(product));
     }
 
+    public ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
+        return filters.getProductCustomerFilter();
+    }
+
+    public ObjectProperty<Predicate<Product>> getProductNameFilter() {
+        return filters.getProductNameFilter();
+    }
+
+    public ObjectProperty<Customer> getSelectedCustomer() {
+        return selectedCustomer;
+    }
+
+    public ObjectProperty<Product> getSelectedProduct() {
+        return selectedProduct;
+    }
+
+    public void setSelectedCustomer(Customer customer) {
+        selectedCustomer.set(customer);
+    }
+
+    public void setSelectedProduct(Product product) {
+        selectedProduct.set(product);
+    }
+
     private void initFilters() {
         customerFilteredList.predicateProperty().bind(filters.getCustomerNameFilter());
         productFilteredList.predicateProperty()
@@ -80,7 +112,7 @@ public class Logic {
                 filters.getTransferProductFilter(), filters.getTransferPartFilter()));
     }
 
-    public void setSelectedCustomer(Customer customer) {
+    public void selectCustomer(Customer customer) {
         if (customer == null) {
             filters.clearProductCustomerFilter();
             filters.clearTransferCustomerFilter();
@@ -90,7 +122,7 @@ public class Logic {
         filters.filterTransferByCustomer(customer);
     }
 
-    public void setSelectedProduct(Product product) {
+    public void selectProduct(Product product) {
         if (product == null) {
             filters.clearTransferProductFilter();
             return;
@@ -98,12 +130,30 @@ public class Logic {
         filters.filterTransferByProduct(product);
     }
 
-    public void setSelectedPart(Part part) {
+    public void selectPart(Part part) {
         if (part == null) {
             filters.clearTransferPartFilter();
             return;
         }
         filters.filterTransferByPart(part);
+    }
+
+    public void selectTransfer(Transfer transfer) {
+        if (transfer == null) {
+            return;
+        }
+        Part part = transfer.getPart();
+        Product product = part.getProduct();
+        Customer customer = product.getCustomer();
+        if (!getProducts().contains(product)) {
+            filters.clearProductCustomerFilter();
+            filters.clearProductNameFilter();
+        }
+        selectedProduct.set(product);
+        if (!getCustomers().contains(customer)) {
+            filters.clearCustomerNameFilter();
+        }
+        selectedCustomer.set(customer);
     }
 
     public void setCustomerNameFilter(String name) {

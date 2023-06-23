@@ -90,6 +90,10 @@ public class DataSync {
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.WITHDRAW)) {
                     TransferDAO.insertTransfer(part, quantity, Transfer.Action.WITHDRAW);
+
+                    // Update Part quantity
+                    Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId());
+                    PartDAO.updatePart(newPart);
                 }
             }
         } catch (SQLException e) {

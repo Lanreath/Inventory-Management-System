@@ -48,6 +48,7 @@ public class TransferTable extends Component<Region> {
         transferQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("transferQuantity"));
         transferTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transferType"));
         transferTable.setItems(logic.getTransfers());
+        transferTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         this.logic.getTransfers().comparatorProperty().bind(transferTable.comparatorProperty());
         transferDatePicker.setOnAction(dateFilterHandler);
         transferDatePicker.setPromptText("Filter by date");
@@ -67,6 +68,10 @@ public class TransferTable extends Component<Region> {
         transferDatePicker.setValue(null);
         transferTypeComboBox.getSelectionModel().clearSelection();
     };
+
+    private void handleSelection(ObservableValue<? extends Transfer> observable, Transfer oldValue, Transfer newValue) {
+        logic.selectTransfer(newValue);
+    }
 
     private void handleTypeFilter(ObservableValue<? extends Transfer.Action> observable, Transfer.Action oldValue, Transfer.Action newValue) {
         logic.setTransferActionFilter(newValue);

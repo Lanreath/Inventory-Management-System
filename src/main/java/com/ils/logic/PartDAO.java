@@ -32,6 +32,7 @@ public class PartDAO {
     static {
         parts = FXCollections.observableArrayList();
         updatePartsFromDB();
+        ProductDAO.updateDefaultParts();
     }
 
     protected static FilteredList<Part> getParts() {
