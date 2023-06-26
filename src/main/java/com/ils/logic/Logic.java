@@ -129,6 +129,52 @@ public class Logic {
         TransferDAO.insertTransfer(part, quantity, action);
     }
 
+    public void deleteCustomer(Customer customer) {
+        productSortedList.forEach(product -> {
+            partSortedList.forEach(part -> {
+                transferSortedList.forEach(transfer -> {
+                    if (transfer.getPart().equals(part)) {
+                        deleteTransfer(transfer);
+                    }
+                });
+                if (part.getProduct().equals(product)) {
+                    deletePart(part);
+                }
+            });
+            if (product.getCustomer().equals(customer)) {
+                deleteProduct(product);
+            }
+        });
+        CustomerDAO.deleteCustomer(customer.getId());
+    }
+
+    public void deleteProduct(Product product) {
+        partSortedList.forEach(part -> {
+            transferSortedList.forEach(transfer -> {
+                if (transfer.getPart().equals(part)) {
+                    deleteTransfer(transfer);
+                }
+            });
+            if (part.getProduct().equals(product)) {
+                deletePart(part);
+            }
+        });
+        ProductDAO.deleteProduct(product.getId());
+    }
+
+    public void deletePart(Part part) {
+        transferSortedList.forEach(transfer -> {
+            if (transfer.getPart().equals(part)) {
+                deleteTransfer(transfer);
+            }
+        });
+        PartDAO.deletePart(part.getId());
+    }
+
+    public void deleteTransfer(Transfer transfer) {
+        TransferDAO.deleteTransfer(transfer.getId());
+    }
+
     public void selectCustomer(Customer customer) {
         if (customer == null) {
             filters.clearProductCustomerFilter();

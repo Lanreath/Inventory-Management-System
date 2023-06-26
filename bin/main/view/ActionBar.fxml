@@ -18,6 +18,8 @@
         </Button>
         <Button fx:id="addTransferBtn">
         </Button>
+        <Button fx:id="deleteBtn">
+        </Button>
         <TextField fx:id="username">
         </TextField>
         <PasswordField fx:id="password">

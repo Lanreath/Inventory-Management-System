@@ -46,13 +46,21 @@ public class MainWindow extends Component<Stage> {
     }
 
     public void fillInnerComponents() {
-        actionBar = new ActionBar(logic);
-        actionBarPlaceholder.getChildren().add(actionBar.getRoot());
-        customerTable = new CustomerTable(logic);
-        customerTablePlaceholder.getChildren().add(customerTable.getRoot());
+        fillCustomerTable();
         fillProductPartTable();
         fillTransferTable();
         fillInputBar();
+        fillActionBar();
+    }
+
+    private void fillActionBar() {
+        actionBar = new ActionBar(logic, inputBar);
+        actionBarPlaceholder.getChildren().add(actionBar.getRoot());
+    }
+
+    private void fillCustomerTable() {
+        customerTable = new CustomerTable(logic);
+        customerTablePlaceholder.getChildren().add(customerTable.getRoot());
     }
 
     private void fillProductPartTable() {

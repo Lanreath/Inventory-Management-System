@@ -23,6 +23,8 @@ import com.ils.logic.Logic;
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
 
+    private InputBar inputBar;
+
     @FXML
     private Button addCustomerBtn;
 
@@ -47,38 +49,44 @@ public class ActionBar extends Component<Region> {
     @FXML
     private DatePicker syncDate;
 
-    // @FXML
-    // private Button editBtn;
-
-    // @FXML
-    // private Button deleteBtn;
+    @FXML
+    private Button deleteBtn;
 
     @FXML
     private Label status;
 
-    public ActionBar(Logic logic) {
+    public ActionBar(Logic logic, InputBar inputBar) {
         super(FXML, logic);
+        this.inputBar = inputBar;
         ImageView cust = new ImageView("/images/customer-v2.png");
         ImageView prod = new ImageView("/images/product-v2.png");
         ImageView part = new ImageView("/images/part-v2.png");
         ImageView xact = new ImageView("/images/transfer-v2.png");
+        ImageView dlte = new ImageView("/images/delete.png");
         ImageView sync = new ImageView("/images/sync-icon.png");
         cust.setPreserveRatio(true);
         cust.setFitHeight(24);
         addCustomerBtn.setGraphic(cust);
         addCustomerBtn.setTooltip(new Tooltip("Add customer"));
+        addCustomerBtn.setOnAction(addCustomerHandler);
         prod.setPreserveRatio(true);
         prod.setFitHeight(24);
         addProductBtn.setGraphic(prod);
         addProductBtn.setTooltip(new Tooltip("Add product"));
+        addProductBtn.setOnAction(addProductHandler);
         part.setPreserveRatio(true);
         part.setFitHeight(24);
         addPartBtn.setGraphic(part);
         addPartBtn.setTooltip(new Tooltip("Add part"));
+        addPartBtn.setOnAction(addPartHandler);
         xact.setPreserveRatio(true);
         xact.setFitHeight(24);
         addTransferBtn.setGraphic(xact);
         addTransferBtn.setTooltip(new Tooltip("Make transfer"));
+        addTransferBtn.setOnAction(addTransferHandler);
+        deleteBtn.setGraphic(dlte);
+        deleteBtn.setTooltip(new Tooltip("Delete entry"));
+        deleteBtn.setOnAction(deleteEntryHandler);
         sync.setPreserveRatio(true);
         sync.setFitHeight(24);
         syncBtn.setGraphic(sync);
@@ -98,6 +106,27 @@ public class ActionBar extends Component<Region> {
         });
         syncDate.setValue(LocalDate.now());
     }
+
+    private EventHandler<ActionEvent> addCustomerHandler = (event) -> {
+        inputBar.addCustomer();
+    };
+
+    private EventHandler<ActionEvent> addProductHandler = (event) -> {
+        inputBar.addProduct();
+    };
+
+    private EventHandler<ActionEvent> addPartHandler = (event) -> {
+        inputBar.addPart();
+    };
+
+    private EventHandler<ActionEvent> addTransferHandler = (event) -> {
+        inputBar.addTransfer();
+    };
+ 
+    private EventHandler<ActionEvent> deleteEntryHandler = (event) -> {
+        inputBar.deleteEntry();
+    };
+
 
     private EventHandler<ActionEvent> syncEventHandler = (event) -> {
             if (username.getText().isEmpty() || password.getText().isEmpty()) {
