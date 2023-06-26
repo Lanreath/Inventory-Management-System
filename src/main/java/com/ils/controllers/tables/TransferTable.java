@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -57,6 +58,10 @@ public class TransferTable extends Component<Region> {
         transferTypeComboBox.setPromptText("Filter by type");
         clearBtn.setText("Clear");
         clearBtn.setOnAction(clearFilterHandler);
+    }
+
+    public SelectionModel<Transfer> getSelectionModel() {
+        return transferTable.getSelectionModel();
     }
 
     private EventHandler<ActionEvent> dateFilterHandler = (event) -> {

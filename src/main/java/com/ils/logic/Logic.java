@@ -8,6 +8,7 @@ import javafx.collections.transformation.SortedList;
 
 import java.time.LocalDate;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import com.ils.models.Customer;
@@ -43,6 +44,20 @@ public class Logic {
         this.selectedCustomer = new SimpleObjectProperty<>(null);
         this.selectedProduct = new SimpleObjectProperty<>(null);
         initFilters();
+    }
+
+    private void initFilters() {
+        customerFilteredList.predicateProperty().bind(filters.getCustomerNameFilter());
+        productFilteredList.predicateProperty()
+                .bind(Bindings.createObjectBinding(
+                        () -> filters.getProductNameFilter().get().and(filters.getProductCustomerFilter().get()),
+                        filters.getProductNameFilter(), filters.getProductCustomerFilter()));
+        transferFilteredList.predicateProperty().bind(Bindings.createObjectBinding(
+                () -> filters.getTransferDateFilter().get().and(filters.getTransferActionFilter().get())
+                        .and(filters.getTransferCustomerFilter().get()).and(filters.getTransferProductFilter().get())
+                        .and(filters.getTransferPartFilter().get()),
+                filters.getTransferDateFilter(), filters.getTransferActionFilter(), filters.getTransferCustomerFilter(),
+                filters.getTransferProductFilter(), filters.getTransferPartFilter()));
     }
 
     public SortedList<Customer> getCustomers() {
@@ -98,18 +113,20 @@ public class Logic {
         selectedProduct.set(product);
     }
 
-    private void initFilters() {
-        customerFilteredList.predicateProperty().bind(filters.getCustomerNameFilter());
-        productFilteredList.predicateProperty()
-                .bind(Bindings.createObjectBinding(
-                        () -> filters.getProductNameFilter().get().and(filters.getProductCustomerFilter().get()),
-                        filters.getProductNameFilter(), filters.getProductCustomerFilter()));
-        transferFilteredList.predicateProperty().bind(Bindings.createObjectBinding(
-                () -> filters.getTransferDateFilter().get().and(filters.getTransferActionFilter().get())
-                        .and(filters.getTransferCustomerFilter().get()).and(filters.getTransferProductFilter().get())
-                        .and(filters.getTransferPartFilter().get()),
-                filters.getTransferDateFilter(), filters.getTransferActionFilter(), filters.getTransferCustomerFilter(),
-                filters.getTransferProductFilter(), filters.getTransferPartFilter()));
+    public void addCustomer(String name) {
+        CustomerDAO.insertCustomer(name);
+    }
+
+    public void addProduct(String name, Customer customer) {
+        ProductDAO.insertProduct(name, customer);
+    }
+
+    public void addPart(String name, int quantity, Product product) {
+        PartDAO.insertPart(name, quantity, product);
+    }
+
+    public void addTransfer(Part part, int quantity, Transfer.Action action) {
+        TransferDAO.insertTransfer(part, quantity, action);
     }
 
     public void selectCustomer(Customer customer) {
@@ -191,6 +208,7 @@ public class Logic {
     public void syncData(String username, String password, LocalDate date) throws IllegalArgumentException {
         sync = new DataSync(username, password);
         if (this.customerFilteredList.isEmpty()) {
+            Logger.getAnonymousLogger().info("Customers empty, syncing all data");
             sync.syncCustomers();
         }
         sync.syncTransfers(date);

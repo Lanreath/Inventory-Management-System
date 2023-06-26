@@ -62,14 +62,13 @@ public class CRUDUtil {
         queryBuilder.append(indexFieldName);
         queryBuilder.append(" = ");
         queryBuilder.append(convertObjectToSQLField(index, indexDataType));
-
         try (Connection conn = Database.connect()) {
             PreparedStatement pstmt = conn.prepareStatement(queryBuilder.toString());
             return pstmt.executeUpdate(); // number of affected rows
         } catch (SQLException ex) {
             Logger.getAnonymousLogger().log(
                     Level.SEVERE,
-                    "Could not update " + tableName + ex.getMessage());
+                    "Could not update " + tableName + ex.getMessage() + queryBuilder.toString());
             return -1;
         }
     }
@@ -124,7 +123,7 @@ public class CRUDUtil {
         } catch (SQLException ex) {
             Logger.getAnonymousLogger().log(
                     Level.SEVERE,
-                    LocalDateTime.now() + ": Could not add customer to database" + ex.getMessage());
+                    LocalDateTime.now() + ": Could not add " + tableName + " to database" + ex.getMessage());
             return -1;
         }
         return -1;

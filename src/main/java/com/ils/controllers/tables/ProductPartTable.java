@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -118,6 +119,10 @@ public class ProductPartTable extends Component<Region> {
         });
    }
 
+    public TreeTableViewSelectionModel<Object> getSelectionModel() {
+        return treeTable.getSelectionModel();
+    }
+
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         treeTable.getSelectionModel().clearSelection();
         productNameSearchField.clear();
@@ -149,7 +154,7 @@ public class ProductPartTable extends Component<Region> {
         rebuild();
     }
 
-    private void rebuild() {
+    public void rebuild() {
         TreeItem<Object> root = treeTable.getRoot();
         root.getChildren().clear();
         for (Product product : this.logic.getProducts()) {

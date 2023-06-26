@@ -92,9 +92,9 @@ public class PartDAO {
     public static void updatePart(Part newPart) {
         int rows = CRUDUtil.update(
             tableName,
-            new String[]{nameColumn, creationDateTimeColumn, quantityColumn, productIdColumn},
-            new Object[]{newPart.getPartName(), newPart.getCreationDateTime(), newPart.getPartQuantity(), newPart.getProduct().getId()},
-            new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER, Types.INTEGER},
+            new String[]{nameColumn, quantityColumn, productIdColumn},
+            new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId()},
+            new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
             idColumn,
             Types.INTEGER,
             newPart.getId()

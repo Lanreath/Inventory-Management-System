@@ -17,7 +17,7 @@ public class MainWindow extends Component<Stage> {
     private CustomerTable customerTable;
     private ProductPartTable productPartTable;
     private TransferTable transferTable;
-    // private InputBar inputBar;
+    private InputBar inputBar;
 
     @FXML
     private StackPane actionBarPlaceholder;
@@ -50,19 +50,24 @@ public class MainWindow extends Component<Stage> {
         actionBarPlaceholder.getChildren().add(actionBar.getRoot());
         customerTable = new CustomerTable(logic);
         customerTablePlaceholder.getChildren().add(customerTable.getRoot());
-        // inputBar = new InputBar(logic);
-        // inputBarPlaceholder.getChildren().add(inputBar.getRoot());
         fillProductPartTable();
         fillTransferTable();
+        fillInputBar();
     }
 
     private void fillProductPartTable() {
         productPartTable = new ProductPartTable(logic);
+        productPartTable.rebuild();
         productPartTablePlaceholder.getChildren().add(productPartTable.getRoot());
     }
 
     private void fillTransferTable() {
         transferTable = new TransferTable(logic);
         transferTablePlaceholder.getChildren().add(transferTable.getRoot());
+    }
+
+    private void fillInputBar() {
+        inputBar = new InputBar(logic, customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
+        inputBarPlaceholder.getChildren().add(inputBar.getRoot());
     }
 }

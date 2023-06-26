@@ -1,11 +1,13 @@
 package com.ils.logic;
 
+import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,7 +73,10 @@ public class ProductDAO {
     }
 
     protected static void updateDefaultParts() {
-        products.forEach((product) -> {
+        // ConcurrentModificationException
+        // Store products to be updated in a list and update them after the loop
+        ObservableList<Product> copyProducts = FXCollections.observableArrayList(ProductDAO.products);
+        copyProducts.forEach((product) -> {
             Optional<Part> defaultPart = PartDAO.getPart(product.getDefaultPart().getId());
             defaultPart.ifPresent((part) -> {
                 ProductDAO.updateProduct(new Product(

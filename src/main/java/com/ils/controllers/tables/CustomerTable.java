@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -45,6 +46,10 @@ public class CustomerTable extends Component<Region> {
         clearBtn.setOnAction(clearFilterHandler);
     }
 
+    public SelectionModel<Customer> getSelectionModel() {
+        return customerTable.getSelectionModel();
+    }
+
     private EventHandler<ActionEvent> clearFilterHandler = (event) ->{
         customerTable.getSelectionModel().clearSelection();
         customerNameSearchField.clear();
@@ -52,7 +57,7 @@ public class CustomerTable extends Component<Region> {
 
     private void handleSelection(ObservableValue<? extends Customer> observable, Customer oldSelection, Customer newSelection) {
         // Hack to prevent double selection
-        if (newSelection.equals(this.logic.getSelectedCustomer().get())) {
+        if (newSelection != null && newSelection.equals(this.logic.getSelectedCustomer().get())) {
             this.logic.setSelectedCustomer(null);
             return;
         }
