@@ -21,6 +21,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
+import java.time.LocalDateTime;
+import java.util.logging.Logger;
+
 public class ProductPartTable extends Component<Region> {
     @FXML
     TreeTableView<Object> treeTable;
@@ -60,16 +63,17 @@ public class ProductPartTable extends Component<Region> {
         this.logic.getProductNameFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-        // this.logic.getSelectedProduct().addListener((observable, oldValue, newValue) -> {
-        //     treeTable.getSelectionModel().select(root.getChildren().stream().filter(item -> {
-        //         if (item.getValue() instanceof Product) {
-        //             Product product = (Product) item.getValue();
-        //             return product.equals(newValue);
-        //         } else {
-        //             return false;
-        //         }
-        //     }).findFirst().orElse(null));
-        // });
+        this.logic.getSelectedProduct().addListener((observable, oldValue, newValue) -> {
+            treeTable.getSelectionModel().select(root.getChildren().stream().filter(item -> {
+                if (item.getValue() instanceof Product) {
+                    Product product = (Product) item.getValue();
+                    return product.equals(newValue);
+                } else {
+                    return false;
+                }
+            }).findFirst().orElse(null));
+        });
+        rebuild();
         productNameSearchField.setPromptText("Filter by product name");
         productNameSearchField.textProperty().addListener(this::handleNameFilter);
         HBox.setHgrow(productNameSearchField, Priority.ALWAYS);
@@ -154,7 +158,7 @@ public class ProductPartTable extends Component<Region> {
         rebuild();
     }
 
-    public void rebuild() {
+    private void rebuild() {
         TreeItem<Object> root = treeTable.getRoot();
         root.getChildren().clear();
         for (Product product : this.logic.getProducts()) {

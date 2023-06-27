@@ -44,7 +44,7 @@ public class CustomerTable extends Component<Region> {
         //     Customer customer = event.getRowValue();
         //     this.logic.updateCustomer(customer, event.getNewValue());
         // });
-        // customerTable.setItems(this.logic.getCustomers());
+        customerTable.setItems(this.logic.getCustomers());
         this.logic.getCustomers().comparatorProperty().bind(customerTable.comparatorProperty());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         customerNameSearchField.setPromptText("Filter by customer name");

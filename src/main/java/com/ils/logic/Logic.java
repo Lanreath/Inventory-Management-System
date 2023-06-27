@@ -7,6 +7,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -77,7 +78,6 @@ public class Logic {
     }
 
     public Integer getProductQuantity(Product product) {
-        // Sum all the transfers of every part of the product
         return PartDAO.getParts().stream()
                 .filter(part -> part.getProduct().equals(product))
                 .mapToInt(part -> part.getPartQuantity())
@@ -86,7 +86,7 @@ public class Logic {
 
     public Stream<Part> getProductParts(Product product) {
         return PartDAO.getParts().stream()
-                .filter(part -> part.getProduct().equals(product));
+                .filter(part -> part.getProduct().getId() == product.getId());
     }
 
     public ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
@@ -119,6 +119,10 @@ public class Logic {
 
     public void addProduct(String name, Customer customer) {
         ProductDAO.insertProduct(name, customer);
+        Optional<Product> prod = ProductDAO.getProductByName(name);
+        PartDAO.insertPart("Default", 0, prod.get());
+        Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
+        ProductDAO.updateProduct(new Product(prod.get().getProductName(), prod.get().getCreationDateTime(), prod.get().getCustomer(), part.get(), prod.get().getId()));
     }
 
     public void addPart(String name, int quantity, Product product) {

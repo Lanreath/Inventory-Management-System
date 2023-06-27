@@ -52,8 +52,6 @@ public class ProductDAO {
                 Integer customerId = rs.getInt(customerIdColumn);
                 Integer defaultPartId = rs.getInt(defaultPartIdColumn);
                 Optional<Customer> customer = CustomerDAO.getCustomer(customerId);
-                // Part has not init
-                // Optional<Part> defaultPart = PartDAO.getPart(defaultPartId);
                 customer.orElseThrow(() -> new IllegalStateException("Could not find Customer with id " + customerId));
                 products.add(new Product(
                     rs.getString(nameColumn),

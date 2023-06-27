@@ -65,7 +65,6 @@ public class MainWindow extends Component<Stage> {
 
     private void fillProductPartTable() {
         productPartTable = new ProductPartTable(logic);
-        productPartTable.rebuild();
         productPartTablePlaceholder.getChildren().add(productPartTable.getRoot());
     }
 
