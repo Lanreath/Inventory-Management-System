@@ -13,7 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 public class Filters {
     private ObjectProperty<Predicate<Customer>> customerNameFilter;
-    private ObjectProperty<Predicate<Product>> productNameFilter;
+    private ObjectProperty<Predicate<Product>> dbNameFilter;
     private ObjectProperty<Predicate<Product>> productCustomerFilter;
     private ObjectProperty<Predicate<Transfer>> transferDateFilter;
     private ObjectProperty<Predicate<Transfer>> transferMonthFilter;
@@ -24,7 +24,7 @@ public class Filters {
 
     public Filters() {
         this.customerNameFilter = new SimpleObjectProperty<>(c -> true);
-        this.productNameFilter = new SimpleObjectProperty<>(p -> true);
+        this.dbNameFilter = new SimpleObjectProperty<>(p -> true);
         this.productCustomerFilter = new SimpleObjectProperty<>(p -> true);
         this.transferDateFilter = new SimpleObjectProperty<>(t -> true);
         this.transferActionFilter = new SimpleObjectProperty<>(t -> true);
@@ -37,8 +37,8 @@ public class Filters {
         return customerNameFilter;
     }
 
-    protected ObjectProperty<Predicate<Product>> getProductNameFilter() {
-        return productNameFilter;
+    protected ObjectProperty<Predicate<Product>> getDBNameFilter() {
+        return dbNameFilter;
     }
 
     protected ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
@@ -70,7 +70,7 @@ public class Filters {
     }
 
     protected void clearProductNameFilter() {
-        productNameFilter.set(p -> true);
+        dbNameFilter.set(p -> true);
     }
 
     protected void clearProductCustomerFilter() {
@@ -102,7 +102,7 @@ public class Filters {
     }
 
     protected void filterProductByName(String name) {
-        productNameFilter.set(product -> product.getProductName().toLowerCase().contains(name.toLowerCase()));
+        dbNameFilter.set(product -> product.getDBName().toLowerCase().contains(name.toLowerCase()));
     }
 
     protected void filterProductByCustomer(Customer c) {

@@ -50,7 +50,7 @@ public class DataSync {
     
     protected void syncTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readTransfersByDate(oracleUsername, oraclePassword, date);
-        Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getProductName);
+        Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
         Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
@@ -80,12 +80,12 @@ public class DataSync {
                     Optional<Part> dflt = PartDAO.getPartByNameAndProduct("Default", prod);
                     dflt.orElseThrow(() -> new IllegalStateException("Could not find Part Default in database"));
                     // Update Product with default part
-                    Product newProd = new Product(prod.getProductName(), prod.getCreationDateTime(), prod.getCustomer(), dflt.get(), prod.getId());
+                    Product newProd = new Product(prod.getDBName(), prod.getCreationDateTime(), prod.getCustomer(), dflt.get(), prod.getId());
                     ProductDAO.updateProduct(newProd);
                     part = dflt.get();
                 }
                 if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
-                    t.getPart().getProduct().getProductName().equals(product) &&
+                    t.getPart().getProduct().getDBName().equals(product) &&
                     t.getTransferQuantity() == quantity &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.WITHDRAW)) {

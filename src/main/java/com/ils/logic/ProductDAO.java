@@ -78,7 +78,7 @@ public class ProductDAO {
             Optional<Part> defaultPart = PartDAO.getPart(product.getDefaultPart().getId());
             defaultPart.ifPresent((part) -> {
                 ProductDAO.updateProduct(new Product(
-                    product.getProductName(),
+                    product.getDBName(),
                     product.getCreationDateTime(),
                     product.getCustomer(),
                     part,
@@ -94,24 +94,24 @@ public class ProductDAO {
     }
 
     public static Optional<Product> getProductByName(String name) {
-        return products.stream().filter((product) -> product.getProductName().equals(name)).findFirst();
+        return products.stream().filter((product) -> product.getDBName().equals(name)).findFirst();
     }
 
     public static Stream<Product> getProductsByCustomer(Customer customer) {
         return products.stream().filter((product) -> product.getCustomer().equals(customer));
     }
 
-    public static void insertProduct(String productName, Customer customer) {
+    public static void insertProduct(String dbName, Customer customer) {
         LocalDateTime now = LocalDateTime.now();
-        int id = (int) CRUDUtil.create(tableName, new String[]{nameColumn, creationDateTimeColumn, customerIdColumn}, new Object[]{productName, now, customer.getId()}, new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
-        products.add(new Product(productName, now, customer, id));
+        int id = (int) CRUDUtil.create(tableName, new String[]{nameColumn, creationDateTimeColumn, customerIdColumn}, new Object[]{dbName, now, customer.getId()}, new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
+        products.add(new Product(dbName, now, customer, id));
     }
 
     public static void updateProduct(Product newProduct) {
         int rows = CRUDUtil.update(
             tableName,
             new String[]{nameColumn, customerIdColumn, defaultPartIdColumn},
-            new Object[]{newProduct.getProductName(), newProduct.getCustomer().getId(), newProduct.getDefaultPart().getId()},
+            new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), newProduct.getDefaultPart().getId()},
             new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
             idColumn,
             Types.INTEGER,

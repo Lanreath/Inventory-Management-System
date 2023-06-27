@@ -29,13 +29,13 @@ public class ProductPartTable extends Component<Region> {
     TreeTableView<Object> treeTable;
 
     @FXML
-    TextField productNameSearchField;
+    TextField dbNameSearchField;
 
     @FXML
     Button clearBtn;
 
     @FXML
-    private TreeTableColumn<Object, String> productNameColumn;
+    private TreeTableColumn<Object, String> dbNameColumn;
 
     @FXML
     private TreeTableColumn<Object, String> defaultPartColumn;
@@ -60,7 +60,7 @@ public class ProductPartTable extends Component<Region> {
         this.logic.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-        this.logic.getProductNameFilter().addListener((observable, oldValue, newValue) -> {
+        this.logic.getDBNameFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
         this.logic.getSelectedProduct().addListener((observable, oldValue, newValue) -> {
@@ -74,19 +74,19 @@ public class ProductPartTable extends Component<Region> {
             }).findFirst().orElse(null));
         });
         rebuild();
-        productNameSearchField.setPromptText("Filter by product name");
-        productNameSearchField.textProperty().addListener(this::handleNameFilter);
-        HBox.setHgrow(productNameSearchField, Priority.ALWAYS);
+        dbNameSearchField.setPromptText("Filter by product name");
+        dbNameSearchField.textProperty().addListener(this::handleNameFilter);
+        HBox.setHgrow(dbNameSearchField, Priority.ALWAYS);
         clearBtn.setText("Clear");
         clearBtn.setOnAction(clearFilterHandler);
     }
 
     private void initProductColumn() {
-         productNameColumn.setCellValueFactory(cellData -> {
+         dbNameColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
                 Product product = (Product) rowItem.getValue();
-                return new SimpleStringProperty(product.getProductName());
+                return new SimpleStringProperty(product.getDBName());
             } else {
                 return new SimpleStringProperty("");
             }
@@ -129,7 +129,7 @@ public class ProductPartTable extends Component<Region> {
 
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         treeTable.getSelectionModel().clearSelection();
-        productNameSearchField.clear();
+        dbNameSearchField.clear();
     };
 
     private void handleSelection(ObservableValue<? extends TreeItem<Object>> observable, TreeItem<Object> oldSelection,

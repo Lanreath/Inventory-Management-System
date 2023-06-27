@@ -13,7 +13,7 @@ public class ReadUtil {
     // private static String inputDate =
     // LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
 
-    private static final String productNameMap = "case\r\n" + //
+    private static final String dbNameMap = "case\r\n" + //
             "when SUBSTR(get_token(pr.productname,1,'_'),9,8) = 'MetVBF01' then '01_CLASSIC'\r\n" + //
             "when SUBSTR(get_token(pr.productname,1,'_'),9,8) = 'MetVBF02' then '02_PAINTER'\r\n" + //
             "when SUBSTR(get_token(pr.productname,1,'_'),9,8) = 'MetVBF03' then '03_ARCH'\r\n" + //
@@ -54,7 +54,7 @@ public class ReadUtil {
             "else get_token(pr.productalias,'1','_')\r\n" + //
             "END ";
     private static final String customerName = "co.customername\r\n";
-    private static final String productName = "get_token(pr.productname,1,'_')";
+    private static final String dbName = "get_token(pr.productname,1,'_')";
     private static final String customerAlias = " as customer, ";
     private static final String productAlias = " as product, ";
     private static final String vaultAlias = "as vaultname, ";
@@ -86,12 +86,12 @@ public class ReadUtil {
 
     public static ResultSet readTransfersByDate(String username, String password, LocalDate date) {
         Connection conn;
-        String query = "select " + customerName + customerAlias + productName + productAlias + productNameMap
+        String query = "select " + customerName + customerAlias + dbName + productAlias + dbNameMap
                 + vaultAlias + "SUM(wo.quantity)\r\n" + quantityAlias + //
                 tableNames + //
                 join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + //
                 join2 + //
-                "group by " + customerName + ", " + productName + ", " + productNameMap //
+                "group by " + customerName + ", " + dbName + ", " + dbNameMap //
                 + "order by customer, product, vaultname";
         try {
             conn = Oracle.connect(username, password);

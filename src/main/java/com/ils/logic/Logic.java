@@ -51,8 +51,8 @@ public class Logic {
         customerFilteredList.predicateProperty().bind(filters.getCustomerNameFilter());
         productFilteredList.predicateProperty()
                 .bind(Bindings.createObjectBinding(
-                        () -> filters.getProductNameFilter().get().and(filters.getProductCustomerFilter().get()),
-                        filters.getProductNameFilter(), filters.getProductCustomerFilter()));
+                        () -> filters.getDBNameFilter().get().and(filters.getProductCustomerFilter().get()),
+                        filters.getDBNameFilter(), filters.getProductCustomerFilter()));
         transferFilteredList.predicateProperty().bind(Bindings.createObjectBinding(
                 () -> filters.getTransferDateFilter().get().and(filters.getTransferActionFilter().get())
                         .and(filters.getTransferCustomerFilter().get()).and(filters.getTransferProductFilter().get())
@@ -93,8 +93,8 @@ public class Logic {
         return filters.getProductCustomerFilter();
     }
 
-    public ObjectProperty<Predicate<Product>> getProductNameFilter() {
-        return filters.getProductNameFilter();
+    public ObjectProperty<Predicate<Product>> getDBNameFilter() {
+        return filters.getDBNameFilter();
     }
 
     public ObjectProperty<Customer> getSelectedCustomer() {
@@ -122,7 +122,7 @@ public class Logic {
         Optional<Product> prod = ProductDAO.getProductByName(name);
         PartDAO.insertPart("Default", 0, prod.get());
         Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
-        ProductDAO.updateProduct(new Product(prod.get().getProductName(), prod.get().getCreationDateTime(), prod.get().getCustomer(), part.get(), prod.get().getId()));
+        ProductDAO.updateProduct(new Product(prod.get().getDBName(), prod.get().getCreationDateTime(), prod.get().getCustomer(), part.get(), prod.get().getId()));
     }
 
     public void addPart(String name, int quantity, Product product) {
@@ -194,7 +194,7 @@ public class Logic {
     }
 
     public void updateProduct(Product product, Part defaultPart) {
-        ProductDAO.updateProduct(new Product(product.getProductName(), product.getCreationDateTime(), product.getCustomer(), product.getId()));
+        ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getId()));
     }
 
     public void selectProduct(Product product) {

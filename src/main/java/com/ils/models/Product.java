@@ -3,25 +3,25 @@ package com.ils.models;
 import java.time.LocalDateTime;
 
 public class Product {
-    private final String productName;
+    private final String dbName;
     private final LocalDateTime creationDateTime;
     private final Customer customer;
     private final Integer productId;
+    private String productName;
     private Part defaultPart;
 
-    public Product(String productName, LocalDateTime creationDateTime, Customer customer, Part defaultPart, int id) {
-        this.productName = productName;
+    public Product(String dbName, LocalDateTime creationDateTime, Customer customer, Part defaultPart, int id) {
+        this.dbName = dbName;
         this.creationDateTime = creationDateTime;
         this.customer = customer;
         this.defaultPart = defaultPart;
         this.productId = id;
     }
 
-    public Product(String productName, LocalDateTime creationDateTime, Customer customer, int id) {
-        this.productName = productName;
+    public Product(String dbName, LocalDateTime creationDateTime, Customer customer, int id) {
+        this.dbName = dbName;
         this.creationDateTime = creationDateTime;
         this.customer = customer;
-        this.defaultPart = null;
         this.productId = id;
     }
 
@@ -29,8 +29,8 @@ public class Product {
         return productId;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getDBName() {
+        return dbName;
     }
 
     public LocalDateTime getCreationDateTime() {
@@ -41,12 +41,16 @@ public class Product {
         return customer;
     }
 
+    public String getProductName() {
+        return productName;
+    }
+
     public Part getDefaultPart() {
         return defaultPart;
     }
 
     @Override
     public String toString() {
-        return "Product [" + productName + ", " + creationDateTime + ", " + customer + "]";
+        return "Product [" + dbName + ", " + creationDateTime + ", " + customer + "]";
     }
 }

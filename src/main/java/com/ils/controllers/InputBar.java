@@ -161,14 +161,14 @@ public class InputBar extends Component<ToolBar> {
     private void deleteProductPart() {
         if (prpt.getSelectedItem().getValue() instanceof Product) {
             Product product = (Product) prpt.getSelectedItem().getValue();
-            displayDelete("product and its parts/transfers?: " + product.getProductName() + " by " + product.getCustomer().getCustomerName());
+            displayDelete("product and its parts/transfers?: " + product.getDBName() + " by " + product.getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 logic.deleteProduct(product);
                 getRoot().getItems().clear();
             });
         } else {
             Part part = (Part) prpt.getSelectedItem().getValue();
-            displayDelete("part and its transfers?: " + part.getPartName() + " from " + part.getProduct().getProductName() + " by " + part.getProduct().getCustomer().getCustomerName());
+            displayDelete("part and its transfers?: " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 logic.deletePart(part);
                 getRoot().getItems().clear();
@@ -178,7 +178,7 @@ public class InputBar extends Component<ToolBar> {
 
     private void deleteTransfer() {
         Transfer transfer = xact.getSelectedItem();
-        displayDelete("transfer?: " + transfer.getTransferDateTime() + " Qty: " + transfer.getTransferQuantity() + " from " + transfer.getPart().getPartName() + " from " + transfer.getPart().getProduct().getProductName() + " by " + transfer.getPart().getProduct().getCustomer().getCustomerName());
+        displayDelete("transfer?: " + transfer.getTransferDateTime() + " Qty: " + transfer.getTransferQuantity() + " from " + transfer.getPart().getPartName() + " from " + transfer.getPart().getProduct().getDBName() + " by " + transfer.getPart().getProduct().getCustomer().getCustomerName());
         confirmBtn.setOnAction(e -> {
             logic.deleteTransfer(transfer);
             getRoot().getItems().clear();

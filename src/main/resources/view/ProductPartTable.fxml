@@ -9,12 +9,12 @@
 
 <VBox xmlns="http//javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
     <HBox>
-        <TextField fx:id="productNameSearchField"/>
+        <TextField fx:id="dbNameSearchField"/>
         <Button fx:id="clearBtn"/>
     </HBox>
     <TreeTableView fx:id="treeTable">
         <columns>
-            <TreeTableColumn fx:id="productNameColumn" text="Product Name" />
+            <TreeTableColumn fx:id="dbNameColumn" text="Product Name" />
             <TreeTableColumn fx:id="defaultPartColumn" text="Part Name" />
             <TreeTableColumn fx:id="quantityColumn" text="Quantity" />
         </columns>
