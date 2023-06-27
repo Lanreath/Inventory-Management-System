@@ -6,13 +6,16 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionModel;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.Callback;
 
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;
@@ -35,8 +38,13 @@ public class CustomerTable extends Component<Region> {
         super("CustomerTable.fxml", logic);
         customerTable.setPrefWidth(200);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        // customerNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         customerNameColumn.setCellValueFactory(new PropertyValueFactory<>("customerName"));
-        customerTable.setItems(this.logic.getCustomers());
+        // customerNameColumn.setOnEditCommit((TableColumn.CellEditEvent<Customer, String> event) -> {
+        //     Customer customer = event.getRowValue();
+        //     this.logic.updateCustomer(customer, event.getNewValue());
+        // });
+        // customerTable.setItems(this.logic.getCustomers());
         this.logic.getCustomers().comparatorProperty().bind(customerTable.comparatorProperty());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         customerNameSearchField.setPromptText("Filter by customer name");

@@ -185,6 +185,14 @@ public class Logic {
         filters.filterTransferByCustomer(customer);
     }
 
+    public void updateCustomer(Customer customer, String name) {
+        CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
+    }
+
+    public void updateProduct(Product product, Part defaultPart) {
+        ProductDAO.updateProduct(new Product(product.getProductName(), product.getCreationDateTime(), product.getCustomer(), product.getId()));
+    }
+
     public void selectProduct(Product product) {
         if (product == null) {
             filters.clearTransferProductFilter();
