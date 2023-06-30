@@ -12,7 +12,7 @@
         <TextField fx:id="customerNameSearchField"/>
         <Button fx:id="clearBtn"/>
     </HBox>
-    <TableView fx:id="customerTable">
+    <TableView fx:id="customerTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="customerNameColumn" text="Customer Name" />
         </columns>

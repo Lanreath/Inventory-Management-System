@@ -1,5 +1,7 @@
 package com.ils.controllers;
 
+import com.ils.controllers.panels.ActionBar;
+import com.ils.controllers.panels.InputBar;
 import com.ils.controllers.tables.CustomerTable;
 import com.ils.controllers.tables.ProductPartTable;
 import com.ils.controllers.tables.TransferTable;

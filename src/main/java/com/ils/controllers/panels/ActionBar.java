@@ -1,4 +1,4 @@
-package com.ils.controllers;
+package com.ils.controllers.panels;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.controllers.Component;
 import com.ils.logic.Logic;
 
 public class ActionBar extends Component<Region> {

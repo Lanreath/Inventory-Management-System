@@ -17,11 +17,12 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
-import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 public class ProductPartTable extends Component<Region> {
@@ -45,15 +46,21 @@ public class ProductPartTable extends Component<Region> {
 
     public ProductPartTable(Logic logic) {
         super("ProductPartTable.fxml", logic);
+
+        initTable();
+        initProductColumn();
+        initPartColumn();
+        initQuantityColumn();
+        rebuild();
+        initFilters();
+    }
+    
+    private void initTable() {
         treeTable.setMinWidth(400);
         treeTable.setPrefWidth(700);
         treeTable.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         treeTable.setShowRoot(false);
-
-        initProductColumn();
-        initPartColumn();
-        initQuantityColumn();
-
+        treeTable.setEditable(true);
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
         treeTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
@@ -63,22 +70,7 @@ public class ProductPartTable extends Component<Region> {
         this.logic.getDBNameFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-        this.logic.getSelectedProduct().addListener((observable, oldValue, newValue) -> {
-            treeTable.getSelectionModel().select(root.getChildren().stream().filter(item -> {
-                if (item.getValue() instanceof Product) {
-                    Product product = (Product) item.getValue();
-                    return product.equals(newValue);
-                } else {
-                    return false;
-                }
-            }).findFirst().orElse(null));
-        });
-        rebuild();
-        dbNameSearchField.setPromptText("Filter by product name");
-        dbNameSearchField.textProperty().addListener(this::handleNameFilter);
-        HBox.setHgrow(dbNameSearchField, Priority.ALWAYS);
-        clearBtn.setText("Clear");
-        clearBtn.setOnAction(clearFilterHandler);
+        this.logic.getSelectedProduct().addListener(this::handleForcedSelection);
     }
 
     private void initProductColumn() {
@@ -105,6 +97,27 @@ public class ProductPartTable extends Component<Region> {
                 throw new RuntimeException("Unknown row item type");
             }
         });
+        defaultPartColumn.setCellFactory(c -> {
+            return new TextFieldTreeTableCell<Object, String>() {
+                @Override
+                public void startEdit() {
+                    TreeItem<Object> rowItem = getTreeTableView().getTreeItem(getTableRow().getIndex());
+                    if (rowItem != null && rowItem.getValue() instanceof Product) {
+                        return;
+                    }
+                    super.startEdit();
+                }
+            };
+        });
+        defaultPartColumn.setOnEditCommit((TreeTableColumn.CellEditEvent<Object, String> event) -> {
+            Object prpt = event.getTreeTableView().getTreeItem(event.getTreeTablePosition().getRow()).getValue();
+            if (prpt instanceof Part) {
+                Part part = (Part) prpt;
+                this.logic.updatePartName(part, event.getNewValue());
+                rebuild();
+            }
+            throw new RuntimeException("Unknown row item type");
+        });
    }
 
     private void initQuantityColumn() {
@@ -121,6 +134,35 @@ public class ProductPartTable extends Component<Region> {
                 throw new RuntimeException("Unknown row item type");
             }
         });
+        quantityColumn.setCellFactory(c -> {
+            return new TextFieldTreeTableCell<Object, Integer>() {
+                @Override
+                public void startEdit() {
+                    TreeItem<Object> rowItem = getTreeTableView().getTreeItem(getTableRow().getIndex());
+                    if (rowItem != null && rowItem.getValue() instanceof Product) {
+                        return;
+                    }
+                    super.startEdit();
+                }
+            };
+        });
+        quantityColumn.setOnEditCommit((TreeTableColumn.CellEditEvent<Object, Integer> event) -> {
+            Object prpt = event.getTreeTableView().getTreeItem(event.getTreeTablePosition().getRow()).getValue();
+            if (prpt instanceof Part) {
+                Part part = (Part) prpt;
+                this.logic.updatePartQuantity(part, event.getNewValue());
+                rebuild();
+            }
+            throw new RuntimeException("Unknown row item type");
+        });
+   }
+
+   private void initFilters() {
+        dbNameSearchField.setPromptText("Filter by product name");
+        dbNameSearchField.textProperty().addListener(this::handleNameFilter);
+        HBox.setHgrow(dbNameSearchField, Priority.ALWAYS);
+        clearBtn.setText("Clear");
+        clearBtn.setOnAction(clearFilterHandler);       
    }
 
     public TreeTableViewSelectionModel<Object> getSelectionModel() {
@@ -138,7 +180,7 @@ public class ProductPartTable extends Component<Region> {
             Product product = (Product) newSelection.getValue();
             // Hack to prevent double selection
             if (product.equals(this.logic.getSelectedProduct().get())) {
-                this.logic.setSelectedProduct(null);
+                // Removed null selection
                 return;
             }
             this.logic.selectProduct(product);
@@ -156,6 +198,22 @@ public class ProductPartTable extends Component<Region> {
     private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         this.logic.setProductNameFilter(newValue);
         rebuild();
+    }
+
+    private void handleForcedSelection(ObservableValue<? extends Product> observable, Product oldValue, Product newValue) {
+            Optional<TreeItem<Object>> prod = treeTable.getRoot().getChildren().stream().filter(item -> {
+                if (item.getValue() instanceof Product) {
+                    Product product = (Product) item.getValue();
+                    return product.equals(newValue);
+                } else {
+                    return false;
+                }
+            }).findFirst();
+            if (prod.isPresent()) {
+                Logger.getAnonymousLogger().info("Selecting product forcefully...");
+                TreeTableViewSelectionModel<Object> selectionModel = treeTable.getSelectionModel();
+                selectionModel.select(prod.get());
+            }
     }
 
     private void rebuild() {

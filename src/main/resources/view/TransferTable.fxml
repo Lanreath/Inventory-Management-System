@@ -14,7 +14,7 @@
         <ComboBox fx:id="transferTypeComboBox" />
         <Button fx:id="clearBtn" />
     </HBox>
-    <TableView fx:id="transferTable">
+    <TableView fx:id="transferTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="transferDateTimeColumn" text="Transfer Date" />
             <TableColumn fx:id="transferQuantityColumn" text="Quantity" />

@@ -69,7 +69,7 @@ public class Filters {
         customerNameFilter.set(c -> true);
     }
 
-    protected void clearProductNameFilter() {
+    protected void clearDBNameFilter() {
         dbNameFilter.set(p -> true);
     }
 

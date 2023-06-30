@@ -179,7 +179,7 @@ public class CRUDUtil {
             }
             if (f.getName().substring(f.getName().length() - 2).equals("Id")) {
                 queryBuilder.append(" PRIMARY KEY AUTOINCREMENT");
-            } else if (!f.getName().equals("defaultPart")) {
+            } else if (!f.getName().equals("defaultPart") && !f.getName().equals("productName")) {
                 queryBuilder.append(" NOT NULL");
             }
             if (i < fields.length - 1) {

@@ -79,7 +79,7 @@ public class Logic {
 
     public Integer getProductQuantity(Product product) {
         return PartDAO.getParts().stream()
-                .filter(part -> part.getProduct().equals(product))
+                .filter(part -> part.getProduct().getId() == product.getId())
                 .mapToInt(part -> part.getPartQuantity())
                 .sum();
     }
@@ -131,6 +131,35 @@ public class Logic {
 
     public void addTransfer(Part part, int quantity, Transfer.Action action) {
         TransferDAO.insertTransfer(part, quantity, action);
+        switch (action) {
+            case WITHDRAW:
+            case REJECT:
+            case SAMPLE:
+                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId()));
+                break;
+            case INCOMING:
+                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
+                break;
+        }
+    }
+
+    public void updateCustomer(Customer customer, String name) {
+        CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
+        Customer cust = CustomerDAO.getCustomer(customer.getId()).get();
+        ProductDAO.getProducts().stream().filter(product -> product.getCustomer().getId() == cust.getId())
+                .forEach(product -> ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getId())));
+    }
+
+    // public void updateProduct(Product product, Part defaultPart) {
+    //     ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getId()));
+    // }
+
+    public void updatePartName(Part part, String name) {
+        PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getId()));
+    }
+
+    public void updatePartQuantity(Part part, int quantity) {
+        PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), quantity, part.getProduct(), part.getId()));
     }
 
     public void deleteCustomer(Customer customer) {
@@ -189,14 +218,6 @@ public class Logic {
         filters.filterTransferByCustomer(customer);
     }
 
-    public void updateCustomer(Customer customer, String name) {
-        CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
-    }
-
-    public void updateProduct(Product product, Part defaultPart) {
-        ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getId()));
-    }
-
     public void selectProduct(Product product) {
         if (product == null) {
             filters.clearTransferProductFilter();
@@ -222,11 +243,17 @@ public class Logic {
         Customer customer = product.getCustomer();
         if (!getProducts().contains(product)) {
             filters.clearProductCustomerFilter();
-            filters.clearProductNameFilter();
+            filters.clearDBNameFilter();
+            assert getProducts().contains(product);
+        } else {
+            Logger.getAnonymousLogger().info("Product is in list");
         }
         selectedProduct.set(product);
         if (!getCustomers().contains(customer)) {
             filters.clearCustomerNameFilter();
+            assert getCustomers().contains(customer);
+        } else {
+            Logger.getAnonymousLogger().info("Customer is in list");
         }
         selectedCustomer.set(customer);
     }
@@ -241,7 +268,7 @@ public class Logic {
 
     public void setProductNameFilter(String name) {
         if (name == null) {
-            filters.clearProductNameFilter();
+            filters.clearDBNameFilter();
             return;
         }
         filters.filterProductByName(name);

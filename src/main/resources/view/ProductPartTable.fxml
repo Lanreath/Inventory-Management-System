@@ -12,7 +12,7 @@
         <TextField fx:id="dbNameSearchField"/>
         <Button fx:id="clearBtn"/>
     </HBox>
-    <TreeTableView fx:id="treeTable">
+    <TreeTableView fx:id="treeTable" VBox.vgrow="ALWAYS">
         <columns>
             <TreeTableColumn fx:id="dbNameColumn" text="Product Name" />
             <TreeTableColumn fx:id="defaultPartColumn" text="Part Name" />

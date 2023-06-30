@@ -1,13 +1,11 @@
 package com.ils.logic;
 
-import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,10 +23,11 @@ import javafx.collections.transformation.FilteredList;
 
 public class ProductDAO {
     private static final String tableName = "PRODUCT";
-    private static final String nameColumn = "PRODUCTNAME";
+    private static final String dbNameColumn = "DBNAME";
     private static final String creationDateTimeColumn = "CREATIONDATETIME";
     private static final String customerIdColumn = "CUSTOMERID";
     private static final String defaultPartIdColumn = "DEFAULTPARTID";
+    private static final String productNameColumn = "PRODUCTNAME";
     private static final String idColumn = "PRODUCTID";
 
     private static final ObservableList<Product> products;
@@ -54,7 +53,7 @@ public class ProductDAO {
                 Optional<Customer> customer = CustomerDAO.getCustomer(customerId);
                 customer.orElseThrow(() -> new IllegalStateException("Could not find Customer with id " + customerId));
                 products.add(new Product(
-                    rs.getString(nameColumn),
+                    rs.getString(dbNameColumn),
                     LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
                     customer.get(),
                     new Part(null, null, 0, null, defaultPartId),
@@ -103,14 +102,14 @@ public class ProductDAO {
 
     public static void insertProduct(String dbName, Customer customer) {
         LocalDateTime now = LocalDateTime.now();
-        int id = (int) CRUDUtil.create(tableName, new String[]{nameColumn, creationDateTimeColumn, customerIdColumn}, new Object[]{dbName, now, customer.getId()}, new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
+        int id = (int) CRUDUtil.create(tableName, new String[]{dbNameColumn, creationDateTimeColumn, customerIdColumn}, new Object[]{dbName, now, customer.getId()}, new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
         products.add(new Product(dbName, now, customer, id));
     }
 
     public static void updateProduct(Product newProduct) {
         int rows = CRUDUtil.update(
             tableName,
-            new String[]{nameColumn, customerIdColumn, defaultPartIdColumn},
+            new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn},
             new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), newProduct.getDefaultPart().getId()},
             new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
             idColumn,

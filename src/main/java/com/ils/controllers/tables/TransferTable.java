@@ -43,14 +43,26 @@ public class TransferTable extends Component<Region> {
 
     public TransferTable(Logic logic) {
         super("TransferTable.fxml", logic);
+        initTable();
+        initCol();
+        initFilter();
+    }
+
+    private void initTable() {
         transferTable.setPrefWidth(400);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        transferDateTimeColumn.setCellValueFactory(new PropertyValueFactory<>("transferDateTime"));
-        transferQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("transferQuantity"));
-        transferTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transferType"));
         transferTable.setItems(logic.getTransfers());
         transferTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         this.logic.getTransfers().comparatorProperty().bind(transferTable.comparatorProperty());
+    }
+
+    private void initCol() {
+        transferDateTimeColumn.setCellValueFactory(new PropertyValueFactory<>("transferDateTime"));
+        transferQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("transferQuantity"));
+        transferTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transferType"));
+    }
+
+    private void initFilter() {
         transferDatePicker.setOnAction(dateFilterHandler);
         transferDatePicker.setPromptText("Filter by date");
         transferTypeComboBox.getItems().addAll(Transfer.Action.values());

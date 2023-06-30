@@ -7,12 +7,4 @@
 <?import javafx.scene.control.ToolBar?>
 
 <ToolBar xmlns="http//javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
-    <items>
-        <!-- <TextField fx:id="inputName">
-        </TextField>
-        <Button fx:id="editBtn">
-        </Button>
-        <Button fx:id="saveBtn">
-        </Button> -->
-    </items>
 </ToolBar>
