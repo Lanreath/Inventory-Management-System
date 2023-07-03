@@ -5,6 +5,8 @@ import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.layout.HBox;
 
+import java.time.LocalDate;
+
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;
 import com.ils.models.Customer;
@@ -34,8 +36,8 @@ public class InfoBar extends Component<HBox> {
         cust.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 customerName.setText(newValue.getCustomerName());
-                customerMonthlyOpeningBal.setText(Integer.toString(this.logic.getMonthlyOpeningBal()));
-                customerMonthlyClosingBal.setText(Integer.toString(this.logic.getMonthlyClosingBal()));
+                customerMonthlyOpeningBal.setText(Integer.toString(this.logic.getMonthlyOpeningBal(LocalDate.now().withDayOfMonth(1))));
+                customerMonthlyClosingBal.setText(Integer.toString(this.logic.getMonthlyClosingBal(LocalDate.now().withDayOfMonth(1).plusMonths(1).minusDays(1))));
             }
         });
     }

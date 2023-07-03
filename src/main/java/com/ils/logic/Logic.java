@@ -115,12 +115,49 @@ public class Logic {
         selectedProduct.set(product);
     }
 
-    public Integer getMonthlyOpeningBal() {
-        return 0;
+    public Integer getMonthlyOpeningBal(LocalDate from) {
+        LocalDate next = from;
+        Transfer earliest;
+        while (true) {
+            Stream<Transfer> daily = TransferDAO.getTransfersByDate(next);
+            if (daily.count() == 0) {
+                next = next.plusDays(1);
+                if (next.getMonth() != from.getMonth()) {
+                    return 0;
+                }
+            } else {
+                earliest = daily.min((t1, t2) -> t1.getTransferDateTime().compareTo(t2.getTransferDateTime())).get();
+                break;
+            }
+        }
+        return earliest.getPrevPartQuantity();
     }
 
-    public Integer getMonthlyClosingBal() {
-        return 0;
+    public Integer getMonthlyClosingBal(LocalDate to) {
+        LocalDate next = to;
+        Transfer latest;
+        while (true) {
+            Stream<Transfer> daily = TransferDAO.getTransfersByDate(next);
+            if (daily.count() == 0) {
+                next = next.minusDays(1);
+                if (next.getMonth() != to.getMonth()) {
+                    return 0;
+                }
+            } else {
+                latest = daily.max((t1, t2) -> t1.getTransferDateTime().compareTo(t2.getTransferDateTime())).get();
+                break;
+            }
+        }
+        switch (latest.getTransferType()) {
+            case WITHDRAW:
+            case REJECT:
+            case SAMPLE:
+                return latest.getPrevPartQuantity() - latest.getTransferQuantity();
+            case INCOMING:
+                return latest.getPrevPartQuantity() + latest.getTransferQuantity();
+            default:
+                return latest.getPrevPartQuantity();
+        }
     }
 
     public void addCustomer(String name) {
