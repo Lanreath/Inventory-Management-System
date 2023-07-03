@@ -8,6 +8,7 @@ import com.ils.models.Product;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -23,6 +24,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
 import java.util.Optional;
+import java.util.logging.Logger;
 
 public class ProductPartTable extends Component<Region> {
     @FXML
@@ -47,6 +49,7 @@ public class ProductPartTable extends Component<Region> {
         super("ProductPartTable.fxml", logic);
 
         initTable();
+        initListeners();
         initProductColumn();
         initPartColumn();
         initQuantityColumn();
@@ -62,7 +65,22 @@ public class ProductPartTable extends Component<Region> {
         treeTable.setEditable(true);
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
+    }
+
+    private void initListeners() {
         treeTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
+        this.logic.getProducts().addListener(new ListChangeListener<Product>() {
+            @Override
+            public void onChanged(Change<? extends Product> c) {
+                rebuild();
+            }
+        });
+        this.logic.getParts().addListener(new ListChangeListener<Part>() {
+            @Override
+            public void onChanged(Change<? extends Part> c) {
+                rebuild();
+            }
+        });
         this.logic.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
@@ -88,7 +106,12 @@ public class ProductPartTable extends Component<Region> {
         defaultPartColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
-                return new SimpleStringProperty("Total");
+                Product prod = (Product) rowItem.getValue();
+                String name = prod.getProductName();
+                if (name == null) {
+                    return new SimpleStringProperty("-");
+                }
+                return new SimpleStringProperty(prod.getProductName());
             } else if (rowItem != null && rowItem.getValue() instanceof Part) {
                 Part part = (Part) rowItem.getValue();
                 return new SimpleStringProperty(part.getPartName());
@@ -100,7 +123,7 @@ public class ProductPartTable extends Component<Region> {
             return new TextFieldTreeTableCell<Object, String>() {
                 @Override
                 public void startEdit() {
-                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
+                    TreeItem<Object> rowItem = getTableRow().getTreeItem();
                     if (rowItem != null && rowItem.getValue() instanceof Product) {
                         return;
                     }
@@ -124,8 +147,7 @@ public class ProductPartTable extends Component<Region> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
                 Product product = (Product) rowItem.getValue();
-                Integer quantity = this.logic.getProductQuantity(product);
-                return new SimpleIntegerProperty(quantity).asObject();
+                return new SimpleIntegerProperty(this.logic.getProductQuantity(product)).asObject();
             } else if (rowItem != null && rowItem.getValue() instanceof Part) {
                 Part part = (Part) rowItem.getValue();
                 return new SimpleIntegerProperty(part.getPartQuantity()).asObject();
@@ -137,7 +159,7 @@ public class ProductPartTable extends Component<Region> {
             return new TextFieldTreeTableCell<Object, Integer>() {
                 @Override
                 public void startEdit() {
-                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
+                    TreeItem<Object> rowItem = getTableRow().getTreeItem();
                     if (rowItem != null && rowItem.getValue() instanceof Product) {
                         return;
                     }
@@ -232,6 +254,7 @@ public class ProductPartTable extends Component<Region> {
                 productItem.getChildren().add(partItem);
             });
         }
+        // Hack to ensure products cells are updated
+        treeTable.refresh();
     }
-
 }

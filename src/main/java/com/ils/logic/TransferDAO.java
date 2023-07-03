@@ -25,6 +25,7 @@ public class TransferDAO {
     private static final String tableName = "TRANSFER";
     private static final String transferTimeColumn = "TRANSFERDATETIME";
     private static final String partIdColumn = "PARTID";
+    private static final String prevPartQuantityColumn = "PREVPARTQUANTITY";
     private static final String quantityColumn = "TRANSFERQUANTITY";
     private static final String transferTypeColumn = "TRANSFERTYPE";
     private static final String idColumn = "TRANSFERID";
@@ -53,6 +54,7 @@ public class TransferDAO {
                 transfers.add(new Transfer(
                     LocalDateTime.parse(rs.getString(transferTimeColumn)),
                     part.get(),
+                    rs.getInt(prevPartQuantityColumn),
                     rs.getInt(quantityColumn),
                     Transfer.Action.valueOf(rs.getString(transferTypeColumn)),
                     rs.getInt(idColumn)
@@ -79,19 +81,19 @@ public class TransferDAO {
         LocalDateTime transferDateTime = LocalDateTime.now();
         int id = (int) CRUDUtil.create(
             tableName,
-            new String[] { transferTimeColumn, partIdColumn, quantityColumn, transferTypeColumn },
-            new Object[] { transferDateTime, part.getId(), quantity, transferType.name() },
-            new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.VARCHAR }
+            new String[] { transferTimeColumn, partIdColumn, prevPartQuantityColumn, quantityColumn, transferTypeColumn },
+            new Object[] { transferDateTime, part.getId(), part.getPartQuantity(), quantity, transferType.name() },
+            new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR }
         );
-        transfers.add(new Transfer(transferDateTime, part, quantity, transferType, id));
+        transfers.add(new Transfer(transferDateTime, part, part.getPartQuantity(), quantity, transferType, id));
     }
 
     public static void updateTransfer(Transfer newTransfer) {
         int rows = CRUDUtil.update(
             tableName,
-            new String[] { transferTimeColumn, partIdColumn, quantityColumn, transferTypeColumn },
-            new Object[] { newTransfer.getTransferDateTime(), newTransfer.getPart().getId(), newTransfer.getTransferQuantity(), newTransfer.getTransferType().name() },
-            new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.VARCHAR },
+            new String[] { transferTimeColumn, partIdColumn, prevPartQuantityColumn, quantityColumn, transferTypeColumn },
+            new Object[] { newTransfer.getTransferDateTime(), newTransfer.getPart().getId(), newTransfer.getPrevPartQuantity(), newTransfer.getTransferQuantity(), newTransfer.getTransferType().name() },
+            new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR },
             idColumn,
             Types.INTEGER,
             newTransfer.getId()

@@ -7,9 +7,10 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ils.models.Customer;
@@ -78,14 +79,15 @@ public class Logic {
     }
 
     public Integer getProductQuantity(Product product) {
-        return PartDAO.getParts().stream()
+        Integer sum = this.partFilteredList.stream()
                 .filter(part -> part.getProduct().equals(product))
                 .mapToInt(part -> part.getPartQuantity())
                 .sum();
+        return sum;
     }
 
     public Stream<Part> getProductParts(Product product) {
-        return PartDAO.getParts().stream()
+        return this.partFilteredList.stream()
                 .filter(part -> part.getProduct().equals(product));
     }
 
@@ -113,6 +115,14 @@ public class Logic {
         selectedProduct.set(product);
     }
 
+    public Integer getMonthlyOpeningBal() {
+        return 0;
+    }
+
+    public Integer getMonthlyClosingBal() {
+        return 0;
+    }
+
     public void addCustomer(String name) {
         CustomerDAO.insertCustomer(name);
     }
@@ -130,7 +140,6 @@ public class Logic {
     }
 
     public void addTransfer(Part part, int quantity, Transfer.Action action) {
-        TransferDAO.insertTransfer(part, quantity, action);
         switch (action) {
             case WITHDRAW:
             case REJECT:
@@ -141,6 +150,9 @@ public class Logic {
                 PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
                 break;
         }
+        Optional<Part> newPart = PartDAO.getPart(part.getId());
+        newPart.ifPresent(p -> TransferDAO.insertTransfer(p, quantity, action));
+        newPart.orElseThrow(() -> new RuntimeException("Part not found"));
     }
 
     public void updateCustomer(Customer customer, String name) {
@@ -163,44 +175,26 @@ public class Logic {
     }
 
     public void deleteCustomer(Customer customer) {
-        productSortedList.forEach(product -> {
-            partSortedList.forEach(part -> {
-                transferSortedList.forEach(transfer -> {
-                    if (transfer.getPart().equals(part)) {
-                        deleteTransfer(transfer);
-                    }
-                });
-                if (part.getProduct().equals(product)) {
-                    deletePart(part);
-                }
-            });
-            if (product.getCustomer().equals(customer)) {
-                deleteProduct(product);
-            }
-        });
+        List<Product> list = ProductDAO.getProducts().stream().filter(p -> p.getCustomer().equals(customer)).collect(Collectors.toList());
+        for (Product product : list) {
+            deleteProduct(product);
+        };
         CustomerDAO.deleteCustomer(customer.getId());
     }
 
     public void deleteProduct(Product product) {
-        partSortedList.forEach(part -> {
-            transferSortedList.forEach(transfer -> {
-                if (transfer.getPart().equals(part)) {
-                    deleteTransfer(transfer);
-                }
-            });
-            if (part.getProduct().equals(product)) {
-                deletePart(part);
-            }
-        });
+        List<Part> list = PartDAO.getParts().stream().filter(p -> p.getProduct().equals(product)).collect(Collectors.toList());
+        for (Part part : list) {
+            deletePart(part);
+        };
         ProductDAO.deleteProduct(product.getId());
     }
 
     public void deletePart(Part part) {
-        transferSortedList.forEach(transfer -> {
-            if (transfer.getPart().equals(part)) {
-                deleteTransfer(transfer);
-            }
-        });
+        List<Transfer> list = TransferDAO.getTransfers().stream().filter(t -> t.getPart().equals(part)).collect(Collectors.toList());
+        for (Transfer transfer : list) {
+            deleteTransfer(transfer);
+        };
         PartDAO.deletePart(part.getId());
     }
 
@@ -293,7 +287,6 @@ public class Logic {
     public void syncData(String username, String password, LocalDate date) throws IllegalArgumentException {
         sync = new DataSync(username, password);
         if (this.customerFilteredList.isEmpty()) {
-            Logger.getAnonymousLogger().info("Customers empty, syncing all data");
             sync.syncCustomers();
         }
         sync.syncTransfers(date);

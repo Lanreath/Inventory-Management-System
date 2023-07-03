@@ -130,7 +130,7 @@ public class CRUDUtil {
     }
 
     public static int delete(String tableName, int id) {
-        String sql = "DELETE FROM " + tableName + " WHERE id = ?";
+        String sql = "DELETE FROM " + tableName + " WHERE " + tableName + "ID = ?";
 
         try (Connection conn = Database.connect()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -141,7 +141,7 @@ public class CRUDUtil {
             Logger.getAnonymousLogger().log(
                     Level.SEVERE,
                     LocalDateTime.now() + ": Could not delete from " + tableName + " by id " + id +
-                            " because " + e.getCause());
+                            " because " + e.getMessage());
             return -1;
         }
     }

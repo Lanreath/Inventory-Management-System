@@ -28,9 +28,6 @@ public class InputBar extends Component<ToolBar> {
 
     private TextField qtyInput;
 
-    // @FXML
-    // private Button editBtn;
-
     private ComboBox<Transfer.Action> actionInput;
 
     private Button saveBtn;
@@ -77,9 +74,11 @@ public class InputBar extends Component<ToolBar> {
             case "Part":
                 getRoot().getItems().add(nameInput);
                 getRoot().getItems().add(qtyInput);
+                break;
             case "Transfer":
                 getRoot().getItems().add(qtyInput);
                 getRoot().getItems().add(actionInput);
+                break;
         }
         getRoot().getItems().add(saveBtn);
         getRoot().getItems().add(cancelBtn);
@@ -187,7 +186,7 @@ public class InputBar extends Component<ToolBar> {
             });
         } else {
             Part part = (Part) prpt.getSelectedItem().getValue();
-            displayDelete("part and its transfers?: " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
+            displayDelete("part and its transfers? - " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 logic.deletePart(part);
                 getRoot().getItems().clear();

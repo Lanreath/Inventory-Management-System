@@ -119,6 +119,8 @@ public class PartDAO {
         CRUDUtil.delete(tableName, id);
 
         Optional<Part> part = getPart(id);
-        part.ifPresent(parts::remove);
+        part.ifPresent((e) -> {
+            parts.remove(e);
+        });
     }
 }
