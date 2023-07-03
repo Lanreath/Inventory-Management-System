@@ -23,7 +23,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
 import java.util.Optional;
-import java.util.logging.Logger;
 
 public class ProductPartTable extends Component<Region> {
     @FXML
@@ -101,7 +100,7 @@ public class ProductPartTable extends Component<Region> {
             return new TextFieldTreeTableCell<Object, String>() {
                 @Override
                 public void startEdit() {
-                    TreeItem<Object> rowItem = getTreeTableView().getTreeItem(getTableRow().getIndex());
+                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
                     if (rowItem != null && rowItem.getValue() instanceof Product) {
                         return;
                     }
@@ -138,7 +137,7 @@ public class ProductPartTable extends Component<Region> {
             return new TextFieldTreeTableCell<Object, Integer>() {
                 @Override
                 public void startEdit() {
-                    TreeItem<Object> rowItem = getTreeTableView().getTreeItem(getTableRow().getIndex());
+                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
                     if (rowItem != null && rowItem.getValue() instanceof Product) {
                         return;
                     }
@@ -201,19 +200,25 @@ public class ProductPartTable extends Component<Region> {
     }
 
     private void handleForcedSelection(ObservableValue<? extends Product> observable, Product oldValue, Product newValue) {
-            Optional<TreeItem<Object>> prod = treeTable.getRoot().getChildren().stream().filter(item -> {
-                if (item.getValue() instanceof Product) {
-                    Product product = (Product) item.getValue();
-                    return product.equals(newValue);
-                } else {
-                    return false;
-                }
-            }).findFirst();
-            if (prod.isPresent()) {
-                Logger.getAnonymousLogger().info("Selecting product forcefully...");
-                TreeTableViewSelectionModel<Object> selectionModel = treeTable.getSelectionModel();
-                selectionModel.select(prod.get());
+        if (newValue == null) {
+            treeTable.getSelectionModel().clearSelection();
+            return;
+        }
+        // Check for product in treetable
+        Optional<TreeItem<Object>> prod = treeTable.getRoot().getChildren().stream().filter(item -> {
+            if (item.getValue() instanceof Product) {
+                Product product = (Product) item.getValue();
+                return product.equals(newValue);
+            } else {
+                return false;
             }
+        }).findFirst();
+        if (!prod.isPresent()) {
+            // Product not found
+            throw new RuntimeException("Product not found in treetable");
+        }
+        // Select product
+        treeTable.getSelectionModel().select(prod.get());
     }
 
     private void rebuild() {

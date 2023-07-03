@@ -69,7 +69,7 @@ public class DataSync {
                 Optional<Product> p = ProductDAO.getProductByName(product);
                 p.orElseThrow(() -> new IllegalStateException("Could not find Product " + product + " in database"));
                 Product prod = p.get();
-                if (savedParts.get().noneMatch((pt) -> pt.getProduct().getId() == prod.getId())) {
+                if (savedParts.get().noneMatch((pt) -> pt.getProduct().equals(prod))) {
                     // Part does not exist in database
                     PartDAO.insertPart("Default", 0, prod);
                 }

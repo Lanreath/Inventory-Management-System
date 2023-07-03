@@ -50,6 +50,16 @@ public class Product {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Product) {
+            Product other = (Product) obj;
+            return this.dbName.equals(other.dbName) && this.creationDateTime.equals(other.creationDateTime)
+                    && this.customer.equals(other.customer) && this.productId.equals(other.productId);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "Product [" + dbName + ", " + creationDateTime + ", " + customer + "]";
     }

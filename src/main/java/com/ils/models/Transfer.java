@@ -45,6 +45,16 @@ public class Transfer {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Transfer) {
+            Transfer other = (Transfer) obj;
+            return this.transferDateTime.equals(other.transferDateTime) && this.part.equals(other.part)
+                    && this.transferQuantity.equals(other.transferQuantity) && this.transferType.equals(other.transferType) && this.transferId.equals(other.transferId);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "Transfer [" + transferDateTime + ", " + part + ", " + transferQuantity + ", " + transferType.name() + "]";
     }

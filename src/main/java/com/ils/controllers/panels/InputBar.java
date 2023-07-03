@@ -9,7 +9,6 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
 
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;

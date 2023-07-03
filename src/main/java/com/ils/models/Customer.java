@@ -26,6 +26,15 @@ public class Customer {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Customer) {
+            Customer other = (Customer) obj;
+            return this.customerName.equals(other.customerName) && this.creationDateTime.equals(other.creationDateTime) && this.customerId.equals(other.customerId);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "Customer [" + customerName + "]";
     }

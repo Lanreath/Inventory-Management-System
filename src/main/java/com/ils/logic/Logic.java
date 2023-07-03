@@ -79,14 +79,14 @@ public class Logic {
 
     public Integer getProductQuantity(Product product) {
         return PartDAO.getParts().stream()
-                .filter(part -> part.getProduct().getId() == product.getId())
+                .filter(part -> part.getProduct().equals(product))
                 .mapToInt(part -> part.getPartQuantity())
                 .sum();
     }
 
     public Stream<Part> getProductParts(Product product) {
         return PartDAO.getParts().stream()
-                .filter(part -> part.getProduct().getId() == product.getId());
+                .filter(part -> part.getProduct().equals(product));
     }
 
     public ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
@@ -146,7 +146,7 @@ public class Logic {
     public void updateCustomer(Customer customer, String name) {
         CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
         Customer cust = CustomerDAO.getCustomer(customer.getId()).get();
-        ProductDAO.getProducts().stream().filter(product -> product.getCustomer().getId() == cust.getId())
+        ProductDAO.getProducts().stream().filter(product -> product.getCustomer().equals(cust))
                 .forEach(product -> ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getId())));
     }
 
@@ -241,19 +241,19 @@ public class Logic {
         Part part = transfer.getPart();
         Product product = part.getProduct();
         Customer customer = product.getCustomer();
+        // Check if the filters are already set to the correct values
         if (!getProducts().contains(product)) {
+            // If not, clear the filters and assert that the correct values are now present
             filters.clearProductCustomerFilter();
             filters.clearDBNameFilter();
             assert getProducts().contains(product);
-        } else {
-            Logger.getAnonymousLogger().info("Product is in list");
         }
+        // Set the filters to the correct values
         selectedProduct.set(product);
+        // Do the same for the part
         if (!getCustomers().contains(customer)) {
             filters.clearCustomerNameFilter();
             assert getCustomers().contains(customer);
-        } else {
-            Logger.getAnonymousLogger().info("Customer is in list");
         }
         selectedCustomer.set(customer);
     }

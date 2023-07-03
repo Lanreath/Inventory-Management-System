@@ -32,6 +32,10 @@ compileJava {
     options.release = 8
 }
 
+run {
+    enableAssertions = true
+}
+
 jar {
     manifest {
         attributes(

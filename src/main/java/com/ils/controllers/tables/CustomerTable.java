@@ -15,9 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
-import java.util.logging.Logger;
-
-import javax.swing.text.DefaultEditorKit.CutAction;
+import java.util.Optional;
 
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;
@@ -95,8 +93,15 @@ public class CustomerTable extends Component<Region> {
     private void handleForcedSelection(ObservableValue<? extends Customer> observable, Customer oldSelection, Customer newSelection) {
         if (newSelection == null) {
             customerTable.getSelectionModel().clearSelection();
-        } else {
-            customerTable.getSelectionModel().select(newSelection);
+            return;
         }
+        // Check for customer tableitem
+        Optional<Customer> customer = customerTable.getItems().stream().filter(c -> c.equals(newSelection)).findFirst();
+        if (!customer.isPresent()) {
+            // Customer not found in table
+            throw new RuntimeException("Customer not found in table");
+        }
+        // Select customer
+        customerTable.getSelectionModel().select(customer.get());
     }
 }

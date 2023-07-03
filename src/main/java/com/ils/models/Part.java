@@ -38,6 +38,16 @@ public class Part {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Part) {
+            Part other = (Part) obj;
+            return this.partName.equals(other.partName) && this.creationDateTime.equals(other.creationDateTime)
+                    && this.partQuantity.equals(other.partQuantity) && this.product.equals(other.product) && this.partId.equals(other.partId);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "Part [" + partName + ", " + creationDateTime + ", " + partQuantity + ", " + product + "]";
     }
