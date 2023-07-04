@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Transfer {
     public enum Action {
-        INCOMING,
+        RECEIVE,
         WITHDRAW,
         SAMPLE,
         REJECT

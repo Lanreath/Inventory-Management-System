@@ -27,14 +27,22 @@ public class Logic {
     private SortedList<Product> productSortedList;
     private SortedList<Part> partSortedList;
     private SortedList<Transfer> transferSortedList;
+
     private ObjectProperty<Customer> selectedCustomer;
     private ObjectProperty<Product> selectedProduct;
-    // private ObjectProperty<Part> selectedPart;
+
     private DataSync sync;
     private Filters filters;
 
     public Logic() {
         this.filters = new Filters();
+        initLists();
+        this.selectedCustomer = new SimpleObjectProperty<>(null);
+        this.selectedProduct = new SimpleObjectProperty<>(null);
+        initFilters();
+    }
+
+    private void initLists() {
         this.customerFilteredList = CustomerDAO.getCustomers();
         this.productFilteredList = ProductDAO.getProducts();
         this.partFilteredList = PartDAO.getParts();
@@ -43,9 +51,6 @@ public class Logic {
         this.productSortedList = new SortedList<>(productFilteredList);
         this.partSortedList = new SortedList<>(partFilteredList);
         this.transferSortedList = new SortedList<>(transferFilteredList);
-        this.selectedCustomer = new SimpleObjectProperty<>(null);
-        this.selectedProduct = new SimpleObjectProperty<>(null);
-        initFilters();
     }
 
     private void initFilters() {
@@ -115,48 +120,96 @@ public class Logic {
         selectedProduct.set(product);
     }
 
-    public Integer getMonthlyOpeningBal(LocalDate from) {
-        LocalDate next = from;
-        Transfer earliest;
-        while (true) {
-            Stream<Transfer> daily = TransferDAO.getTransfersByDate(next);
-            if (daily.count() == 0) {
-                next = next.plusDays(1);
-                if (next.getMonth() != from.getMonth()) {
-                    return 0;
-                }
-            } else {
-                earliest = daily.min((t1, t2) -> t1.getTransferDateTime().compareTo(t2.getTransferDateTime())).get();
-                break;
-            }
+    public Integer getMonthlyOpeningBalByCustomer(Customer cust, LocalDate from) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByCustomer(cust).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        Optional<Transfer> earliest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from) || t.getTransferDateTime().toLocalDate().isAfter(from)).findFirst();
+        if (!earliest.isPresent()) {
+            return -1;
         }
-        return earliest.getPrevPartQuantity();
+        Transfer t = earliest.get();
+        return t.getPrevPartQuantity();
     }
 
-    public Integer getMonthlyClosingBal(LocalDate to) {
-        LocalDate next = to;
-        Transfer latest;
-        while (true) {
-            Stream<Transfer> daily = TransferDAO.getTransfersByDate(next);
-            if (daily.count() == 0) {
-                next = next.minusDays(1);
-                if (next.getMonth() != to.getMonth()) {
-                    return 0;
-                }
-            } else {
-                latest = daily.max((t1, t2) -> t1.getTransferDateTime().compareTo(t2.getTransferDateTime())).get();
-                break;
-            }
+    public Integer getMonthlyOpeningBalByProduct(Product prod, LocalDate from) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        Optional<Transfer> earliest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from) || t.getTransferDateTime().toLocalDate().isAfter(from)).findFirst();
+        if (!earliest.isPresent()) {
+            return -1;
         }
-        switch (latest.getTransferType()) {
+        Transfer t = earliest.get();
+        return t.getPrevPartQuantity();
+    }
+
+    public Integer getMonthlyOpeningBalByPart(Part part, LocalDate from) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByPart(part).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        Optional<Transfer> earliest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from) || t.getTransferDateTime().toLocalDate().isAfter(from)).findFirst();
+        if (!earliest.isPresent()) {
+            return -1;
+        }
+        Transfer t = earliest.get();
+        return t.getPrevPartQuantity();
+    }
+
+    public Integer getMonthlyClosingBalByCustomer(Customer cust, LocalDate to) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByCustomer(cust).sorted((t1, t2) -> t2.getTransferDateTime()
+                .compareTo(t1.getTransferDateTime()));
+        Optional<Transfer> latest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to) || t.getTransferDateTime().toLocalDate().isBefore(to)).findFirst();
+        if (!latest.isPresent()) {
+            return -1;
+        }
+        Transfer t = latest.get();
+        switch (t.getTransferType()) {
             case WITHDRAW:
             case REJECT:
             case SAMPLE:
-                return latest.getPrevPartQuantity() - latest.getTransferQuantity();
-            case INCOMING:
-                return latest.getPrevPartQuantity() + latest.getTransferQuantity();
+                return t.getPrevPartQuantity() - t.getTransferQuantity();
+            case RECEIVE:
+                return t.getPrevPartQuantity() + t.getTransferQuantity();
             default:
-                return latest.getPrevPartQuantity();
+                return t.getPrevPartQuantity();
+        }
+    }
+
+    public Integer getMonthlyClosingBalByProduct(Product prod, LocalDate to) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod).sorted((t1, t2) -> t2.getTransferDateTime()
+                .compareTo(t1.getTransferDateTime()));
+        Optional<Transfer> latest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to) || t.getTransferDateTime().toLocalDate().isBefore(to)).findFirst();
+        if (!latest.isPresent()) {
+            return -1;
+        }
+        Transfer t = latest.get();
+        switch (t.getTransferType()) {
+            case WITHDRAW:
+            case REJECT:
+            case SAMPLE:
+                return t.getPrevPartQuantity() - t.getTransferQuantity();
+            case RECEIVE:
+                return t.getPrevPartQuantity() + t.getTransferQuantity();
+            default:
+                return t.getPrevPartQuantity();
+        }
+    }
+
+    public Integer getMonthlyClosingBalByPart(Part part, LocalDate to) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByPart(part).sorted((t1, t2) -> t2.getTransferDateTime()
+                .compareTo(t1.getTransferDateTime()));
+        Optional<Transfer> latest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to) || t.getTransferDateTime().toLocalDate().isBefore(to)).findFirst();
+        if (!latest.isPresent()) {
+            return -1;
+        }
+        Transfer t = latest.get();
+        switch (t.getTransferType()) {
+            case WITHDRAW:
+            case REJECT:
+            case SAMPLE:
+                return t.getPrevPartQuantity() - t.getTransferQuantity();
+            case RECEIVE:
+                return t.getPrevPartQuantity() + t.getTransferQuantity();
+            default:
+                return t.getPrevPartQuantity();
         }
     }
 
@@ -177,19 +230,19 @@ public class Logic {
     }
 
     public void addTransfer(Part part, int quantity, Transfer.Action action) {
+        Optional<Part> newPart = PartDAO.getPart(part.getId());
+        newPart.ifPresent(p -> TransferDAO.insertTransfer(p, quantity, action));
+        newPart.orElseThrow(() -> new RuntimeException("Part not found"));
         switch (action) {
             case WITHDRAW:
             case REJECT:
             case SAMPLE:
                 PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId()));
                 break;
-            case INCOMING:
+            case RECEIVE:
                 PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
                 break;
         }
-        Optional<Part> newPart = PartDAO.getPart(part.getId());
-        newPart.ifPresent(p -> TransferDAO.insertTransfer(p, quantity, action));
-        newPart.orElseThrow(() -> new RuntimeException("Part not found"));
     }
 
     public void updateCustomer(Customer customer, String name) {
@@ -198,10 +251,6 @@ public class Logic {
         ProductDAO.getProducts().stream().filter(product -> product.getCustomer().equals(cust))
                 .forEach(product -> ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getId())));
     }
-
-    // public void updateProduct(Product product, Part defaultPart) {
-    //     ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getId()));
-    // }
 
     public void updatePartName(Part part, String name) {
         PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getId()));

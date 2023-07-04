@@ -14,7 +14,9 @@ import java.util.stream.Stream;
 
 import com.ils.db.CRUDUtil;
 import com.ils.db.Database;
+import com.ils.models.Customer;
 import com.ils.models.Part;
+import com.ils.models.Product;
 import com.ils.models.Transfer;
 
 import javafx.collections.FXCollections;
@@ -71,6 +73,18 @@ public class TransferDAO {
 
     public static Optional<Transfer> getTransfer(int id) {
         return transfers.stream().filter(t -> t.getId() == id).findFirst();
+    }
+
+    public static Stream<Transfer> getTransfersByCustomer(Customer cust) {
+        return transfers.stream().filter(t -> t.getPart().getProduct().getCustomer().equals(cust));
+    }
+
+    public static Stream<Transfer> getTransfersByProduct(Product product) {
+        return transfers.stream().filter(t -> t.getPart().getProduct().equals(product));
+    }
+
+    public static Stream<Transfer> getTransfersByPart(Part part) {
+        return transfers.stream().filter(t -> t.getPart().equals(part));
     }
 
     public static Stream<Transfer> getTransfersByDate(LocalDate date) {

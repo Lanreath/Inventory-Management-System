@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.TextFlow?>
 
 <HBox xmlns="http//javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
-</Hbox>
+    <TextFlow fx:id="customerInfo">
+    </TextFlow>
+    <Separator orientation="vertical"/>
+    <TextFlow fx:id="productInfo">
+    </TextFlow>
+    <Separator orientation="vertical"/>
+    <DatePicker fx:id="startDatePicker" promptText="Start Date"/>
+    <DatePicker fx:id="endDatePicker" promptText="End Date"/>
+</HBox>

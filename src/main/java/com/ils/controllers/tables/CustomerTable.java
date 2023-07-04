@@ -42,7 +42,7 @@ public class CustomerTable extends Component<Region> {
     }
 
     private void initTable() {
-        customerTable.setPrefWidth(200);
+        customerTable.setPrefWidth(100);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         customerTable.setItems(this.logic.getCustomers());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);

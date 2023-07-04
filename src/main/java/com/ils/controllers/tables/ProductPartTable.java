@@ -59,7 +59,7 @@ public class ProductPartTable extends Component<Region> {
     
     private void initTable() {
         treeTable.setMinWidth(400);
-        treeTable.setPrefWidth(700);
+        treeTable.setPrefWidth(600);
         treeTable.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         treeTable.setShowRoot(false);
         treeTable.setEditable(true);
@@ -123,7 +123,7 @@ public class ProductPartTable extends Component<Region> {
             return new TextFieldTreeTableCell<Object, String>() {
                 @Override
                 public void startEdit() {
-                    TreeItem<Object> rowItem = getTableRow().getTreeItem();
+                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
                     if (rowItem != null && rowItem.getValue() instanceof Product) {
                         return;
                     }
@@ -159,7 +159,7 @@ public class ProductPartTable extends Component<Region> {
             return new TextFieldTreeTableCell<Object, Integer>() {
                 @Override
                 public void startEdit() {
-                    TreeItem<Object> rowItem = getTableRow().getTreeItem();
+                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
                     if (rowItem != null && rowItem.getValue() instanceof Product) {
                         return;
                     }

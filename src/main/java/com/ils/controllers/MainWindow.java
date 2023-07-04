@@ -1,6 +1,7 @@
 package com.ils.controllers;
 
 import com.ils.controllers.panels.ActionBar;
+import com.ils.controllers.panels.InfoBar;
 import com.ils.controllers.panels.InputBar;
 import com.ils.controllers.tables.CustomerTable;
 import com.ils.controllers.tables.ProductPartTable;
@@ -20,12 +21,16 @@ public class MainWindow extends Component<Stage> {
     private ProductPartTable productPartTable;
     private TransferTable transferTable;
     private InputBar inputBar;
+    private InfoBar infoBar;
 
     @FXML
     private StackPane actionBarPlaceholder;
 
     @FXML
     private StackPane inputBarPlaceholder;
+
+    @FXML
+    private StackPane infoBarPlaceholder;
 
     @FXML
     private StackPane customerTablePlaceholder;
@@ -52,6 +57,7 @@ public class MainWindow extends Component<Stage> {
         fillProductPartTable();
         fillTransferTable();
         fillInputBar();
+        fillInfoBar();
         fillActionBar();
     }
 
@@ -78,5 +84,10 @@ public class MainWindow extends Component<Stage> {
     private void fillInputBar() {
         inputBar = new InputBar(logic, customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
         inputBarPlaceholder.getChildren().add(inputBar.getRoot());
+    }
+
+    private void fillInfoBar() {
+        infoBar = new InfoBar(logic, customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
+        infoBarPlaceholder.getChildren().add(infoBar.getRoot());
     }
 }

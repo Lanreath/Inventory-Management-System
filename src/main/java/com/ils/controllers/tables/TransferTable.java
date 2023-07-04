@@ -49,7 +49,7 @@ public class TransferTable extends Component<Region> {
     }
 
     private void initTable() {
-        transferTable.setPrefWidth(400);
+        transferTable.setPrefWidth(300);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         transferTable.setItems(logic.getTransfers());
         transferTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
