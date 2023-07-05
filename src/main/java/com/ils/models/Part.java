@@ -7,6 +7,7 @@ public class Part {
     private final LocalDateTime creationDateTime;
     private final Integer partQuantity;
     private final Product product;
+    private final Part nextPart;
     private final Integer partId;
 
     public Part(String partName, LocalDateTime creationDateTime, int quantity, Product product, int id) {
@@ -14,6 +15,16 @@ public class Part {
         this.creationDateTime = creationDateTime;
         this.partQuantity = quantity;
         this.product = product;
+        this.nextPart = null;
+        this.partId = id;
+    }
+
+    public Part(String partName, LocalDateTime creationDateTime, int quantity, Product product, Part nextPart, int id) {
+        this.partName = partName;
+        this.creationDateTime = creationDateTime;
+        this.partQuantity = quantity;
+        this.product = product;
+        this.nextPart = nextPart;
         this.partId = id;
     }
 
@@ -35,6 +46,10 @@ public class Part {
 
     public Product getProduct() {
         return product;
+    }
+
+    public Part getNextPart() {
+        return nextPart;
     }
 
     @Override

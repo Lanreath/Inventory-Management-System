@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import com.ils.db.CRUDUtil;
 import com.ils.db.Database;
@@ -25,6 +26,7 @@ public class PartDAO {
     private static final String creationDateTimeColumn = "CREATIONDATETIME";
     private static final String quantityColumn = "PARTQUANTITY";
     private static final String productIdColumn = "PRODUCTID";
+    private static final String nextPartIdColumn = "NEXTPARTID";
     private static final String idColumn = "PARTID";
 
     private static final ObservableList<Part> parts;
@@ -59,6 +61,7 @@ public class PartDAO {
                     LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
                     rs.getInt(quantityColumn),
                     product.get(),
+                    new Part(null, null, 0, null, rs.getInt(nextPartIdColumn)),
                     rs.getInt(idColumn)
                 ));
             } 
@@ -79,6 +82,10 @@ public class PartDAO {
         return parts.stream().filter(part -> part.getPartName().equals(partName) && part.getProduct().equals(product)).findFirst();
     }
 
+    public static Stream<Part> getPartsByProduct(Product product) {
+        return parts.stream().filter(part -> part.getProduct().equals(product));
+    }
+
     public static void insertPart(String partName, int quantity, Product product) {
         LocalDateTime now = LocalDateTime.now();
         int id = (int) CRUDUtil.create(
@@ -92,9 +99,9 @@ public class PartDAO {
     public static void updatePart(Part newPart) {
         int rows = CRUDUtil.update(
             tableName,
-            new String[]{nameColumn, quantityColumn, productIdColumn},
-            new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId()},
-            new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
+            new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn},
+            new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), newPart.getNextPart().getId()},
+            new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER},
             idColumn,
             Types.INTEGER,
             newPart.getId()

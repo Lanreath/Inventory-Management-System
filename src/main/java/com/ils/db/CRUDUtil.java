@@ -7,10 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CRUDUtil {
+    private static final List<String> nullableColumns = Arrays.asList("defaultPart", "productName", "nextPart");
 
     public static Object read(String tableName, String fieldName, int fieldDataType,
             String indexFieldName, int indexDataType, Object index) {
@@ -179,7 +182,7 @@ public class CRUDUtil {
             }
             if (f.getName().substring(f.getName().length() - 2).equals("Id")) {
                 queryBuilder.append(" PRIMARY KEY AUTOINCREMENT");
-            } else if (!f.getName().equals("defaultPart") && !f.getName().equals("productName")) {
+            } else if (!nullableColumns.contains(f.getName())) {
                 queryBuilder.append(" NOT NULL");
             }
             if (i < fields.length - 1) {

@@ -226,6 +226,7 @@ public class Logic {
     }
 
     public void addPart(String name, int quantity, Product product) {
+        Stream<Part> matches = PartDAO.getPartsByProduct(product);
         PartDAO.insertPart(name, quantity, product);
     }
 
