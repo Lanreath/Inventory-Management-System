@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionModel;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -60,6 +61,17 @@ public class TransferTable extends Component<Region> {
         transferDateTimeColumn.setCellValueFactory(new PropertyValueFactory<>("transferDateTime"));
         transferQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("transferQuantity"));
         transferTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transferType"));
+        transferDateTimeColumn.setCellFactory(column -> new TableCell<Transfer, LocalDateTime>(){
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(item.toLocalDate().toString() + " " + item.toLocalTime().getHour() + ":" + item.toLocalTime().getMinute());
+                }
+            }
+        });
     }
 
     private void initFilter() {

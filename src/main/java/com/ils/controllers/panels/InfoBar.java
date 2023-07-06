@@ -8,7 +8,6 @@ import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
