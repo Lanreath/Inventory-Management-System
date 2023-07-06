@@ -35,6 +35,7 @@ public class PartDAO {
         parts = FXCollections.observableArrayList();
         updatePartsFromDB();
         ProductDAO.updateDefaultParts();
+        updateNextParts();
     }
 
     protected static FilteredList<Part> getParts() {
@@ -56,14 +57,26 @@ public class PartDAO {
                     );
                     continue;
                 }
-                parts.add(new Part(
-                    rs.getString(nameColumn),
-                    LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
-                    rs.getInt(quantityColumn),
-                    product.get(),
-                    new Part(null, null, 0, null, rs.getInt(nextPartIdColumn)),
-                    rs.getInt(idColumn)
-                ));
+                int nextid = rs.getInt(nextPartIdColumn);
+                if (rs.wasNull()) {
+                    parts.add(new Part(
+                        rs.getString(nameColumn),
+                        LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
+                        rs.getInt(quantityColumn),
+                        product.get(),
+                        null,
+                        rs.getInt(idColumn)
+                    ));
+                } else {
+                    parts.add(new Part(
+                        rs.getString(nameColumn),
+                        LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
+                        rs.getInt(quantityColumn),
+                        product.get(),
+                        new Part(null, null, 0, null, nextid),
+                        rs.getInt(idColumn)
+                    ));
+                }
             } 
         } catch (SQLException e) {
             Logger.getAnonymousLogger().log(
@@ -72,6 +85,23 @@ public class PartDAO {
             );
             parts.clear();
         }
+    }
+
+    private static void updateNextParts() {
+        ObservableList<Part> copy = FXCollections.observableArrayList(parts);
+        copy.forEach(part -> {
+            if (part.getNextPart() != null) {
+                Optional<Part> nextPart = getPart(part.getNextPart().getId());
+                if (nextPart.isPresent()) {
+                    part.setNextPart(nextPart.get());
+                } else {
+                    Logger.getAnonymousLogger().log(
+                        Level.SEVERE,
+                        LocalDateTime.now() + ": Could not load Part from database, Part with id " + part.getNextPart().getId() + " not found"
+                    );
+                }
+            }
+        });
     }
 
     public static Optional<Part> getPart(int id) {
@@ -97,16 +127,28 @@ public class PartDAO {
     }
 
     public static void updatePart(Part newPart) {
-        int rows = CRUDUtil.update(
-            tableName,
-            new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn},
-            new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), newPart.getNextPart().getId()},
-            new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER},
-            idColumn,
-            Types.INTEGER,
-            newPart.getId()
-        );
-
+        int rows;
+        if (newPart.getNextPart() != null) {
+            rows = CRUDUtil.update(
+                tableName,
+                new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn},
+                new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), newPart.getNextPart().getId()},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER},
+                idColumn,
+                Types.INTEGER,
+                newPart.getId()
+            );
+        } else {
+            rows = CRUDUtil.update(
+                tableName,
+                new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn},
+                new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), null},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER},
+                idColumn,
+                Types.INTEGER,
+                newPart.getId()
+            );
+        }
 
         if (rows == 0) {
             throw new IllegalStateException("Part to be updated with id" + newPart.getId() + " does not exist in database");

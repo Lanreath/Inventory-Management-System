@@ -72,17 +72,11 @@ public class ProductDAO {
     protected static void updateDefaultParts() {
         // ConcurrentModificationException
         // Store products to be updated in a list and update them after the loop
-        ObservableList<Product> copyProducts = FXCollections.observableArrayList(ProductDAO.products);
+        ObservableList<Product> copyProducts = FXCollections.observableArrayList(products);
         copyProducts.forEach((product) -> {
             Optional<Part> defaultPart = PartDAO.getPart(product.getDefaultPart().getId());
             defaultPart.ifPresent((part) -> {
-                ProductDAO.updateProduct(new Product(
-                    product.getDBName(),
-                    product.getCreationDateTime(),
-                    product.getCustomer(),
-                    part,
-                    product.getId()
-                ));
+                product.setDefaultPart(part);
             });
             defaultPart.orElseThrow(() -> new IllegalStateException("Could not find Part with id " + product.getDefaultPart().getId()));
         });
@@ -107,15 +101,28 @@ public class ProductDAO {
     }
 
     public static void updateProduct(Product newProduct) {
-        int rows = CRUDUtil.update(
-            tableName,
-            new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn},
-            new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), newProduct.getDefaultPart().getId()},
-            new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
-            idColumn,
-            Types.INTEGER,
-            newProduct.getId()
-        );
+        int rows;
+        if (newProduct.getDefaultPart() != null) {
+            rows = CRUDUtil.update(
+                tableName,
+                new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn},
+                new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), newProduct.getDefaultPart().getId()},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
+                idColumn,
+                Types.INTEGER,
+                newProduct.getId()
+            );
+        } else {
+            rows = CRUDUtil.update(
+                tableName,
+                new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn},
+                new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), null},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
+                idColumn,
+                Types.INTEGER,
+                newProduct.getId()
+            );
+        }
        
         if (rows == 0) {
             throw new IllegalStateException("Product to be updated with id" + newProduct.getId() + " does not exist in database.");

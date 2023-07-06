@@ -7,8 +7,8 @@ public class Part {
     private final LocalDateTime creationDateTime;
     private final Integer partQuantity;
     private final Product product;
-    private final Part nextPart;
     private final Integer partId;
+    private Part nextPart;
 
     public Part(String partName, LocalDateTime creationDateTime, int quantity, Product product, int id) {
         this.partName = partName;
@@ -52,12 +52,16 @@ public class Part {
         return nextPart;
     }
 
+    public void setNextPart(Part nextPart) {
+        this.nextPart = nextPart;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Part) {
             Part other = (Part) obj;
             return this.partName.equals(other.partName) && this.creationDateTime.equals(other.creationDateTime)
-                    && this.partQuantity.equals(other.partQuantity) && this.product.equals(other.product) && this.partId.equals(other.partId);
+                    && this.product.equals(other.product) && this.partId.equals(other.partId);
         }
         return false;
     }

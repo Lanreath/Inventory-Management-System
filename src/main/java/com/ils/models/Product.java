@@ -47,6 +47,10 @@ public class Product {
 
     public Part getDefaultPart() {
         return defaultPart;
+    }   
+    
+    public void setDefaultPart(Part defaultPart) {
+        this.defaultPart = defaultPart;
     }
 
     @Override

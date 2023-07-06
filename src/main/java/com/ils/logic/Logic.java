@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -226,14 +228,22 @@ public class Logic {
     }
 
     public void addPart(String name, int quantity, Product product) {
-        Stream<Part> matches = PartDAO.getPartsByProduct(product);
         PartDAO.insertPart(name, quantity, product);
+        Optional<Part> newPart = PartDAO.getPartByNameAndProduct(name, product);
+        if (!newPart.isPresent()) {
+            throw new RuntimeException("Part not found after insertion");
+        }
+        // Update next part of the last part of the product
+        Part curr = product.getDefaultPart();
+        while (curr.getNextPart() != null) {
+            curr = curr.getNextPart();
+        }
+        curr.setNextPart(newPart.get());
+        PartDAO.updatePart(curr);
     }
 
     public void addTransfer(Part part, int quantity, Transfer.Action action) {
-        Optional<Part> newPart = PartDAO.getPart(part.getId());
-        newPart.ifPresent(p -> TransferDAO.insertTransfer(p, quantity, action));
-        newPart.orElseThrow(() -> new RuntimeException("Part not found"));
+        TransferDAO.insertTransfer(part, quantity, action);
         switch (action) {
             case WITHDRAW:
             case REJECT:
@@ -244,6 +254,14 @@ public class Logic {
                 PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
                 break;
         }
+        // Check for default part change
+        if (part.getProduct().getDefaultPart().equals(part)) {
+            Optional<Part> newDefault = PartDAO.getPart(part.getId());
+            if (!newDefault.isPresent()) {
+                throw new RuntimeException("Part not found after insertion");
+            }
+            ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(), part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getId()));
+        }
     }
 
     public void updateCustomer(Customer customer, String name) {
@@ -253,8 +271,42 @@ public class Logic {
                 .forEach(product -> ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getId())));
     }
 
+    public void updateDefaultPart(Part newDefault) {
+        // Update next part of the part that is pointing to the new default part
+        Optional<Part> prev = PartDAO.getPartsByProduct(newDefault.getProduct())
+                .filter(p -> p.getNextPart() != null && p.getNextPart().equals(newDefault)).findFirst();
+        prev.ifPresent(p -> {
+            p.setNextPart(newDefault.getNextPart());
+            PartDAO.updatePart(p);
+        });
+        // Update next part of the new default part to be the old default part
+        Part oldDefault = newDefault.getProduct().getDefaultPart();
+        if (oldDefault != null) {
+            newDefault.setNextPart(oldDefault);
+            PartDAO.updatePart(newDefault);
+        }
+        // Update default part of the product
+        newDefault.getProduct().setDefaultPart(newDefault);
+        ProductDAO.updateProduct(newDefault.getProduct());
+    }
+
     public void updatePartName(Part part, String name) {
         PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getId()));
+        Optional<Part> newPart = PartDAO.getPartByNameAndProduct(name, part.getProduct());
+        if (!newPart.isPresent()) {
+            throw new RuntimeException("Part not found after insertion");
+        }
+        // Check for parts that are pointing to this part
+        PartDAO.getPartsByProduct(part.getProduct()).filter(p -> p.getNextPart() != null && p.getNextPart().equals(part))
+                .forEach(p -> {
+                    p.setNextPart(newPart.get());
+                    PartDAO.updatePart(p);
+                });
+        // Check if product's default part is this part
+        if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
+            part.getProduct().setDefaultPart(newPart.get());
+            ProductDAO.updateProduct(part.getProduct());
+        }
     }
 
     public void updatePartQuantity(Part part, int quantity) {
@@ -270,7 +322,8 @@ public class Logic {
     }
 
     public void deleteProduct(Product product) {
-        List<Part> list = PartDAO.getParts().stream().filter(p -> p.getProduct().equals(product)).collect(Collectors.toList());
+        //TODO: Bug
+        List<Part> list = PartDAO.getPartsByProduct(product).collect(Collectors.toList());
         for (Part part : list) {
             deletePart(part);
         };
@@ -278,10 +331,29 @@ public class Logic {
     }
 
     public void deletePart(Part part) {
+        // Delete all transfers associated with the part
         List<Transfer> list = TransferDAO.getTransfers().stream().filter(t -> t.getPart().equals(part)).collect(Collectors.toList());
         for (Transfer transfer : list) {
             deleteTransfer(transfer);
         };
+        Part curr = part.getProduct().getDefaultPart();
+        // Check if the part to be deleted is the default part
+        if (curr.equals(part) && curr.getNextPart() != null) {
+            // Update the next part of the part to be deleted to be the new default part
+            updateDefaultPart(part.getNextPart());
+            // Update the current part to be the new default part
+            curr = part.getProduct().getDefaultPart();
+        }
+        // Find the previous part of the part to be deleted
+        while (curr.getNextPart() != null && !curr.getNextPart().equals(part)) {
+            curr = curr.getNextPart();
+        }
+        if (curr.getNextPart() == null) {
+            Logger.getAnonymousLogger().log(Level.FINE, "Part to be deleted is not linked to default part");
+        } else {
+            curr.setNextPart(part.getNextPart());
+            PartDAO.updatePart(curr);
+        }
         PartDAO.deletePart(part.getId());
     }
 

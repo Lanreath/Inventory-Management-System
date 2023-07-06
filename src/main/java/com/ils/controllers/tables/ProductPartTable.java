@@ -4,6 +4,7 @@ import com.ils.controllers.Component;
 import com.ils.logic.Logic;
 import com.ils.models.Part;
 import com.ils.models.Product;
+import com.ils.models.Transfer;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -22,9 +23,15 @@ import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.converter.DefaultStringConverter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
+
+import javax.print.DocFlavor.INPUT_STREAM;
 
 public class ProductPartTable extends Component<Region> {
     @FXML
@@ -81,6 +88,17 @@ public class ProductPartTable extends Component<Region> {
                 rebuild();
             }
         });
+        // this.logic.getTransfers().addListener(new ListChangeListener<Transfer>() {
+        //     @Override
+        //     public void onChanged(Change<? extends Transfer> c) {
+        //         while (c.next()) {
+        //             if (c.wasAdded()) {
+
+                        
+        //             }
+        //         }
+        //     }
+        // });
         this.logic.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
@@ -120,7 +138,7 @@ public class ProductPartTable extends Component<Region> {
             }
         });
         defaultPartColumn.setCellFactory(c -> {
-            return new TextFieldTreeTableCell<Object, String>() {
+            return new TextFieldTreeTableCell<Object, String>(new DefaultStringConverter()) {
                 @Override
                 public void startEdit() {
                     TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
@@ -137,6 +155,7 @@ public class ProductPartTable extends Component<Region> {
                 Part part = (Part) prpt;
                 this.logic.updatePartName(part, event.getNewValue());
                 rebuild();
+                return;
             }
             throw new RuntimeException("Unknown row item type");
         });
@@ -249,7 +268,18 @@ public class ProductPartTable extends Component<Region> {
         for (Product product : this.logic.getProducts()) {
             TreeItem<Object> productItem = new TreeItem<>(product);
             root.getChildren().add(productItem);
-            this.logic.getProductParts(product).forEach(part -> {
+            // List of linked parts
+            List<Integer> linkedParts = new ArrayList<>(); 
+            Part start = product.getDefaultPart();
+            while (start != null) {
+                linkedParts.add(start.getId());
+                TreeItem<Object> partItem = new TreeItem<>(start);
+                productItem.getChildren().add(partItem);
+                start = start.getNextPart();
+            }
+            // Add remaining parts
+            Stream<Part> parts = this.logic.getProductParts(product);
+            parts.filter(part -> !linkedParts.contains(part.getId())).forEach(part -> {
                 TreeItem<Object> partItem = new TreeItem<>(part);
                 productItem.getChildren().add(partItem);
             });

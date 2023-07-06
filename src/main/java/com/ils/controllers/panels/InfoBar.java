@@ -1,6 +1,8 @@
 package com.ils.controllers.panels;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
@@ -20,7 +22,7 @@ import com.ils.models.Part;
 import com.ils.models.Product;
 import com.ils.models.Transfer;
 
-public class InfoBar extends Component<Region> {
+public class InfoBar extends Component<HBox> {
     private static final String FXML = "InfoBar.fxml";
 
     @FXML
@@ -34,6 +36,9 @@ public class InfoBar extends Component<Region> {
 
     @FXML
     private DatePicker endDatePicker;
+
+    @FXML
+    private Button setDefaultPartBtn;
     
     private SelectionModel<Customer> cust;
     private TreeTableViewSelectionModel<Object> prpt;
@@ -65,8 +70,10 @@ public class InfoBar extends Component<Region> {
     }
 
     private void initLayout() {
+        getRoot().setAlignment(Pos.CENTER_LEFT);
         customerInfo.setPrefWidth(191);
         HBox.setHgrow(productInfo, Priority.ALWAYS);
+        setDefaultPartBtn.setVisible(false);
         startDatePicker.setPrefWidth(162);
         endDatePicker.setPrefWidth(161);
     }
@@ -104,9 +111,18 @@ public class InfoBar extends Component<Region> {
         });
         prpt.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             removeProductInfo();
+            setDefaultPartBtn.setVisible(false);
             if (oldValue == null || !oldValue.equals(newValue)) {
                 updateProductInfo();
             }
+        });
+        setDefaultPartBtn.setOnAction(event -> {
+            if (prpt.getSelectedItem() == null) {
+                return;
+            }
+            Part part = (Part) prpt.getSelectedItem().getValue();
+            this.logic.updateDefaultPart(part);
+            setDefaultPartBtn.setVisible(false);
         });
     }
 
@@ -143,6 +159,7 @@ public class InfoBar extends Component<Region> {
             part = (Part) prpt.getSelectedItem().getValue();
             opening = this.logic.getMonthlyOpeningBalByPart(part, startDatePicker.getValue());
             closing = this.logic.getMonthlyClosingBalByPart(part, endDatePicker.getValue());
+            setDefaultPartBtn.setVisible(true);
         }
         productMonthlyOpeningBal.setText(Integer.toString(opening) + "\n");
         productMonthlyClosingBal.setText(Integer.toString(closing) + "\n");
