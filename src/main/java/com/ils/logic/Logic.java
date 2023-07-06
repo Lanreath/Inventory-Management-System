@@ -224,7 +224,9 @@ public class Logic {
         Optional<Product> prod = ProductDAO.getProductByName(name);
         PartDAO.insertPart("Default", 0, prod.get());
         Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
-        ProductDAO.updateProduct(new Product(prod.get().getDBName(), prod.get().getCreationDateTime(), prod.get().getCustomer(), part.get(), prod.get().getId()));
+        Product updatedProd = new Product(prod.get().getDBName(), prod.get().getCreationDateTime(), prod.get().getCustomer(), part.get(), prod.get().getId());
+        ProductDAO.updateProduct(updatedProd);
+        part.get().getProduct().setDefaultPart(part.get());
     }
 
     public void addPart(String name, int quantity, Product product) {
