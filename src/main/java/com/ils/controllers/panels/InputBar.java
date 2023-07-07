@@ -188,8 +188,12 @@ public class InputBar extends Component<ToolBar> {
             Part part = (Part) prpt.getSelectedItem().getValue();
             displayDelete("part and its transfers? - " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
-                logic.deletePart(part);
                 getRoot().getItems().clear();
+                if (logic.getProductParts(part.getProduct()).count() == 1) {
+                    displayMsg("Unable to delete part. Product must have at least one part.");     
+                    return;
+                }
+                logic.deletePart(part);
             });
         }
     }

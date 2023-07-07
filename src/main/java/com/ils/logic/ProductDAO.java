@@ -81,7 +81,9 @@ public class ProductDAO {
             defaultPart.ifPresent((part) -> {
                 product.setDefaultPart(part);
             });
-            defaultPart.orElseThrow(() -> new IllegalStateException("Could not find Part with id " + product.getDefaultPart().getId()));
+            if (!defaultPart.isPresent()) {
+                Logger.getAnonymousLogger().log(Level.FINE, "No default part found");
+            }
         });
     }
 

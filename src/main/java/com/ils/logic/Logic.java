@@ -274,6 +274,9 @@ public class Logic {
     }
 
     public void updateDefaultPart(Part newDefault) {
+        if (newDefault.getProduct().getDefaultPart().equals(newDefault)) {
+            return;
+        }
         // Update next part of the part that is pointing to the new default part
         Optional<Part> prev = PartDAO.getPartsByProduct(newDefault.getProduct())
                 .filter(p -> p.getNextPart() != null && p.getNextPart().equals(newDefault)).findFirst();
@@ -339,19 +342,27 @@ public class Logic {
         };
         Part curr = part.getProduct().getDefaultPart();
         // Check if the part to be deleted is the default part
-        if (curr.equals(part) && curr.getNextPart() != null) {
-            // Update the next part of the part to be deleted to be the new default part
-            updateDefaultPart(part.getNextPart());
-            // Update the current part to be the new default part
-            curr = part.getProduct().getDefaultPart();
-        }
-        // Find the previous part of the part to be deleted
-        while (curr.getNextPart() != null && !curr.getNextPart().equals(part)) {
-            curr = curr.getNextPart();
-        }
-        if (curr.getNextPart() == null) {
-            Logger.getAnonymousLogger().log(Level.FINE, "Part to be deleted is not linked to default part");
+        if (curr.equals(part)) {
+            if (curr.getNextPart() != null) {
+                List<Part> affectedParts = PartDAO.getPartsByProduct(curr.getProduct()).collect(Collectors.toList());
+                // Update the next part of the part to be deleted to be the new default part 
+                curr.getProduct().setDefaultPart(curr.getNextPart());
+                ProductDAO.updateProduct(curr.getProduct());
+                Optional<Product> updated = ProductDAO.getProduct(curr.getProduct().getId());
+                if (!updated.isPresent()) {
+                    throw new RuntimeException("Product not found after default part update");
+                }
+                // Update the current part to be the new default part
+                affectedParts.forEach(p -> PartDAO.updatePart(new Part(p.getPartName(), p.getCreationDateTime(), p.getPartQuantity(), updated.get(), p.getNextPart(), p.getPartNotes(), p.getId())));
+            } else {
+                // Set the default part to null and update the product
+                throw new RuntimeException("Last part of product cannot be deleted");
+            }
         } else {
+            // Find the previous part of the part to be deleted
+            while (curr.getNextPart() != null && !curr.getNextPart().equals(part)) {
+                curr = curr.getNextPart();
+            }
             curr.setNextPart(part.getNextPart());
             PartDAO.updatePart(curr);
         }

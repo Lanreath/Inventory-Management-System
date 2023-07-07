@@ -80,6 +80,6 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product [" + dbName + ", " + creationDateTime + ", " + customer + "]";
+        return "Product [" + dbName + ", " + creationDateTime + ", " + defaultPart.getPartName() + ", " + customer + "]";
     }
 }
