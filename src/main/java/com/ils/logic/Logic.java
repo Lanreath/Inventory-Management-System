@@ -354,9 +354,6 @@ public class Logic {
                 }
                 // Update the current part to be the new default part
                 affectedParts.forEach(p -> PartDAO.updatePart(new Part(p.getPartName(), p.getCreationDateTime(), p.getPartQuantity(), updated.get(), p.getNextPart(), p.getPartNotes(), p.getId())));
-            } else {
-                // Set the default part to null and update the product
-                throw new RuntimeException("Last part of product cannot be deleted");
             }
         } else {
             // Find the previous part of the part to be deleted
