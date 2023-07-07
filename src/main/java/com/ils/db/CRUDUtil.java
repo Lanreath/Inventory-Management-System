@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CRUDUtil {
-    private static final List<String> nullableColumns = Arrays.asList("defaultPart", "productName", "nextPart");
+    private static final List<String> nullableColumns = Arrays.asList("defaultPart", "productName", "nextPart", "productNotes", "partNotes");
 
     public static Object read(String tableName, String fieldName, int fieldDataType,
             String indexFieldName, int indexDataType, Object index) {

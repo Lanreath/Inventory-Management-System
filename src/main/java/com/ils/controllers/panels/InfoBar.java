@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionModel;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -31,13 +32,16 @@ public class InfoBar extends Component<HBox> {
     private TextFlow productInfo;
 
     @FXML
+    private TextField productNotes;
+
+    @FXML
+    private Button setDefaultPartBtn;
+
+    @FXML
     private DatePicker startDatePicker;
 
     @FXML
     private DatePicker endDatePicker;
-
-    @FXML
-    private Button setDefaultPartBtn;
     
     private SelectionModel<Customer> cust;
     private TreeTableViewSelectionModel<Object> prpt;
@@ -72,7 +76,6 @@ public class InfoBar extends Component<HBox> {
         getRoot().setAlignment(Pos.CENTER_LEFT);
         customerInfo.setPrefWidth(191);
         HBox.setHgrow(productInfo, Priority.ALWAYS);
-        setDefaultPartBtn.setVisible(false);
         startDatePicker.setPrefWidth(162);
         endDatePicker.setPrefWidth(161);
     }
@@ -110,18 +113,19 @@ public class InfoBar extends Component<HBox> {
         });
         prpt.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             removeProductInfo();
-            setDefaultPartBtn.setVisible(false);
             if (oldValue == null || !oldValue.equals(newValue)) {
                 updateProductInfo();
+                updateProductNotes();
             }
         });
+        productNotes.visibleProperty().bind(prpt.selectedItemProperty().isNotNull());
+        setDefaultPartBtn.visibleProperty().bind(prpt.selectedItemProperty().isNotNull());
         setDefaultPartBtn.setOnAction(event -> {
             if (prpt.getSelectedItem() == null) {
                 return;
             }
             Part part = (Part) prpt.getSelectedItem().getValue();
             this.logic.updateDefaultPart(part);
-            setDefaultPartBtn.setVisible(false);
         });
     }
 
@@ -158,7 +162,6 @@ public class InfoBar extends Component<HBox> {
             part = (Part) prpt.getSelectedItem().getValue();
             opening = this.logic.getMonthlyOpeningBalByPart(part, startDatePicker.getValue());
             closing = this.logic.getMonthlyClosingBalByPart(part, endDatePicker.getValue());
-            setDefaultPartBtn.setVisible(true);
         }
         productMonthlyOpeningBal.setText(Integer.toString(opening) + "\n");
         productMonthlyClosingBal.setText(Integer.toString(closing) + "\n");
@@ -172,5 +175,18 @@ public class InfoBar extends Component<HBox> {
 
     private void removeProductInfo() {
         this.productInfo.getChildren().clear();
+    }
+
+    private void updateProductNotes() {
+        if (prpt.getSelectedItem() == null) {
+            return;
+        }
+        if (prpt.getSelectedItem().getValue() instanceof Product) {
+            Product product = (Product) prpt.getSelectedItem().getValue();
+            productNotes.setText(product.getProductNotes());
+        } else {
+            Part part = (Part) prpt.getSelectedItem().getValue();
+            productNotes.setText(part.getPartNotes());
+        }
     }
 }

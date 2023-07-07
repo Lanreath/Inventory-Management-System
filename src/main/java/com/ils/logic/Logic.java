@@ -269,7 +269,7 @@ public class Logic {
     public void updateCustomer(Customer customer, String name) {
         CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
         Customer cust = CustomerDAO.getCustomer(customer.getId()).get();
-        ProductDAO.getProducts().stream().filter(product -> product.getCustomer().equals(cust))
+        ProductDAO.getProductsByCustomer(customer)
                 .forEach(product -> ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getId())));
     }
 
@@ -293,7 +293,7 @@ public class Logic {
     }
 
     public void updatePartName(Part part, String name) {
-        PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getId()));
+        PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId()));
         Optional<Part> newPart = PartDAO.getPartByNameAndProduct(name, part.getProduct());
         if (!newPart.isPresent()) {
             throw new RuntimeException("Part not found after insertion");
@@ -312,7 +312,7 @@ public class Logic {
     }
 
     public void updatePartQuantity(Part part, int quantity) {
-        PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), quantity, part.getProduct(), part.getId()));
+        PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), quantity, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId()));
     }
 
     public void deleteCustomer(Customer customer) {
@@ -324,7 +324,6 @@ public class Logic {
     }
 
     public void deleteProduct(Product product) {
-        //TODO: Bug
         List<Part> list = PartDAO.getPartsByProduct(product).collect(Collectors.toList());
         for (Part part : list) {
             deletePart(part);
@@ -334,7 +333,7 @@ public class Logic {
 
     public void deletePart(Part part) {
         // Delete all transfers associated with the part
-        List<Transfer> list = TransferDAO.getTransfers().stream().filter(t -> t.getPart().equals(part)).collect(Collectors.toList());
+        List<Transfer> list = TransferDAO.getTransfersByPart(part).collect(Collectors.toList());
         for (Transfer transfer : list) {
             deleteTransfer(transfer);
         };

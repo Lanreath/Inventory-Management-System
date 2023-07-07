@@ -9,22 +9,23 @@ public class Part {
     private final Product product;
     private final Integer partId;
     private Part nextPart;
+    private String partNotes;
 
     public Part(String partName, LocalDateTime creationDateTime, int quantity, Product product, int id) {
         this.partName = partName;
         this.creationDateTime = creationDateTime;
         this.partQuantity = quantity;
         this.product = product;
-        this.nextPart = null;
         this.partId = id;
     }
 
-    public Part(String partName, LocalDateTime creationDateTime, int quantity, Product product, Part nextPart, int id) {
+    public Part(String partName, LocalDateTime creationDateTime, int quantity, Product product, Part nextPart, String partNotes, int id) {
         this.partName = partName;
         this.creationDateTime = creationDateTime;
         this.partQuantity = quantity;
         this.product = product;
         this.nextPart = nextPart;
+        this.partNotes = partNotes;
         this.partId = id;
     }
 
@@ -50,6 +51,10 @@ public class Part {
 
     public Part getNextPart() {
         return nextPart;
+    }
+    
+    public String getPartNotes() {
+        return partNotes;
     }
 
     public void setNextPart(Part nextPart) {

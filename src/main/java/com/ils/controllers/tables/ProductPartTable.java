@@ -4,7 +4,6 @@ import com.ils.controllers.Component;
 import com.ils.logic.Logic;
 import com.ils.models.Part;
 import com.ils.models.Product;
-import com.ils.models.Transfer;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,10 +27,7 @@ import javafx.util.converter.DefaultStringConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
-
-import javax.print.DocFlavor.INPUT_STREAM;
 
 public class ProductPartTable extends Component<Region> {
     @FXML

@@ -28,6 +28,7 @@ public class ProductDAO {
     private static final String customerIdColumn = "CUSTOMERID";
     private static final String defaultPartIdColumn = "DEFAULTPARTID";
     private static final String productNameColumn = "PRODUCTNAME";
+    private static final String productNotesColumn = "PRODUCTNOTES";
     private static final String idColumn = "PRODUCTID";
 
     private static final ObservableList<Product> products;
@@ -57,6 +58,8 @@ public class ProductDAO {
                     LocalDateTime.parse(rs.getString(creationDateTimeColumn)),
                     customer.get(),
                     new Part(null, null, 0, null, defaultPartId),
+                    rs.getString(productNameColumn),
+                    rs.getString(productNotesColumn),
                     rs.getInt(idColumn)
                 ));
             } 
@@ -67,7 +70,7 @@ public class ProductDAO {
             );
             products.clear();
         }
-    }
+    };
 
     protected static void updateDefaultParts() {
         // ConcurrentModificationException
@@ -105,9 +108,9 @@ public class ProductDAO {
         if (newProduct.getDefaultPart() != null) {
             rows = CRUDUtil.update(
                 tableName,
-                new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn},
-                new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), newProduct.getDefaultPart().getId()},
-                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
+                new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn, productNameColumn, productNotesColumn},
+                new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), newProduct.getDefaultPart().getId(), newProduct.getProductName(), newProduct.getProductNotes()},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR},
                 idColumn,
                 Types.INTEGER,
                 newProduct.getId()
@@ -115,9 +118,9 @@ public class ProductDAO {
         } else {
             rows = CRUDUtil.update(
                 tableName,
-                new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn},
-                new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), null},
-                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER},
+                new String[]{dbNameColumn, customerIdColumn, defaultPartIdColumn, productNameColumn, productNotesColumn},
+                new Object[]{newProduct.getDBName(), newProduct.getCustomer().getId(), null, newProduct.getProductName(), newProduct.getProductNotes()},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR},
                 idColumn,
                 Types.INTEGER,
                 newProduct.getId()

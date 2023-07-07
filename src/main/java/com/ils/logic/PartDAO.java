@@ -27,6 +27,7 @@ public class PartDAO {
     private static final String quantityColumn = "PARTQUANTITY";
     private static final String productIdColumn = "PRODUCTID";
     private static final String nextPartIdColumn = "NEXTPARTID";
+    private static final String partNotesColumn = "PARTNOTES";
     private static final String idColumn = "PARTID";
 
     private static final ObservableList<Part> parts;
@@ -65,6 +66,7 @@ public class PartDAO {
                         rs.getInt(quantityColumn),
                         product.get(),
                         null,
+                        rs.getString(partNotesColumn),
                         rs.getInt(idColumn)
                     ));
                 } else {
@@ -74,6 +76,7 @@ public class PartDAO {
                         rs.getInt(quantityColumn),
                         product.get(),
                         new Part(null, null, 0, null, nextid),
+                        rs.getString(partNotesColumn),
                         rs.getInt(idColumn)
                     ));
                 }
@@ -131,9 +134,9 @@ public class PartDAO {
         if (newPart.getNextPart() != null) {
             rows = CRUDUtil.update(
                 tableName,
-                new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn},
-                new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), newPart.getNextPart().getId()},
-                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER},
+                new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn, partNotesColumn},
+                new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), newPart.getNextPart().getId(), newPart.getPartNotes()},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR},
                 idColumn,
                 Types.INTEGER,
                 newPart.getId()
@@ -141,9 +144,9 @@ public class PartDAO {
         } else {
             rows = CRUDUtil.update(
                 tableName,
-                new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn},
-                new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), null},
-                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER},
+                new String[]{nameColumn, quantityColumn, productIdColumn, nextPartIdColumn, partNotesColumn},
+                new Object[]{newPart.getPartName(), newPart.getPartQuantity(), newPart.getProduct().getId(), null, newPart.getPartNotes()},
+                new int[]{Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR},
                 idColumn,
                 Types.INTEGER,
                 newPart.getId()
@@ -166,7 +169,6 @@ public class PartDAO {
 
     public static void deletePart(int id) {
         CRUDUtil.delete(tableName, id);
-
         Optional<Part> part = getPart(id);
         part.ifPresent((e) -> {
             parts.remove(e);
