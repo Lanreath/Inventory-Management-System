@@ -10,8 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -271,6 +269,10 @@ public class Logic {
         Customer cust = CustomerDAO.getCustomer(customer.getId()).get();
         ProductDAO.getProductsByCustomer(customer)
                 .forEach(product -> ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getId())));
+    }
+
+    public void updateProductName(Product product, String name) {
+        ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getDefaultPart(), name, product.getProductNotes(), product.getId()));
     }
 
     public void updateDefaultPart(Part newDefault) {

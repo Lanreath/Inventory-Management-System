@@ -84,17 +84,6 @@ public class ProductPartTable extends Component<Region> {
                 rebuild();
             }
         });
-        // this.logic.getTransfers().addListener(new ListChangeListener<Transfer>() {
-        //     @Override
-        //     public void onChanged(Change<? extends Transfer> c) {
-        //         while (c.next()) {
-        //             if (c.wasAdded()) {
-
-                        
-        //             }
-        //         }
-        //     }
-        // });
         this.logic.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
@@ -134,26 +123,20 @@ public class ProductPartTable extends Component<Region> {
             }
         });
         defaultPartColumn.setCellFactory(c -> {
-            return new TextFieldTreeTableCell<Object, String>(new DefaultStringConverter()) {
-                @Override
-                public void startEdit() {
-                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
-                    if (rowItem != null && rowItem.getValue() instanceof Product) {
-                        return;
-                    }
-                    super.startEdit();
-                }
-            };
+            return new TextFieldTreeTableCell<Object, String>(new DefaultStringConverter());
         });
         defaultPartColumn.setOnEditCommit((TreeTableColumn.CellEditEvent<Object, String> event) -> {
             Object prpt = event.getTreeTableView().getTreeItem(event.getTreeTablePosition().getRow()).getValue();
             if (prpt instanceof Part) {
                 Part part = (Part) prpt;
                 this.logic.updatePartName(part, event.getNewValue());
-                rebuild();
-                return;
+            } else if (prpt instanceof Product) {
+                Product product = (Product) prpt;
+                this.logic.updateProductName(product, event.getNewValue());
+            } else {
+                throw new RuntimeException("Unknown row item type");
             }
-            throw new RuntimeException("Unknown row item type");
+            rebuild();
         });
    }
 
