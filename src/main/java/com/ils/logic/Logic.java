@@ -219,7 +219,7 @@ public class Logic {
 
     public void addProduct(String name, Customer customer) {
         ProductDAO.insertProduct(name, customer);
-        Optional<Product> prod = ProductDAO.getProductByName(name);
+        Optional<Product> prod = ProductDAO.getProductByDBName(name);
         PartDAO.insertPart("Default", 0, prod.get());
         Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
         Product updatedProd = new Product(prod.get().getDBName(), prod.get().getCreationDateTime(), prod.get().getCustomer(), part.get(), prod.get().getId());
@@ -273,6 +273,10 @@ public class Logic {
 
     public void updateProductName(Product product, String name) {
         ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getDefaultPart(), name, product.getProductNotes(), product.getId()));
+        Optional<Product> newProd = ProductDAO.getProduct(product.getId());
+        if (!newProd.isPresent()) {
+            throw new RuntimeException("Product not found after update");
+        }
     }
 
     public void updateDefaultPart(Part newDefault) {
@@ -301,7 +305,7 @@ public class Logic {
         PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId()));
         Optional<Part> newPart = PartDAO.getPartByNameAndProduct(name, part.getProduct());
         if (!newPart.isPresent()) {
-            throw new RuntimeException("Part not found after insertion");
+            throw new RuntimeException("Part not found after update");
         }
         // Check for parts that are pointing to this part
         PartDAO.getPartsByProduct(part.getProduct()).filter(p -> p.getNextPart() != null && p.getNextPart().equals(part))

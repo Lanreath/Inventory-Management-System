@@ -66,7 +66,7 @@ public class DataSync {
                     c.orElseThrow(() -> new IllegalStateException("Could not find Customer " + customer + " in database"));
                 }
                 // Product
-                Optional<Product> p = ProductDAO.getProductByName(product);
+                Optional<Product> p = ProductDAO.getProductByDBName(product);
                 p.orElseThrow(() -> new IllegalStateException("Could not find Product " + product + " in database"));
                 Product prod = p.get();
                 if (savedParts.get().noneMatch((pt) -> pt.getProduct().equals(prod))) {

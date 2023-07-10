@@ -91,7 +91,7 @@ public class ProductDAO {
         return products.stream().filter((product) -> product.getId() == id).findFirst();
     }
 
-    public static Optional<Product> getProductByName(String name) {
+    public static Optional<Product> getProductByDBName(String name) {
         return products.stream().filter((product) -> product.getDBName().equals(name)).findFirst();
     }
 
