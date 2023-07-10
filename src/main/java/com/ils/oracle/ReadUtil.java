@@ -9,6 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.MainApp;
+
 public class ReadUtil {
     // private static String inputDate =
     // LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
@@ -21,7 +23,7 @@ public class ReadUtil {
         "when co.customername = 'CVN'\r\n" + //
         "then 'UOB VN'\r\n" + //
         "when co.customername in ('TFWSG', 'TFW_APAC')\r\n" + //
-        "then 'TFW_AP'\r\n" + //
+        "then 'TFW_APAC'\r\n" + //
         "else co.customername\r\n" + //
         "END as customer, \r\n";
     private static final String dbNameMap = "case\r\n" + //
@@ -119,7 +121,7 @@ public class ReadUtil {
             conn = Oracle.connect();
             return conn.createStatement().executeQuery(query);
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE,
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
                     LocalDateTime.now() + ": Could not retrieve customers from Oracle database." + e.getMessage());
             return null;
         }
@@ -129,12 +131,11 @@ public class ReadUtil {
         Connection conn;
         String subquery = "SELECT\r\n" + customerName + dbNameMap + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + ") summary\r\n";
         String query = "SELECT\r\n" + resultSet + "FROM (\r\n" + subquery + group + order;
-        Logger.getAnonymousLogger().info(query);
         try {
             conn = Oracle.connect();
             return conn.createStatement().executeQuery(query);
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE,
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
                     LocalDateTime.now() + ": Could not retrieve transfers from Oracle database." + e.getMessage());
             return null;
         }

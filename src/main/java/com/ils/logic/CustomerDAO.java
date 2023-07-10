@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.MainApp;
 import com.ils.db.CRUDUtil;
 import com.ils.db.Database;
 import com.ils.models.Customer;
@@ -49,7 +50,7 @@ public class CustomerDAO {
                 ));
             } 
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                 Level.SEVERE,
                 LocalDateTime.now() + ": Could not load Customers from database " + e.getMessage()
             );

@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.MainApp;
+
 public abstract class Oracle {
     private static final Properties prop = new Properties();
     
@@ -20,7 +22,7 @@ public abstract class Oracle {
             DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
             return true;
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not start Oracle drivers " + e.getMessage());
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not start Oracle drivers " + e.getMessage());
             return false;
         }
     }
@@ -30,7 +32,7 @@ public abstract class Oracle {
             FileInputStream ip = new FileInputStream("database/oracle.properties");
             prop.load(ip);
         } catch (IOException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not load Oracle properties file " + e.getMessage());
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not load Oracle properties file " + e.getMessage());
             return null;
         }
         String username = prop.getProperty("username");
@@ -40,7 +42,7 @@ public abstract class Oracle {
         try {
             connection = DriverManager.getConnection("jdbc:oracle:thin:" + dbURL, username, password);
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not connect to Oracle database at " + location);
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not connect to Oracle database at " + location);
             return null;
         }
         return connection;
@@ -50,7 +52,7 @@ public abstract class Oracle {
         try (Connection connection = connect()) {
             return connection != null;
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not connect to Oracle database.");
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not connect to Oracle database.");
             return false;
         }
     }

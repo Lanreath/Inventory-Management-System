@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.MainApp;
+
 public class CRUDUtil {
     private static final List<String> nullableColumns = Arrays.asList("defaultPart", "productName", "nextPart", "productNotes", "partNotes");
 
@@ -40,7 +42,7 @@ public class CRUDUtil {
                 }
             }
         } catch (SQLException exception) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                     Level.SEVERE,
                     LocalDateTime.now() + ": Could not fetch from " + tableName + " by index " + index +
                             " and column " + fieldName);
@@ -69,7 +71,7 @@ public class CRUDUtil {
             PreparedStatement pstmt = conn.prepareStatement(queryBuilder.toString());
             return pstmt.executeUpdate(); // number of affected rows
         } catch (SQLException ex) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                     Level.SEVERE,
                     "Could not update " + tableName + ex.getMessage() + queryBuilder.toString());
             return -1;
@@ -124,7 +126,7 @@ public class CRUDUtil {
                 }
             }
         } catch (SQLException ex) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                     Level.SEVERE,
                     LocalDateTime.now() + ": Could not add " + tableName + " to database" + ex.getMessage());
             return -1;
@@ -141,7 +143,7 @@ public class CRUDUtil {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                     Level.SEVERE,
                     LocalDateTime.now() + ": Could not delete from " + tableName + " by id " + id +
                             " because " + e.getMessage());
@@ -194,7 +196,7 @@ public class CRUDUtil {
             PreparedStatement stmt = conn.prepareStatement(queryBuilder.toString());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                     Level.SEVERE,
                     LocalDateTime.now() + ": Could not create table " + model.getSimpleName() +
                             " because " + e.getMessage() + "\n" + queryBuilder.toString());

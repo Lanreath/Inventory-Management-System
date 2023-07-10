@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import com.ils.MainApp;
 import com.ils.models.Model;
 
 public abstract class Database {
@@ -23,7 +24,7 @@ public abstract class Database {
             DriverManager.registerDriver(new org.sqlite.JDBC());
             return true;
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not start SQLite drivers");
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not start SQLite drivers");
             return false;
         }
     }
@@ -32,12 +33,12 @@ public abstract class Database {
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:" + location);
             if (conn != null) {
-                Logger.getAnonymousLogger().log(Level.FINE,
+                Logger.getLogger(MainApp.class.getName()).log(Level.FINE,
                         LocalDateTime.now() + ": Connected to SQLite database at " + location);
             }
             return conn;
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE,
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
                     LocalDateTime.now() + ": Could not connect to SQLite database at " + location);
             return null;
         }
@@ -56,7 +57,7 @@ public abstract class Database {
             String[] tblnames = new String[requiredTables.length];
             // If no tables exist, create them
             if (!rs.isBeforeFirst()) {
-                Logger.getAnonymousLogger().log(Level.INFO,
+                Logger.getLogger(MainApp.class.getName()).log(Level.INFO,
                         LocalDateTime.now() + ": Empty database, creating tables...");
                 Model.getModels().forEach(CRUDUtil::createTable);
                 return;
@@ -66,7 +67,7 @@ public abstract class Database {
                 tblnames[rs.getRow() - 1] = rs.getString(1);
             }
             if (tblnames[requiredTables.length - 1] == null) {
-                Logger.getAnonymousLogger().log(Level.INFO, 
+                Logger.getLogger(MainApp.class.getName()).log(Level.INFO, 
                         LocalDateTime.now() + ": Database is missing tables, creating them...");
             }
             // Find all tables that are missing
@@ -79,7 +80,7 @@ public abstract class Database {
                     })
                     .forEach(CRUDUtil::createTable);
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE,
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
                     LocalDateTime.now() + ": Could not check tables in database." + e.getMessage());
         }
     }

@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import com.ils.MainApp;
 import com.ils.db.Database;
 import com.ils.models.Customer;
 import com.ils.models.Part;
@@ -37,9 +38,9 @@ public class DataSync {
                     CustomerDAO.insertCustomer(curr);
                 }
             }
-            Logger.getAnonymousLogger().log(Level.FINE, "All customers inserted");
+            Logger.getLogger(MainApp.class.getName()).log(Level.INFO, "All customers inserted");
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Customers from database " + e.getMessage());
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Customers from database " + e.getMessage());
         }
     }
     
@@ -81,7 +82,6 @@ public class DataSync {
                 }
                 if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
-                    t.getTransferQuantity() == quantity &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.WITHDRAW)) {
                     TransferDAO.insertTransfer(part, quantity, Transfer.Action.WITHDRAW);
@@ -89,10 +89,24 @@ public class DataSync {
                     // Update Part quantity
                     Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId());
                     PartDAO.updatePart(newPart);
+                } else {
+                    // Transfer already exists, but quantity might be different
+                    Optional<Transfer> t = TransferDAO.getTransferByPartAndDate(part, date);
+                    t.orElseThrow(() -> new IllegalStateException("Could not find matching transfer in database"));    
+                    Transfer transfer = t.get();
+                    if (transfer.getTransferQuantity() != quantity) {
+                        // Update Transfer quantity
+                        Transfer newTransfer = new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity(), transfer.getTransferType(), transfer.getId());
+                        TransferDAO.updateTransfer(newTransfer);
+
+                        // Update Part quantity, subtracting the difference
+                        Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), quantity - transfer.getTransferQuantity(), part.getProduct(), part.getId());
+                        PartDAO.updatePart(newPart);
+                    }
                 }
             }
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Transfers from database " + e.getMessage());
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Transfers from database " + e.getMessage());
         }
     }
 }

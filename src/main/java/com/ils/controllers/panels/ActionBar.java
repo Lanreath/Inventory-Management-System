@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.MainApp;
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;
 
@@ -119,7 +120,7 @@ public class ActionBar extends Component<Region> {
                 status.setText("Synced!");
                 status.setStyle("-fx-text-fill: #00ff00;");
             } catch (IllegalStateException e) {
-                Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": IllegalStateException from database " + e.getMessage());
+                Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": IllegalStateException from database " + e.getMessage());
                 status.setText("Sync failed!");
                 status.setStyle("-fx-text-fill: #ff0000;");
             } catch (IllegalArgumentException e) {

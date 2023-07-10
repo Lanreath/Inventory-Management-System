@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import com.ils.MainApp;
 import com.ils.db.CRUDUtil;
 import com.ils.db.Database;
 import com.ils.models.Customer;
@@ -64,7 +65,7 @@ public class ProductDAO {
                 ));
             } 
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                 Level.SEVERE,
                 LocalDateTime.now() + ": Could not load Products from database " + e.getMessage()
             );
@@ -82,7 +83,7 @@ public class ProductDAO {
                 product.setDefaultPart(part);
             });
             if (!defaultPart.isPresent()) {
-                Logger.getAnonymousLogger().log(Level.FINE, "No default part found");
+                Logger.getLogger(MainApp.class.getName()).log(Level.FINE, "No default part found");
             }
         });
     }

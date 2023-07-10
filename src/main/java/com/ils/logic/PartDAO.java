@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import com.ils.MainApp;
 import com.ils.db.CRUDUtil;
 import com.ils.db.Database;
 import com.ils.models.Part;
@@ -52,7 +53,7 @@ public class PartDAO {
             while (rs.next()) {
                 Optional<Product> product = ProductDAO.getProduct(rs.getInt(productIdColumn));
                 if (!product.isPresent()) {
-                    Logger.getAnonymousLogger().log(
+                    Logger.getLogger(MainApp.class.getName()).log(
                         Level.SEVERE,
                         LocalDateTime.now() + ": Could not load Part from database, Product with id " + rs.getInt(productIdColumn) + " not found"
                     );
@@ -82,7 +83,7 @@ public class PartDAO {
                 }
             } 
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                 Level.SEVERE,
                 LocalDateTime.now() + ": Could not load Parts from database "
             );
@@ -98,7 +99,7 @@ public class PartDAO {
                 if (nextPart.isPresent()) {
                     part.setNextPart(nextPart.get());
                 } else {
-                    Logger.getAnonymousLogger().log(
+                    Logger.getLogger(MainApp.class.getName()).log(
                         Level.SEVERE,
                         LocalDateTime.now() + ": Could not load Part from database, Part with id " + part.getNextPart().getId() + " not found"
                     );

@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import com.ils.MainApp;
 import com.ils.db.CRUDUtil;
 import com.ils.db.Database;
 import com.ils.models.Customer;
@@ -63,7 +64,7 @@ public class TransferDAO {
                 ));
             } 
         } catch (SQLException e) {
-            Logger.getAnonymousLogger().log(
+            Logger.getLogger(MainApp.class.getName()).log(
                 Level.SEVERE,
                 LocalDateTime.now() + ": Could not load Transfers from database " + e.getMessage()
             );
@@ -73,6 +74,10 @@ public class TransferDAO {
 
     public static Optional<Transfer> getTransfer(int id) {
         return transfers.stream().filter(t -> t.getId() == id).findFirst();
+    }
+
+    public static Optional<Transfer> getTransferByPartAndDate(Part part, LocalDate date) {
+        return transfers.stream().filter(t -> t.getPart().equals(part) && t.getTransferDateTime().toLocalDate().equals(date)).findFirst();
     }
 
     public static Stream<Transfer> getTransfersByCustomer(Customer cust) {
