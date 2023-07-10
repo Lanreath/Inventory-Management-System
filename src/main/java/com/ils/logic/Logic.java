@@ -279,6 +279,27 @@ public class Logic {
         }
     }
 
+    public void updateProductNotes(Product product, String notes) {
+        Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getDefaultPart(), product.getProductName(), notes, product.getId());
+        // Update product of parts
+        for (Part part : PartDAO.getPartsByProduct(product).collect(Collectors.toList())) {
+            PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), newProd, part.getNextPart(), part.getPartNotes(), part.getId()));
+        }
+        // Update nextPart of parts
+        for (Part part : PartDAO.getPartsByProduct(product).collect(Collectors.toList())) {
+            if (part.getNextPart() != null) {
+                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), PartDAO.getPart(part.getNextPart().getId()).get(), part.getPartNotes(), part.getId()));
+            }
+        }
+        // Update default part
+        if (product.getDefaultPart() != null) {
+            Part newDefault = PartDAO.getPart(product.getDefaultPart().getId()).get();
+            newProd.setDefaultPart(newDefault);
+        }
+        // Update product
+        ProductDAO.updateProduct(newProd);
+    }
+
     public void updateDefaultPart(Part newDefault) {
         if (newDefault.getProduct().getDefaultPart().equals(newDefault)) {
             return;
@@ -322,6 +343,24 @@ public class Logic {
 
     public void updatePartQuantity(Part part, int quantity) {
         PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), quantity, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId()));
+    }
+
+    public void updatePartNotes(Part part, String notes) {
+        PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getNextPart(), notes, part.getId()));
+        Optional<Part> newPart = PartDAO.getPart(part.getId());
+        if (!newPart.isPresent()) {
+            throw new RuntimeException("Part not found after update");
+        }
+        // Check if product's default part is this part
+        if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
+            part.getProduct().setDefaultPart(newPart.get());
+            ProductDAO.updateProduct(part.getProduct());
+        }
+        List<Part> list = PartDAO.getPartsByProduct(part.getProduct()).filter(p -> p.getNextPart() != null && p.getNextPart().equals(part)).collect(Collectors.toList());
+        for (Part p : list) {
+            p.setNextPart(newPart.get());
+            PartDAO.updatePart(p);
+        }
     }
 
     public void deleteCustomer(Customer customer) {

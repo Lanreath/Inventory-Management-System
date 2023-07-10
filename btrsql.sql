@@ -47,45 +47,47 @@ when co.customername IN ('SCBSG','SCBBR') then
 when co.customername = 'CCLSG' then
 get_token(pr.productalias,'1','_') || '-' || 
     case
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00010' then 'Net App'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00016' then 'Net App'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00022' then 'Navitas'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00048' then 'Mc Premium'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00049' then 'CNPC Silver'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00050' then 'CNPC Gold'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00052' then 'Honeywell'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00067' then 'Bayer'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00068' then 'AIA'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00069' then 'AIA'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00071' then 'APMM TERMINAL'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00072' then 'APM DAMCO'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00073' then 'APM MAERSK LINE'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00076' then 'APMM TERMINAL'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00077' then 'APM DAMCO'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00078' then 'APM MAERSK LINE'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00079' then 'APM MAERSK TANKER'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00080' then 'APM SVITZER'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00081' then 'APM MAERSK DRILLING'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00082' then 'APM DAMCO'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00083' then 'APM MAERSK LINE'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00084' then 'APM SVITZER'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00085' then 'APM MAERSK DRILLING'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00089' then 'NBC UNIVERSAL'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00104' then 'GENERAL MOTORS'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00106' then 'SAMSUNG TAIWAN'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00107' then 'FONTERRA'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00120' then 'SCHRODERS'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00123' then 'JTI'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00149' then 'WHITE CARD PLASTIC'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00157' then 'ICARE Pcard'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00164' then 'NETFLIX'
-    when get_token(ca.exportedkeyvalue4,'9',';') ='00167' then 'PALANTIR'
+    when ca.custom ='00010' then 'Net App'
+    when ca.custom ='00016' then 'Net App'
+    when ca.custom ='00022' then 'Navitas'
+    when ca.custom ='00048' then 'Mc Premium'
+    when ca.custom ='00049' then 'CNPC Silver'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00050' then 'CNPC Gold'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00052' then 'Honeywell'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00067' then 'Bayer'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00068' then 'AIA'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00069' then 'AIA'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00071' then 'APMM TERMINAL'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00072' then 'APM DAMCO'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00073' then 'APM MAERSK LINE'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00076' then 'APMM TERMINAL'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00077' then 'APM DAMCO'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00078' then 'APM MAERSK LINE'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00079' then 'APM MAERSK TANKER'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00080' then 'APM SVITZER'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00081' then 'APM MAERSK DRILLING'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00082' then 'APM DAMCO'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00083' then 'APM MAERSK LINE'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00084' then 'APM SVITZER'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00085' then 'APM MAERSK DRILLING'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00089' then 'NBC UNIVERSAL'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00104' then 'GENERAL MOTORS'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00106' then 'SAMSUNG TAIWAN'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00107' then 'FONTERRA'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00120' then 'SCHRODERS'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00123' then 'JTI'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00149' then 'WHITE CARD PLASTIC'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00157' then 'ICARE Pcard'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00164' then 'NETFLIX'
+--    when get_token(ca.exportedkeyvalue4,'9',';') ='00167' then 'PALANTIR'
     else SUBSTR(pr.productkey1,1,4)
     end
 else get_token(pr.productalias,'1','_')
 END as vaultname,
-wo.quantity as qty,
-from customerorder co, workorder wo, product pr, part pt, card ca
+wo.quantity as qty
+from customerorder co, workorder wo, product pr, part pt, (
+SELECT DISTINCT workorderid, get_token(exportedkeyvalue4,'9',';') as custom FROM card
+) ca
 where wo.productid = pr.productid
 and pr.productkey1 = pt.productkey1
 and pr.configurationid = pt.configurationid
@@ -94,9 +96,9 @@ and wo.status <> 700
 and wo.splitflag <> 1
 and (get_token(pr.productname,'5','_') != 'RNW')
 and co.customername <> 'CSG'
-and  to_date(wo.creationdate,'DD/MM/YY') = to_date($P{PersoDate},'DD/MM/YY')
+and  to_date(wo.creationdate,'DD/MM/YY') = to_date('10/07/23','DD/MM/YY')
 and wo.customerorderid = co.customerorderid
 and ca.workorderid=wo.workorderid
-) as summary
+) summary
 GROUP BY customer, product, vaultname
-ORDER BY vaultname
+ORDER BY customer, vaultname;

@@ -1,5 +1,6 @@
 package com.ils.controllers.panels;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -7,6 +8,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
@@ -119,6 +122,22 @@ public class InfoBar extends Component<HBox> {
             }
         });
         productNotes.visibleProperty().bind(prpt.selectedItemProperty().isNotNull());
+        productNotes.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent ke) {
+                if (ke.getCode().equals(KeyCode.ENTER)) {
+                    if (prpt.getSelectedItem().getValue() instanceof Part) {
+                        Part part = (Part) prpt.getSelectedItem().getValue();
+                        logic.updatePartNotes(part, productNotes.getText());
+                    } else if (prpt.getSelectedItem().getValue() instanceof Product) {
+                        Product product = (Product) prpt.getSelectedItem().getValue();
+                        logic.updateProductNotes(product, productNotes.getText());
+                    } else {
+                        return;
+                    }
+                }
+            }
+        });
         setDefaultPartBtn.visibleProperty().bind(prpt.selectedItemProperty().isNotNull());
         setDefaultPartBtn.setOnAction(event -> {
             if (prpt.getSelectedItem() == null) {
@@ -169,14 +188,6 @@ public class InfoBar extends Component<HBox> {
         this.productInfo.getChildren().addAll(productOpeningDesc, productMonthlyOpeningBal, productClosingDesc, productMonthlyClosingBal, productChangeDesc, productMonthlyChange);
     }
 
-    private void removeCustomerInfo() {
-        this.customerInfo.getChildren().clear();
-    }
-
-    private void removeProductInfo() {
-        this.productInfo.getChildren().clear();
-    }
-
     private void updateProductNotes() {
         if (prpt.getSelectedItem() == null) {
             return;
@@ -188,5 +199,13 @@ public class InfoBar extends Component<HBox> {
             Part part = (Part) prpt.getSelectedItem().getValue();
             productNotes.setText(part.getPartNotes());
         }
+    }
+
+    private void removeCustomerInfo() {
+        this.customerInfo.getChildren().clear();
+    }
+
+    private void removeProductInfo() {
+        this.productInfo.getChildren().clear();
     }
 }
