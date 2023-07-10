@@ -19,20 +19,15 @@ import com.ils.oracle.Oracle;
 import com.ils.oracle.ReadUtil;
 
 public class DataSync {
-    private String oracleUsername;
-    private String oraclePassword;
-
-    protected DataSync(String oracleUsername, String oraclePassword) {
-        if (Database.isOK() && Oracle.isOK(oracleUsername, oraclePassword)) {
-            this.oracleUsername = oracleUsername;
-            this.oraclePassword = oraclePassword;
+    protected DataSync() {
+        if (Database.isOK() && Oracle.isOK()) {
             return;
         }
-        throw new IllegalArgumentException("Could not connect to database, please check your credentials");
+        throw new IllegalArgumentException("Could not connect to database, please check your properties file at database/oracle.properties");
     }
 
     protected void syncCustomers() {
-        ResultSet customers = ReadUtil.readCustomers(oracleUsername, oraclePassword);
+        ResultSet customers = ReadUtil.readCustomers();
         Supplier<Stream<String>> savedCustomers = () -> CustomerDAO.getCustomers().stream().map(Customer::getCustomerName);
         try {
             while (customers.next()) {
@@ -49,14 +44,14 @@ public class DataSync {
     }
     
     protected void syncTransfers(LocalDate date) {
-        ResultSet transfers = ReadUtil.readTransfersByDate(oracleUsername, oraclePassword, date);
+        ResultSet transfers = ReadUtil.readTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
         Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
-                String product = transfers.getString("PRODUCT");
+                String product = transfers.getString("VAULTNAME");
                 int quantity = transfers.getInt("QUANTITY");
 
                 if (savedProducts.get().noneMatch((p) -> p.equals(product))) {

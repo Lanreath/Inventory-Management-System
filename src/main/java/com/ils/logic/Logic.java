@@ -497,8 +497,8 @@ public class Logic {
         filters.filterTransferByAction(type);
     }
 
-    public void syncData(String username, String password, LocalDate date) throws IllegalArgumentException {
-        sync = new DataSync(username, password);
+    public void syncData(LocalDate date) throws IllegalArgumentException {
+        sync = new DataSync();
         if (this.customerFilteredList.isEmpty()) {
             sync.syncCustomers();
         }

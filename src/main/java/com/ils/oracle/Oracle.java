@@ -1,13 +1,17 @@
 package com.ils.oracle;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class Oracle {
+    private static final Properties prop = new Properties();
     
     private static final String location = "@10.151.40.55:1521:PCMS";
 
@@ -21,10 +25,20 @@ public abstract class Oracle {
         }
     }
 
-    protected static Connection connect(String username, String password) {
+    protected static Connection connect() {
+        try {
+            FileInputStream ip = new FileInputStream("database/oracle.properties");
+            prop.load(ip);
+        } catch (IOException e) {
+            Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not load Oracle properties file " + e.getMessage());
+            return null;
+        }
+        String username = prop.getProperty("username");
+        String password = prop.getProperty("password");
+        String dbURL = prop.getProperty("db.url");
         Connection connection;
         try {
-            connection = DriverManager.getConnection("jdbc:oracle:thin:" + location, username, password);
+            connection = DriverManager.getConnection("jdbc:oracle:thin:" + dbURL, username, password);
         } catch (SQLException e) {
             Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not connect to Oracle database at " + location);
             return null;
@@ -32,16 +46,16 @@ public abstract class Oracle {
         return connection;
     }
 
-    private static boolean checkConnection(String username, String password) {
-        try (Connection connection = connect(username, password)) {
+    private static boolean checkConnection() {
+        try (Connection connection = connect()) {
             return connection != null;
         } catch (SQLException e) {
             Logger.getAnonymousLogger().log(Level.SEVERE, LocalDateTime.now() + ": Could not connect to Oracle database.");
             return false;
         }
     }
-    public static boolean isOK(String username, String password){
-        return checkDrivers() && checkConnection(username, password);
+    public static boolean isOK(){
+        return checkDrivers() && checkConnection();
     }
 
 }

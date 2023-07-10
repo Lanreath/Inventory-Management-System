@@ -42,12 +42,6 @@ public class ActionBar extends Component<Region> {
     private Button syncBtn;
 
     @FXML
-    private TextField username;
-
-    @FXML
-    private PasswordField password;
-
-    @FXML
     private DatePicker syncDate;
 
     @FXML
@@ -93,18 +87,6 @@ public class ActionBar extends Component<Region> {
         syncBtn.setGraphic(sync);
         syncBtn.setTooltip(new Tooltip("Sync data"));
         syncBtn.setOnAction(syncEventHandler);
-        username.setPromptText("Username");
-        username.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                syncEventHandler.handle(new ActionEvent());
-            }
-        });
-        password.setPromptText("Password");
-        password.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                syncEventHandler.handle(new ActionEvent());
-            }
-        });
         syncDate.setValue(LocalDate.now());
     }
 
@@ -130,15 +112,10 @@ public class ActionBar extends Component<Region> {
 
 
     private EventHandler<ActionEvent> syncEventHandler = (event) -> {
-            if (username.getText().isEmpty() || password.getText().isEmpty()) {
-                status.setText("Please enter username and password!");
-                status.setStyle("-fx-text-fill: #ff0000;");
-                return;
-            }
             status.setText("Syncing...");
             status.setStyle("-fx-text-fill: #000000;");
             try {
-                this.logic.syncData(username.getText(), password.getText(), syncDate.getValue());
+                this.logic.syncData(syncDate.getValue());
                 status.setText("Synced!");
                 status.setStyle("-fx-text-fill: #00ff00;");
             } catch (IllegalStateException e) {

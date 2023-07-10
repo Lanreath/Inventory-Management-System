@@ -12,10 +12,10 @@ import java.util.logging.Logger;
 public class ReadUtil {
     // private static String inputDate =
     // LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
-    private static final String resultSet = "customer, product, vaultname, SUM(qty)\r\n";
+    private static final String resultSet = "customer, vaultname, SUM(qty) as quantity\r\n";
     private static final String customerName = "case\r\n" + //
-        "when INSTR(pr.productname, 'P71') > 0\r\n" + //
-        "then 'AMXSG_METAL'\r\n" + //
+        // "when INSTR(pr.productname, 'P71') > 0\r\n" + //
+        // "then 'AMXSG_METAL'\r\n" + //
         "when co.customername = 'CCL_APAC'\r\n" + //
         "then 'CCLSG'\r\n" + //
         "when co.customername = 'CVN'\r\n" + //
@@ -24,7 +24,6 @@ public class ReadUtil {
         "then 'TFW_AP'\r\n" + //
         "else co.customername\r\n" + //
         "END as customer, \r\n";
-    private static final String dbName = "get_token(pr.productname,1,'_') as product, \r\n";
     private static final String dbNameMap = "case\r\n" + //
         "when co.customername = 'AMEX_BAHRAIN' then\r\n" + //
         "    case\r\n" + //
@@ -110,14 +109,14 @@ public class ReadUtil {
             "and to_date(wo.creationdate,'DD/MM/YY') = to_date(";
     private static final String join2 = ", 'DD/MM/YY')\r\n" + "and wo.customerorderid = co.customerorderid " + //
         "and ca.workorderid = wo.workorderid\r\n";
-    private static final String group = "GROUP BY customer, product, vaultname\r\n";
-    private static final String order = "ORDER BY customer, vaultname;";
+    private static final String group = "GROUP BY customer, vaultname\r\n";
+    private static final String order = "ORDER BY customer, vaultname";
 
-    public static ResultSet readCustomers(String username, String password) {
+    public static ResultSet readCustomers() {
         Connection conn;
         String query = "SELECT * FROM CUSTOMER";
         try {
-            conn = Oracle.connect(username, password);
+            conn = Oracle.connect();
             return conn.createStatement().executeQuery(query);
         } catch (SQLException e) {
             Logger.getAnonymousLogger().log(Level.SEVERE,
@@ -126,12 +125,13 @@ public class ReadUtil {
         }
     }
 
-    public static ResultSet readTransfersByDate(String username, String password, LocalDate date) {
+    public static ResultSet readTransfersByDate(LocalDate date) {
         Connection conn;
-        String subquery = "SELECT\r\n" + customerName + dbName + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + ") summary\r\n";
+        String subquery = "SELECT\r\n" + customerName + dbNameMap + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + ") summary\r\n";
         String query = "SELECT\r\n" + resultSet + "FROM (\r\n" + subquery + group + order;
+        Logger.getAnonymousLogger().info(query);
         try {
-            conn = Oracle.connect(username, password);
+            conn = Oracle.connect();
             return conn.createStatement().executeQuery(query);
         } catch (SQLException e) {
             Logger.getAnonymousLogger().log(Level.SEVERE,
