@@ -2,10 +2,32 @@
 layout: page
 title: User Guide
 ---
-
 ---
 
 ## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Quick Start](#quick-start)
+- [Features](#features)
+  - [Adding a customer](#adding-a-customer)
+  - [Adding a product](#adding-a-product)
+  - [Adding a part](#adding-a-part)
+  - [Adding a transfer](#adding-a-transfer)
+  - [Editing product names](#editing-product-names)
+  - [Editing part names](#editing-part-names)
+  - [Deleting a customer](#deleting-a-customer)
+  - [Deleting a product](#deleting-a-product)
+  - [Deleting a part](#deleting-a-part)
+  - [Deleting a transfer](#deleting-a-transfer)
+  - [Filtering customers by name](#filtering-customers-by-name)
+  - [Filtering products/parts by name](#filtering-productsparts-by-name)
+  - [Filtering transfers by date](#filtering-transfers-by-date)
+  - [Filtering transfers by type](#filtering-transfers-by-type)
+  - [Data Synchronization](#data-synchronization)
+  - [Customer Statistics](#customer-statistics)
+  - [Product/Part Statistics](#productpart-statistics)
+  - [Setting default part for a product](#setting-default-part-for-a-product)
+  - [Editing product/part notes](#editing-productpart-notes)
 
 ## Quick Start
 
@@ -27,6 +49,8 @@ title: User Guide
 
 7. Try out the different filters to see how they work.
 
+---
+
 ## Features
 
 ### Adding a customer
@@ -39,7 +63,7 @@ An input box will appear. Enter the customer's name and click on the `Save` butt
 
 ![AddCustomerInput](images/addcustomerinput.png)
 
-A new customer will be added to the table. The section is highlighted in the image below:
+A new customer will be added to the table.
 
 ![AddCustomerTable](images/addcustomertable.png)
 
@@ -55,7 +79,7 @@ An input box will appear. Enter the product's name and click on the `Save` butto
 
 Note that a customer must be selected before a product can be added.
 
-A new product will be added to the table along with a default part. The section is highlighted in the image below:
+A new product will be added to the table along with a default part.
 
 ![AddProductTable](images/addproducttable.png)
 
@@ -71,7 +95,7 @@ An input box will appear. Enter the part's name and quantity, then click on the 
 
 Note that a product must be selected before a part can be added.
 
-A new part will be added to the table. The section is highlighted in the image below:
+A new part will be added to the table.
 
 ![AddPartTable](images/addparttable.png)
 
@@ -87,7 +111,7 @@ An input box will appear. Enter the transfer's quantity and type, then click on 
 
 Note that a part must be selected before a transfer can be added.
 
-A new transfer will be added to the table. The section is highlighted in the image below:
+A new transfer will be added to the table.
 
 ![AddTransferTable](images/addtransfertable.png)
 
@@ -111,7 +135,7 @@ To save the changes, press the `Enter` key on your keyboard.
 
 To delete a customer, select the customer in the table and click on the `Delete` button on the action bar. The section is highlighted in the image below:
 
-![DeleteCustomerButton](images/deletecustomerbutton.png)
+![DeleteCustomerButton](images/deletebutton.png)
 
 A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
 
@@ -123,11 +147,11 @@ Note that deleting a customer will also delete all the products, parts and trans
 
 To delete a product, select the product in the table and click on the `Delete` button on the action bar. The section is highlighted in the image below:
 
-![DeleteProductButton](images/deleteproductbutton.png)
+![DeleteProductButton](images/deletebutton.png)
 
 A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
 
-![DeleteProductConfirmation](images/deleteproductconfirmation.png)
+![DeleteProductConfirmation](images/deleteproconfirmation.png)
 
 Note that deleting a product will also delete all the parts and transfers associated with the product.
 
@@ -135,7 +159,7 @@ Note that deleting a product will also delete all the parts and transfers associ
 
 To delete a part, select the part in the table and click on the `Delete` button on the action bar. The section is highlighted in the image below:
 
-![DeletePartButton](images/deletepartbutton.png)
+![DeletePartButton](images/deletebutton.png)
 
 A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
 
@@ -145,7 +169,7 @@ A confirmation box will appear. Click on the `Yes` button to confirm the deletio
 
 To delete a transfer, select the transfer in the table and click on the `Delete` button on the action bar. The section is highlighted in the image below:
 
-![DeleteTransferButton](images/deletetransferbutton.png)
+![DeleteTransferButton](images/deletebutton.png)
 
 A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
 
