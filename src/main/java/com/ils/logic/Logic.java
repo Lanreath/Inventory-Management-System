@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -267,12 +269,13 @@ public class Logic {
     public void updateCustomer(Customer customer, String name) {
         CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
         Customer cust = CustomerDAO.getCustomer(customer.getId()).get();
-        ProductDAO.getProductsByCustomer(customer)
-                .forEach(product -> ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getId())));
+        for (Product product : ProductDAO.getProductsByCustomer(customer).collect(Collectors.toList())) {
+            ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust, product.getDefaultPart(), product.getProductName(), product.getProductNotes(), product.getId()));
+        }
     }
 
     public void updateProductName(Product product, String name) {
-        Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getDefaultPart(), product.getProductNotes(), name, product.getId());
+        Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getDefaultPart(), name, product.getProductNotes(), product.getId());
         // Update product of parts
         for (Part part : PartDAO.getPartsByProduct(product).collect(Collectors.toList())) {
             Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), newProd, part.getNextPart(), part.getPartNotes(), part.getId());
@@ -282,10 +285,12 @@ public class Logic {
                 newProd.setDefaultPart(newPart);
             }
             // Check for parts that have this part as next part
-            PartDAO.getPartsByProduct(part.getProduct()).filter(p -> p.getNextPart() != null && p.getNextPart().equals(part)).forEach(p -> {
-                p.setNextPart(newPart);
-                PartDAO.updatePart(p);
-            });
+            for (Part p : PartDAO.getPartsByProduct(part.getProduct()).collect(Collectors.toList())) {
+                if (p.getNextPart() != null && p.getNextPart().equals(part)) {
+                    p.setNextPart(newPart);
+                    PartDAO.updatePart(p);
+                }
+            }
             // Update transfers of parts
             for (Transfer transfer : TransferDAO.getTransfersByPart(part).collect(Collectors.toList())) {
                 Transfer newTransfer = new Transfer(transfer.getTransferDateTime(), newPart, transfer.getPrevPartQuantity(), transfer.getTransferQuantity(), transfer.getTransferType(), transfer.getId());

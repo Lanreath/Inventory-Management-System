@@ -114,7 +114,7 @@ public class ProductPartTable extends Component<Region> {
                 if (name == null) {
                     return new SimpleStringProperty("-");
                 }
-                return new SimpleStringProperty(prod.getProductName());
+                return new SimpleStringProperty(name);
             } else if (rowItem != null && rowItem.getValue() instanceof Part) {
                 Part part = (Part) rowItem.getValue();
                 return new SimpleStringProperty(part.getPartName());
@@ -152,27 +152,6 @@ public class ProductPartTable extends Component<Region> {
             } else {
                 throw new RuntimeException("Unknown row item type");
             }
-        });
-        quantityColumn.setCellFactory(c -> {
-            return new TextFieldTreeTableCell<Object, Integer>() {
-                @Override
-                public void startEdit() {
-                    TreeItem<Object> rowItem = getTreeTableRow().getTreeItem();
-                    if (rowItem != null && rowItem.getValue() instanceof Product) {
-                        return;
-                    }
-                    super.startEdit();
-                }
-            };
-        });
-        quantityColumn.setOnEditCommit((TreeTableColumn.CellEditEvent<Object, Integer> event) -> {
-            Object prpt = event.getTreeTableView().getTreeItem(event.getTreeTablePosition().getRow()).getValue();
-            if (prpt instanceof Part) {
-                Part part = (Part) prpt;
-                this.logic.updatePartQuantity(part, event.getNewValue());
-                rebuild();
-            }
-            throw new RuntimeException("Unknown row item type");
         });
    }
 
