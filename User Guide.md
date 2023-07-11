@@ -151,7 +151,7 @@ To delete a product, select the product in the table and click on the `Delete` b
 
 A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
 
-![DeleteProductConfirmation](images/deleteproconfirmation.png)
+![DeleteProductConfirmation](images/deleteproductconfirmation.png)
 
 Note that deleting a product will also delete all the parts and transfers associated with the product.
 
@@ -237,7 +237,7 @@ The statistics are updated whenever a customer is selected.
 
 The date range for the statistics can be changed by selecting a start date and end date using the datepickers shown below:
 
-![StatisticsDateRange](images/customerstatisticsdaterange.png)
+![StatisticsDateRange](images/statisticsdaterange.png)
 
 ### Product/Part Statistics
 
@@ -249,7 +249,7 @@ The statistics are updated whenever a product/part is selected.
 
 The date range for the statistics can be changed by selecting a start date and end date using the datepickers shown below:
 
-![StatisticsDateRange](images/productpartstatisticsdaterange.png)
+![StatisticsDateRange](images/statisticsdaterange.png)
 
 ### Setting default part for a product
 
