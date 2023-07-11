@@ -110,9 +110,9 @@ public class TransferDAO {
     public static void updateTransfer(Transfer newTransfer) {
         int rows = CRUDUtil.update(
             tableName,
-            new String[] { transferTimeColumn, partIdColumn, prevPartQuantityColumn, quantityColumn, transferTypeColumn },
-            new Object[] { newTransfer.getTransferDateTime(), newTransfer.getPart().getId(), newTransfer.getPrevPartQuantity(), newTransfer.getTransferQuantity(), newTransfer.getTransferType().name() },
-            new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR },
+            new String[] { partIdColumn, prevPartQuantityColumn, quantityColumn, transferTypeColumn },
+            new Object[] { newTransfer.getPart().getId(), newTransfer.getPrevPartQuantity(), newTransfer.getTransferQuantity(), newTransfer.getTransferType().name() },
+            new int[] { Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR },
             idColumn,
             Types.INTEGER,
             newTransfer.getId()

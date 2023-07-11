@@ -32,8 +32,8 @@ compileJava {
     options.release = 8
 }
 
-run {
-    enableAssertions = true
+tasks.withType(JavaExec) {
+     enableAssertions = true
 }
 
 jar {

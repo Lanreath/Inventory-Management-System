@@ -272,11 +272,27 @@ public class Logic {
     }
 
     public void updateProductName(Product product, String name) {
-        ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getDefaultPart(), name, product.getProductNotes(), product.getId()));
-        Optional<Product> newProd = ProductDAO.getProduct(product.getId());
-        if (!newProd.isPresent()) {
-            throw new RuntimeException("Product not found after update");
+        Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(), product.getDefaultPart(), product.getProductNotes(), name, product.getId());
+        // Update product of parts
+        for (Part part : PartDAO.getPartsByProduct(product).collect(Collectors.toList())) {
+            Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), newProd, part.getNextPart(), part.getPartNotes(), part.getId());
+            PartDAO.updatePart(newPart);
+            // Check for default part change
+            if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
+                newProd.setDefaultPart(newPart);
+            }
+            // Check for parts that have this part as next part
+            PartDAO.getPartsByProduct(part.getProduct()).filter(p -> p.getNextPart() != null && p.getNextPart().equals(part)).forEach(p -> {
+                p.setNextPart(newPart);
+                PartDAO.updatePart(p);
+            });
+            // Update transfers of parts
+            for (Transfer transfer : TransferDAO.getTransfersByPart(part).collect(Collectors.toList())) {
+                Transfer newTransfer = new Transfer(transfer.getTransferDateTime(), newPart, transfer.getPrevPartQuantity(), transfer.getTransferQuantity(), transfer.getTransferType(), transfer.getId());
+                TransferDAO.updateTransfer(newTransfer);
+            }
         }
+        ProductDAO.updateProduct(newProd);
     }
 
     public void updateProductNotes(Product product, String notes) {
@@ -453,6 +469,7 @@ public class Logic {
             // If not, clear the filters and assert that the correct values are now present
             filters.clearProductCustomerFilter();
             filters.clearDBNameFilter();
+            // TODO: Bug
             assert getProducts().contains(product);
         }
         // Set the filters to the correct values
