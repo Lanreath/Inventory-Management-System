@@ -2,7 +2,6 @@ package com.ils.logic;
 
 import java.time.LocalDate;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 
 import com.ils.models.Customer;
 import com.ils.models.Part;
@@ -17,7 +16,6 @@ public class Filters {
     private ObjectProperty<Predicate<Product>> dbNameFilter;
     private ObjectProperty<Predicate<Product>> productCustomerFilter;
     private ObjectProperty<Predicate<Transfer>> transferDateFilter;
-    private ObjectProperty<Predicate<Transfer>> transferMonthFilter;
     private ObjectProperty<Predicate<Transfer>> transferActionFilter;
     private ObjectProperty<Predicate<Transfer>> transferCustomerFilter;
     private ObjectProperty<Predicate<Transfer>> transferProductFilter;

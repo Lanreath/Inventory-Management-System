@@ -50,7 +50,6 @@ public class DataSync {
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
         Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
-            CustomerDAO.insertCustomer("UOB VN");
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
                 String product = transfers.getString("VAULTNAME");

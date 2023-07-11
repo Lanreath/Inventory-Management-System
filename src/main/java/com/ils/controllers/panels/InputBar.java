@@ -1,5 +1,7 @@
 package com.ils.controllers.panels;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -9,6 +11,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;
@@ -64,6 +67,55 @@ public class InputBar extends Component<ToolBar> {
         });
     }
 
+    private EventHandler<ActionEvent> addCustomerHandler = (event) -> {
+        if (nameInput.getText().isEmpty()) {
+            displayMsg("Please enter a name.");
+            return;
+        }
+        logic.addCustomer(nameInput.getText());
+        nameInput.setText("");
+        getRoot().getItems().clear();
+    };
+
+    private EventHandler<ActionEvent> addProductHandler = (event) -> {
+        if (nameInput.getText().isEmpty()) {
+            displayMsg("Please enter a name.");
+            return;
+        }
+        logic.addProduct(nameInput.getText(), cust.getSelectedItem());
+        nameInput.setText("");
+        getRoot().getItems().clear();
+    };
+
+    private EventHandler<ActionEvent> addPartHandler = (event) -> {
+        if (nameInput.getText().isEmpty()) {
+            displayMsg("Please enter a name.");
+            return;
+        }
+        if (qtyInput.getText().isEmpty()) {
+            displayMsg("Please enter a quantity.");
+            return;
+        }
+        logic.addPart(nameInput.getText(), Integer.parseInt(qtyInput.getText()), (Product) prpt.getSelectedItem().getValue());
+        nameInput.setText("");
+        qtyInput.clear();
+        getRoot().getItems().clear();
+    };
+
+    private EventHandler<ActionEvent> addTransferHandler = (event) -> {
+        if (qtyInput.getText().isEmpty()) {
+            displayMsg("Please enter a quantity.");
+            return;
+        }
+        if (actionInput.getValue() == null) {
+            displayMsg("Please select an action.");
+            return;
+        }
+        logic.addTransfer((Part) prpt.getSelectedItem().getValue(), Integer.parseInt(qtyInput.getText()), actionInput.getValue());
+        qtyInput.clear();
+        getRoot().getItems().clear();
+    };
+
     private void displayForm(String type) {
         getRoot().getItems().clear();
         switch (type) {
@@ -100,11 +152,12 @@ public class InputBar extends Component<ToolBar> {
         displayForm("Customer");
         nameInput.setPromptText("Customer Name");
         nameInput.setText("");
-        saveBtn.setOnAction(e -> {
-            logic.addCustomer(nameInput.getText());
-            nameInput.setText("");
-            getRoot().getItems().clear();
+        nameInput.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                addCustomerHandler.handle(new ActionEvent());
+            }
         });
+        saveBtn.setOnAction(addCustomerHandler);
     }
 
     protected void addProduct() {
@@ -115,11 +168,12 @@ public class InputBar extends Component<ToolBar> {
         displayForm("Product");
         nameInput.setPromptText("Product Name");
         nameInput.setText("");
-        saveBtn.setOnAction(e -> {
-            logic.addProduct(nameInput.getText(), cust.getSelectedItem());
-            nameInput.setText("");
-            getRoot().getItems().clear();
+        nameInput.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                addProductHandler.handle(new ActionEvent());
+            }
         });
+        saveBtn.setOnAction(addProductHandler);
     }
 
     protected void addPart() {
@@ -130,14 +184,19 @@ public class InputBar extends Component<ToolBar> {
         displayForm("Part");
         nameInput.setPromptText("Part Name");
         nameInput.setText("");
+        nameInput.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                addPartHandler.handle(new ActionEvent());
+            }
+        });
         qtyInput.setPromptText("Quantity");
         qtyInput.setText("");
-        saveBtn.setOnAction(e -> {
-            logic.addPart(nameInput.getText(), Integer.parseInt(qtyInput.getText()), (Product) prpt.getSelectedItem().getValue());
-            nameInput.setText("");
-            qtyInput.clear();
-            getRoot().getItems().clear();
+        qtyInput.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                addPartHandler.handle(new ActionEvent());
+            }
         });
+        saveBtn.setOnAction(addPartHandler);
     }
 
     protected void addTransfer() {
@@ -148,11 +207,7 @@ public class InputBar extends Component<ToolBar> {
         displayForm("Transfer");
         qtyInput.setPromptText("Quantity");
         qtyInput.setText("");
-        saveBtn.setOnAction(e -> {
-            logic.addTransfer((Part) prpt.getSelectedItem().getValue(), Integer.parseInt(qtyInput.getText()), actionInput.getValue());
-            qtyInput.clear();
-            getRoot().getItems().clear();
-        });
+        saveBtn.setOnAction(addTransferHandler);
     }
 
     protected void deleteEntry() {
@@ -169,7 +224,7 @@ public class InputBar extends Component<ToolBar> {
 
     private void deleteCustomer() {
         Customer customer = cust.getSelectedItem();
-        displayDelete("customer?: " + customer.getCustomerName());
+        displayDelete("customer? " + customer.getCustomerName());
         confirmBtn.setOnAction(e -> {
             logic.deleteCustomer(customer);
             getRoot().getItems().clear();
@@ -179,14 +234,14 @@ public class InputBar extends Component<ToolBar> {
     private void deleteProductPart() {
         if (prpt.getSelectedItem().getValue() instanceof Product) {
             Product product = (Product) prpt.getSelectedItem().getValue();
-            displayDelete("product and its parts/transfers?: " + product.getDBName() + " by " + product.getCustomer().getCustomerName());
+            displayDelete("product and its parts/transfers? " + product.getDBName() + " by " + product.getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 logic.deleteProduct(product);
                 getRoot().getItems().clear();
             });
         } else {
             Part part = (Part) prpt.getSelectedItem().getValue();
-            displayDelete("part and its transfers? - " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
+            displayDelete("part and its transfers? " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 getRoot().getItems().clear();
                 if (logic.getProductParts(part.getProduct()).count() == 1) {
@@ -200,7 +255,7 @@ public class InputBar extends Component<ToolBar> {
 
     private void deleteTransfer() {
         Transfer transfer = xact.getSelectedItem();
-        displayDelete("transfer?: " + transfer.getTransferDateTime() + " Qty: " + transfer.getTransferQuantity() + " from " + transfer.getPart().getPartName() + " from " + transfer.getPart().getProduct().getDBName() + " by " + transfer.getPart().getProduct().getCustomer().getCustomerName());
+        displayDelete("transfer? " + transfer.getTransferDateTime() + " Qty: " + transfer.getTransferQuantity() + " from " + transfer.getPart().getPartName() + " from " + transfer.getPart().getProduct().getDBName() + " by " + transfer.getPart().getProduct().getCustomer().getCustomerName());
         confirmBtn.setOnAction(e -> {
             logic.deleteTransfer(transfer);
             getRoot().getItems().clear();

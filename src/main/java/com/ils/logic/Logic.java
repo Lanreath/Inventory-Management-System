@@ -474,7 +474,6 @@ public class Logic {
             // If not, clear the filters and assert that the correct values are now present
             filters.clearProductCustomerFilter();
             filters.clearDBNameFilter();
-            // TODO: Bug
             assert getProducts().contains(product);
         }
         // Set the filters to the correct values
