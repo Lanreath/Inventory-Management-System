@@ -223,10 +223,6 @@ To synchronize the application's database with the company's database, select a 
 
 ![SyncButton](images/syncbutton.png)
 
-The application will then synchronize its database with the company's database. The section is highlighted in the image below:
-
-![Syncing](images/syncing.png)
-
 ### Customer Statistics
 
 The application displays statistics for the selected customer. The statistics are displayed below the table. The section is highlighted in the image below:
