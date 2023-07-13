@@ -106,11 +106,13 @@ public class ReadUtil {
             "and wo.workorderiddisplay = wo.workorderid\r\n" + //
             "and wo.status <> 700\r\n" + //
             "and wo.splitflag <> 1\r\n" + //
-            "and (get_token(pr.productname, 5,'_') != 'RNW')\r\n" + //
+            "and wo.customerorderid = co.customerorderid " + //
+            "and ca.workorderid = wo.workorderid\r\n" +
             "and co.customername <> 'CSG'\r\n" + //
             "and to_date(wo.creationdate,'DD/MM/YY') = to_date(";
-    private static final String join2 = ", 'DD/MM/YY')\r\n" + "and wo.customerorderid = co.customerorderid " + //
-        "and ca.workorderid = wo.workorderid\r\n";
+    private static final String join2 = ", 'DD/MM/YY')\r\n";
+    private static final String daily = "and (get_token(pr.productname, 5,'_') != 'RNW')\r\n";
+    private static final String renewal = "and (get_token(pr.productname, 5,'_') = 'RNW')\r\n";
     private static final String group = "GROUP BY customer, vaultname\r\n";
     private static final String order = "ORDER BY customer, vaultname";
 
@@ -127,11 +129,26 @@ public class ReadUtil {
         }
     }
 
-    public static ResultSet readTransfersByDate(LocalDate date) {
+    public static ResultSet readDailyTransfersByDate(LocalDate date) {
         Connection conn;
-        String subquery = "SELECT\r\n" + customerName + dbNameMap + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + ") summary\r\n";
+        String subquery = "SELECT\r\n" + customerName + dbNameMap + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + daily + ") summary\r\n";
         String query = "SELECT\r\n" + resultSet + "FROM (\r\n" + subquery + group + order;
         try {
+            Logger.getLogger(MainApp.class.getName()).log(Level.INFO, query);
+            conn = Oracle.connect();
+            return conn.createStatement().executeQuery(query);
+        } catch (SQLException e) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
+                    LocalDateTime.now() + ": Could not retrieve transfers from Oracle database." + e.getMessage());
+            return null;
+        }
+    }
+    public static ResultSet readRenewalTransfersByDate(LocalDate date) {
+        Connection conn;
+        String subquery = "SELECT\r\n" + customerName + dbNameMap + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + renewal + ") summary\r\n";
+        String query = "SELECT\r\n" + resultSet + "FROM (\r\n" + subquery + group + order;
+        try {
+            Logger.getLogger(MainApp.class.getName()).log(Level.INFO, query);
             conn = Oracle.connect();
             return conn.createStatement().executeQuery(query);
         } catch (SQLException e) {

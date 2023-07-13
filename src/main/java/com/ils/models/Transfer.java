@@ -4,10 +4,15 @@ import java.time.LocalDateTime;
 
 public class Transfer {
     public enum Action {
-        RECEIVE,
-        WITHDRAW,
+        RECEIVED,
+        DAILY,
+        DESTRUCT,
+        RENEWAL,
+        PROJECT,
         SAMPLE,
-        REJECT
+        REJECT_DAILY,
+        REJECT_RENEWAL,
+        REJECT_PROJECT,
     }
 
     private final LocalDateTime transferDateTime;

@@ -13,7 +13,7 @@
     <Separator orientation="vertical"/>
     <TextFlow fx:id="productInfo"/>
     <TextField fx:id="productNotes"/>
-    <Button fx:id="setDefaultPartBtn" text="Set Default Part"/>
+    <Button fx:id="setDefaultPartBtn" text="Set Active Part"/>
     <Separator orientation="vertical"/>
     <DatePicker fx:id="startDatePicker" promptText="Start Date"/>
     <DatePicker fx:id="endDatePicker" promptText="End Date"/>

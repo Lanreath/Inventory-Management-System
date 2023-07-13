@@ -115,7 +115,7 @@ The `Transfer` class represents a transfer. It contains the following attributes
 
 Each `Transfer` object is mapped to a row in the `transfer` table in the SQLite database and a row in the `transfer` table in the Oracle database.
 
-The `part` attribute is a `Part` object that represents the part that the transfer belongs to. The `transferType` attribute is a `String` that represents the type of the transfer: `RECEIVE`, `WITHDRAW`, `REJECT`, `SAMPLE`.
+The `part` attribute is a `Part` object that represents the part that the transfer belongs to. The `transferType` attribute is a `String` that represents the type of the transfer: `RECEIVED`, `WITHDRAW`, `REJECT`, `SAMPLE`.
 
 The `transferDate` attribute is a `Date` object that represents the date of the transfer. The `transferQuantity` attribute is an `int` that represents the quantity of the transfer. The `prevPartQuantity` attribute is an `int` that represents the quantity of the part before the transfer to facilitate quantity operations.
 

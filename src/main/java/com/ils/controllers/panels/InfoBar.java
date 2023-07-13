@@ -12,6 +12,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -84,12 +85,17 @@ public class InfoBar extends Component<HBox> {
     }
 
     private void initTexts() {
+        customerInfo.setLineSpacing(1);
+        productInfo.setLineSpacing(1);
+
+        Font descFont = new Font("System Bold", 14);
+
         customerOpeningDesc = new Text("Opening Balance: ");
         customerClosingDesc = new Text("Closing Balance: ");
         customerChangeDesc = new Text("Stock Change: ");
-        customerOpeningDesc.setStyle("-fx-font-weight: bold");
-        customerClosingDesc.setStyle("-fx-font-weight: bold");
-        customerChangeDesc.setStyle("-fx-font-weight: bold");
+        customerOpeningDesc.setFont(descFont);
+        customerClosingDesc.setFont(descFont);
+        customerChangeDesc.setFont(descFont);
 
         customerMonthlyOpeningBal = new Text();
         customerMonthlyClosingBal = new Text();
@@ -98,9 +104,9 @@ public class InfoBar extends Component<HBox> {
         productOpeningDesc = new Text("Opening Balance: ");
         productClosingDesc = new Text("Closing Balance: ");
         productChangeDesc = new Text("Stock Change: ");
-        productOpeningDesc.setStyle("-fx-font-weight: bold");
-        productClosingDesc.setStyle("-fx-font-weight: bold");
-        productChangeDesc.setStyle("-fx-font-weight: bold");
+        productOpeningDesc.setFont(descFont);
+        productClosingDesc.setFont(descFont);
+        productChangeDesc.setFont(descFont);
 
         productMonthlyOpeningBal = new Text();
         productMonthlyClosingBal = new Text();

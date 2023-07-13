@@ -164,11 +164,11 @@ public class Logic {
         }
         Transfer t = latest.get();
         switch (t.getTransferType()) {
-            case WITHDRAW:
-            case REJECT:
+            case DAILY:
+            case REJECT_DAILY:
             case SAMPLE:
                 return t.getPrevPartQuantity() - t.getTransferQuantity();
-            case RECEIVE:
+            case RECEIVED:
                 return t.getPrevPartQuantity() + t.getTransferQuantity();
             default:
                 return t.getPrevPartQuantity();
@@ -184,11 +184,11 @@ public class Logic {
         }
         Transfer t = latest.get();
         switch (t.getTransferType()) {
-            case WITHDRAW:
-            case REJECT:
+            case DAILY:
+            case REJECT_DAILY:
             case SAMPLE:
                 return t.getPrevPartQuantity() - t.getTransferQuantity();
-            case RECEIVE:
+            case RECEIVED:
                 return t.getPrevPartQuantity() + t.getTransferQuantity();
             default:
                 return t.getPrevPartQuantity();
@@ -204,11 +204,11 @@ public class Logic {
         }
         Transfer t = latest.get();
         switch (t.getTransferType()) {
-            case WITHDRAW:
-            case REJECT:
+            case DAILY:
+            case REJECT_DAILY:
             case SAMPLE:
                 return t.getPrevPartQuantity() - t.getTransferQuantity();
-            case RECEIVE:
+            case RECEIVED:
                 return t.getPrevPartQuantity() + t.getTransferQuantity();
             default:
                 return t.getPrevPartQuantity();
@@ -247,12 +247,17 @@ public class Logic {
     public void addTransfer(Part part, int quantity, Transfer.Action action) {
         TransferDAO.insertTransfer(part, quantity, action);
         switch (action) {
-            case WITHDRAW:
-            case REJECT:
+            case DAILY:
+            case DESTRUCT:
+            case PROJECT:
+            case REJECT_DAILY:
+            case REJECT_PROJECT:
+            case REJECT_RENEWAL:
+            case RENEWAL:
             case SAMPLE:
                 PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId()));
                 break;
-            case RECEIVE:
+            case RECEIVED:
                 PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
                 break;
         }
@@ -523,6 +528,7 @@ public class Logic {
         if (this.customerFilteredList.isEmpty()) {
             sync.syncCustomers();
         }
-        sync.syncTransfers(date);
+        sync.syncDailyTransfers(date);
+        sync.syncRenewalTransfers(date);
     }
 }
