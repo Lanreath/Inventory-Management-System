@@ -95,7 +95,7 @@ public class ReadUtil {
     private static final String woId = "wo.workorderid as workorderid,\r\n";
     private static final String qty = "wo.quantity as qty\r\n";
     private static final String tableNames = "from customerorder co, workorder wo, product pr, part pt, (\r\n" + //
-            "SELECT DISTINCT workorderid, get_token(exportedkeyvalue4,'9',';') as custom FROM card\r\n" + //
+            "SELECT workorderid, get_token(exportedkeyvalue4,'9',';') as custom FROM card\r\n" + //
             ") ca\r\n";
     private static final String join1 = "where wo.productid = pr.productid\r\n" + //
             "and pr.productkey1 = pt.productkey1\r\n" + //
@@ -109,22 +109,22 @@ public class ReadUtil {
             "and co.customername <> 'CSG'\r\n" + //
             "and to_date(wo.creationdate,'DD/MM/YY') = to_date(";
     private static final String join2 = ", 'DD/MM/YY')\r\n";
-    private static final String daily = "and (get_token(pr.productname, 5,'_') != 'RNW')\r\n";
-    private static final String renewal = "and (get_token(pr.productname, 5,'_') = 'RNW')\r\n";
+    private static final String daily = "and get_token(pr.productname, 5,'_') != 'RNW'\r\n";
+    private static final String renewal = "and get_token(pr.productname, 5,'_') = 'RNW'\r\n";
 
     private static final String union1 = "SELECT\r\n" + //
-        "customer, product, vaultname, SUM(qty) AS qty\r\n" + //
+        "customer, vaultname, SUM(qty) AS qty\r\n" + //
         "FROM (\r\n" + //
         "SELECT DISTINCT\r\n" + //
         "customer, vaultname, workorderid, qty\r\n" + //
         "FROM summary\r\n" + //
-        "where customer <> 'CCLSG' or REGEXP_instr(vaultname, '[A_Z]+_[A-Z|a-z]+') <= 0\r\n" + //
+        "where customer <> 'CCLSG' or REGEXP_INSTR(vaultname, '[A-Z]+-[A-Z|a-z]+') <= 0\r\n" + //
         ") sub\r\n" + //
         "GROUP BY customer, vaultname\r\n";
     private static final String union2 = "SELECT\r\n" + //
         "customer, vaultname, COUNT(*) AS qty\r\n" + //
         "FROM summary\r\n" + //
-        "where customer = 'CCLSG' and REGEXP_instr(vaultname, '[A_Z]+_[A-Z|a-z]+') > 0\r\n" + //
+        "where customer = 'CCLSG' and REGEXP_instr(vaultname, '[A-Z]+-[A-Z|a-z]+') > 0\r\n" + //
         "GROUP BY customer, vaultname\r\n";
     private static final String order = "ORDER BY customer, vaultname";
 
@@ -146,7 +146,6 @@ public class ReadUtil {
         String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + daily + ")\r\n";
         String query = subquery + union1 + "UNION\r\n" + union2 + order;
         try {
-            Logger.getLogger(MainApp.class.getName()).log(Level.INFO, query);
             conn = Oracle.connect();
             return conn.createStatement().executeQuery(query);
         } catch (SQLException e) {
@@ -160,7 +159,6 @@ public class ReadUtil {
         String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + renewal + ")\r\n";
         String query = subquery + union1 + "UNION\r\n" + union2 + order;
         try {
-            Logger.getLogger(MainApp.class.getName()).log(Level.INFO, query);
             conn = Oracle.connect();
             return conn.createStatement().executeQuery(query);
         } catch (SQLException e) {

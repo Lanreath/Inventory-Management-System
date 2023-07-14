@@ -126,7 +126,7 @@ public class DataSync {
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
                 String product = transfers.getString("VAULTNAME");
-                int quantity = transfers.getInt("QUANTITY");
+                int quantity = transfers.getInt("QTY");
 
                 if (savedProducts.get().noneMatch((p) -> p.equals(product))) {
                     // Product does not exist in database
