@@ -48,8 +48,8 @@ public class InputBar extends Component<ToolBar> {
         qtyInput = new TextField();
         actionInput = new ComboBox<Transfer.Action>();
         saveBtn = new Button();
-        confirmBtn = new Button("Confirm");
-        cancelBtn = new Button("Cancel");
+        confirmBtn = new Button();
+        cancelBtn = new Button();
         qtyInput.setPromptText("Quantity");
         qtyInput.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
@@ -58,10 +58,20 @@ public class InputBar extends Component<ToolBar> {
         });
         actionInput.getItems().addAll(Transfer.Action.values());
         ImageView save = new ImageView("/images/save.png");
+        ImageView confirm = new ImageView("/images/confirm-icon.png");
+        ImageView cancel = new ImageView("/images/cancel-icon.png");
         save.setPreserveRatio(true);
         save.setFitHeight(24);
         saveBtn.setGraphic(save);
         saveBtn.setTooltip(new Tooltip("Save"));
+        confirm.setPreserveRatio(true);
+        confirm.setFitHeight(24);
+        confirmBtn.setGraphic(confirm);
+        confirmBtn.setTooltip(new Tooltip("Confirm"));
+        cancel.setPreserveRatio(true);
+        cancel.setFitHeight(24);
+        cancelBtn.setGraphic(cancel);
+        cancelBtn.setTooltip(new Tooltip("Cancel"));
         cancelBtn.setOnAction(e -> {
             getRoot().getItems().clear();
         });

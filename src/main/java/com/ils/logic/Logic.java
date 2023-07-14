@@ -122,7 +122,7 @@ public class Logic {
         selectedProduct.set(product);
     }
 
-    public Integer getMonthlyOpeningBalByCustomer(Customer cust, LocalDate from) {
+    public Integer getOpeningBalByCustomer(Customer cust, LocalDate from) {
         Stream<Transfer> matches = TransferDAO.getTransfersByCustomer(cust).sorted((t1, t2) -> t1.getTransferDateTime()
                 .compareTo(t2.getTransferDateTime()));
         Optional<Transfer> earliest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from) || t.getTransferDateTime().toLocalDate().isAfter(from)).findFirst();
@@ -133,7 +133,7 @@ public class Logic {
         return t.getPrevPartQuantity();
     }
 
-    public Integer getMonthlyOpeningBalByProduct(Product prod, LocalDate from) {
+    public Integer getOpeningBalByProduct(Product prod, LocalDate from) {
         Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod).sorted((t1, t2) -> t1.getTransferDateTime()
                 .compareTo(t2.getTransferDateTime()));
         Optional<Transfer> earliest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from) || t.getTransferDateTime().toLocalDate().isAfter(from)).findFirst();
@@ -144,7 +144,7 @@ public class Logic {
         return t.getPrevPartQuantity();
     }
 
-    public Integer getMonthlyOpeningBalByPart(Part part, LocalDate from) {
+    public Integer getOpeningBalByPart(Part part, LocalDate from) {
         Stream<Transfer> matches = TransferDAO.getTransfersByPart(part).sorted((t1, t2) -> t1.getTransferDateTime()
                 .compareTo(t2.getTransferDateTime()));
         Optional<Transfer> earliest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from) || t.getTransferDateTime().toLocalDate().isAfter(from)).findFirst();
@@ -155,7 +155,7 @@ public class Logic {
         return t.getPrevPartQuantity();
     }
 
-    public Integer getMonthlyClosingBalByCustomer(Customer cust, LocalDate to) {
+    public Integer getClosingBalByCustomer(Customer cust, LocalDate to) {
         Stream<Transfer> matches = TransferDAO.getTransfersByCustomer(cust).sorted((t1, t2) -> t2.getTransferDateTime()
                 .compareTo(t1.getTransferDateTime()));
         Optional<Transfer> latest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to) || t.getTransferDateTime().toLocalDate().isBefore(to)).findFirst();
@@ -165,7 +165,12 @@ public class Logic {
         Transfer t = latest.get();
         switch (t.getTransferType()) {
             case DAILY:
+            case DESTRUCT:
+            case PROJECT:
             case REJECT_DAILY:
+            case REJECT_PROJECT:
+            case REJECT_RENEWAL:
+            case RENEWAL:
             case SAMPLE:
                 return t.getPrevPartQuantity() - t.getTransferQuantity();
             case RECEIVED:
@@ -175,7 +180,7 @@ public class Logic {
         }
     }
 
-    public Integer getMonthlyClosingBalByProduct(Product prod, LocalDate to) {
+    public Integer getClosingBalByProduct(Product prod, LocalDate to) {
         Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod).sorted((t1, t2) -> t2.getTransferDateTime()
                 .compareTo(t1.getTransferDateTime()));
         Optional<Transfer> latest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to) || t.getTransferDateTime().toLocalDate().isBefore(to)).findFirst();
@@ -185,7 +190,12 @@ public class Logic {
         Transfer t = latest.get();
         switch (t.getTransferType()) {
             case DAILY:
+            case DESTRUCT:
+            case PROJECT:
             case REJECT_DAILY:
+            case REJECT_PROJECT:
+            case REJECT_RENEWAL:
+            case RENEWAL:
             case SAMPLE:
                 return t.getPrevPartQuantity() - t.getTransferQuantity();
             case RECEIVED:
@@ -195,7 +205,7 @@ public class Logic {
         }
     }
 
-    public Integer getMonthlyClosingBalByPart(Part part, LocalDate to) {
+    public Integer getClosingBalByPart(Part part, LocalDate to) {
         Stream<Transfer> matches = TransferDAO.getTransfersByPart(part).sorted((t1, t2) -> t2.getTransferDateTime()
                 .compareTo(t1.getTransferDateTime()));
         Optional<Transfer> latest = matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to) || t.getTransferDateTime().toLocalDate().isBefore(to)).findFirst();
@@ -205,7 +215,12 @@ public class Logic {
         Transfer t = latest.get();
         switch (t.getTransferType()) {
             case DAILY:
+            case DESTRUCT:
+            case PROJECT:
             case REJECT_DAILY:
+            case REJECT_PROJECT:
+            case REJECT_RENEWAL:
+            case RENEWAL:
             case SAMPLE:
                 return t.getPrevPartQuantity() - t.getTransferQuantity();
             case RECEIVED:
@@ -213,6 +228,60 @@ public class Logic {
             default:
                 return t.getPrevPartQuantity();
         }
+    }
+
+    public Integer getDailyTransferSumByProduct(Product prod, LocalDate start, LocalDate end) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        return matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(start) || t.getTransferDateTime().toLocalDate().isAfter(start))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(end) || t.getTransferDateTime().toLocalDate().isBefore(end))
+                .filter(t -> t.getTransferType() == Transfer.Action.DAILY)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
+    public Integer getDailyTransferSumByPart(Part part, LocalDate start, LocalDate end) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByPart(part).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        return matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(start) || t.getTransferDateTime().toLocalDate().isAfter(start))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(end) || t.getTransferDateTime().toLocalDate().isBefore(end))
+                .filter(t -> t.getTransferType() == Transfer.Action.DAILY)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
+    public Integer getRenewalTransferSumByProduct(Product prod, LocalDate start, LocalDate end) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        return matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(start) || t.getTransferDateTime().toLocalDate().isAfter(start))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(end) || t.getTransferDateTime().toLocalDate().isBefore(end))
+                .filter(t -> t.getTransferType() == Transfer.Action.RENEWAL)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
+    public Integer getRenewalTransferSumByPart(Part part, LocalDate start, LocalDate end) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByPart(part).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        return matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(start) || t.getTransferDateTime().toLocalDate().isAfter(start))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(end) || t.getTransferDateTime().toLocalDate().isBefore(end))
+                .filter(t -> t.getTransferType() == Transfer.Action.RENEWAL)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
+    public Integer getRejectTransferSumByProduct(Product prod, LocalDate start, LocalDate end) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        return matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(start) || t.getTransferDateTime().toLocalDate().isAfter(start))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(end) || t.getTransferDateTime().toLocalDate().isBefore(end))
+                .filter(t -> t.getTransferType() == Transfer.Action.REJECT_DAILY || t.getTransferType() == Transfer.Action.REJECT_PROJECT || t.getTransferType() == Transfer.Action.REJECT_RENEWAL)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
+    public Integer getRejectTransferSumByPart(Part part, LocalDate start, LocalDate end) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByPart(part).sorted((t1, t2) -> t1.getTransferDateTime()
+                .compareTo(t2.getTransferDateTime()));
+        return matches.filter(t -> t.getTransferDateTime().toLocalDate().isEqual(start) || t.getTransferDateTime().toLocalDate().isAfter(start))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(end) || t.getTransferDateTime().toLocalDate().isBefore(end))
+                .filter(t -> t.getTransferType() == Transfer.Action.REJECT_DAILY || t.getTransferType() == Transfer.Action.REJECT_PROJECT || t.getTransferType() == Transfer.Action.REJECT_RENEWAL)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
     }
 
     public void addCustomer(String name) {
@@ -230,8 +299,8 @@ public class Logic {
     }
 
     public void addPart(String name, int quantity, Product product) {
-        PartDAO.insertPart(name, quantity, product);
-        Optional<Part> newPart = PartDAO.getPartByNameAndProduct(name, product);
+        int id = PartDAO.insertPart(name, quantity, product);
+        Optional<Part> newPart = PartDAO.getPart(id);
         if (!newPart.isPresent()) {
             throw new RuntimeException("Part not found after insertion");
         }
@@ -350,7 +419,7 @@ public class Logic {
 
     public void updatePartName(Part part, String name) {
         PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId()));
-        Optional<Part> newPart = PartDAO.getPartByNameAndProduct(name, part.getProduct());
+        Optional<Part> newPart = PartDAO.getPart(part.getId());
         if (!newPart.isPresent()) {
             throw new RuntimeException("Part not found after update");
         }

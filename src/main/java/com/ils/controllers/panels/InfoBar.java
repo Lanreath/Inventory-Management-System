@@ -18,6 +18,7 @@ import javafx.scene.text.TextFlow;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.logging.Logger;
 
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;
@@ -34,6 +35,9 @@ public class InfoBar extends Component<HBox> {
 
     @FXML
     private TextFlow productInfo;
+
+    @FXML
+    private TextFlow productTransfers;
 
     @FXML
     private TextField productNotes;
@@ -54,17 +58,25 @@ public class InfoBar extends Component<HBox> {
     private Text customerClosingDesc;
     private Text customerChangeDesc;
 
-    private Text customerMonthlyOpeningBal;
-    private Text customerMonthlyClosingBal;
-    private Text customerMonthlyChange;
+    private Text customerOpeningBal;
+    private Text customerClosingBal;
+    private Text customerChangeBal;
 
     private Text productOpeningDesc;
     private Text productClosingDesc;
     private Text productChangeDesc;
+    private Text productDailyDesc;
+    private Text productRenewalDesc;
+    private Text productRejectDesc;
+    private Text productReceiveDesc;
 
-    private Text productMonthlyOpeningBal;
-    private Text productMonthlyClosingBal;
-    private Text productMonthlyChange;
+    private Text productOpeningBal;
+    private Text productClosingBal;
+    private Text productChangeBal;
+    private Text productDailyBal;
+    private Text productRenewalBal;
+    private Text productRejectBal;
+    private Text productReceiveBal;
 
     public InfoBar(Logic logic, SelectionModel<Customer> cust, TreeTableViewSelectionModel<Object> prpt, SelectionModel<Transfer> xact) {
         super(FXML, logic);
@@ -79,7 +91,6 @@ public class InfoBar extends Component<HBox> {
     private void initLayout() {
         getRoot().setAlignment(Pos.CENTER_LEFT);
         customerInfo.setPrefWidth(191);
-        HBox.setHgrow(productInfo, Priority.ALWAYS);
         startDatePicker.setPrefWidth(162);
         endDatePicker.setPrefWidth(161);
     }
@@ -87,6 +98,7 @@ public class InfoBar extends Component<HBox> {
     private void initTexts() {
         customerInfo.setLineSpacing(1);
         productInfo.setLineSpacing(1);
+        productTransfers.setLineSpacing(1);
 
         Font descFont = new Font("System Bold", 14);
 
@@ -97,20 +109,29 @@ public class InfoBar extends Component<HBox> {
         customerClosingDesc.setFont(descFont);
         customerChangeDesc.setFont(descFont);
 
-        customerMonthlyOpeningBal = new Text();
-        customerMonthlyClosingBal = new Text();
-        customerMonthlyChange = new Text();
+        customerOpeningBal = new Text();
+        customerClosingBal = new Text();
+        customerChangeBal = new Text();
 
         productOpeningDesc = new Text("Opening Balance: ");
         productClosingDesc = new Text("Closing Balance: ");
-        productChangeDesc = new Text("Stock Change: ");
+        productChangeDesc = new Text("Change: ");
+        productDailyDesc = new Text("Daily: ");
+        productRenewalDesc = new Text("Renewal: ");
+        productRejectDesc = new Text("Reject: ");
         productOpeningDesc.setFont(descFont);
         productClosingDesc.setFont(descFont);
         productChangeDesc.setFont(descFont);
+        productDailyDesc.setFont(descFont);
+        productRenewalDesc.setFont(descFont);
+        productRejectDesc.setFont(descFont);
 
-        productMonthlyOpeningBal = new Text();
-        productMonthlyClosingBal = new Text();
-        productMonthlyChange = new Text();
+        productOpeningBal = new Text();
+        productClosingBal = new Text();
+        productChangeBal = new Text();
+        productDailyBal = new Text();
+        productRenewalBal = new Text();
+        productRejectBal = new Text();
     }
 
     private void initListeners() {
@@ -163,12 +184,12 @@ public class InfoBar extends Component<HBox> {
         if (cust.getSelectedItem() == null) {
             return;
         }
-        Integer opening = this.logic.getMonthlyOpeningBalByCustomer(cust.getSelectedItem(), startDatePicker.getValue());
-        Integer closing = this.logic.getMonthlyClosingBalByCustomer(cust.getSelectedItem(), endDatePicker.getValue());
-        customerMonthlyOpeningBal.setText(Integer.toString(opening) + "\n");
-        customerMonthlyClosingBal.setText(Integer.toString(closing) + "\n");
-        customerMonthlyChange.setText(Integer.toString(closing - opening));
-        this.customerInfo.getChildren().addAll(customerOpeningDesc, customerMonthlyOpeningBal, customerClosingDesc, customerMonthlyClosingBal, customerChangeDesc, customerMonthlyChange);
+        Integer opening = this.logic.getOpeningBalByCustomer(cust.getSelectedItem(), startDatePicker.getValue());
+        Integer closing = this.logic.getClosingBalByCustomer(cust.getSelectedItem(), endDatePicker.getValue());
+        customerOpeningBal.setText(Integer.toString(opening) + "\n");
+        customerClosingBal.setText(Integer.toString(closing) + "\n");
+        customerChangeBal.setText(Integer.toString(closing - opening));
+        this.customerInfo.getChildren().addAll(customerOpeningDesc, customerOpeningBal, customerClosingDesc, customerClosingBal, customerChangeDesc, customerChangeBal);
     }
 
     private void updateProductInfo() {
@@ -176,22 +197,39 @@ public class InfoBar extends Component<HBox> {
         Part part;
         Integer opening;
         Integer closing;
+        Integer daily;
+        Integer renewal;
+        Integer reject;
         if (prpt.getSelectedItem() == null) {
             return;
         }
         if (prpt.getSelectedItem().getValue() instanceof Product) {
             product = (Product) prpt.getSelectedItem().getValue();
-            opening = this.logic.getMonthlyOpeningBalByProduct(product, startDatePicker.getValue());
-            closing = this.logic.getMonthlyClosingBalByProduct(product, endDatePicker.getValue());
-        } else {
+            opening = this.logic.getOpeningBalByProduct(product, startDatePicker.getValue());
+            closing = this.logic.getClosingBalByProduct(product, endDatePicker.getValue());
+            daily = this.logic.getDailyTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
+            renewal = this.logic.getRenewalTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
+            reject = this.logic.getRejectTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
+        } else if (prpt.getSelectedItem().getValue() instanceof Part) {
             part = (Part) prpt.getSelectedItem().getValue();
-            opening = this.logic.getMonthlyOpeningBalByPart(part, startDatePicker.getValue());
-            closing = this.logic.getMonthlyClosingBalByPart(part, endDatePicker.getValue());
+            opening = this.logic.getOpeningBalByPart(part, startDatePicker.getValue());
+            closing = this.logic.getClosingBalByPart(part, endDatePicker.getValue());
+            daily = this.logic.getDailyTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
+            renewal = this.logic.getRenewalTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
+            reject = this.logic.getRejectTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
+        } else {
+            throw new RuntimeException("Invalid selection type for Product/Part table");
         }
-        productMonthlyOpeningBal.setText(Integer.toString(opening) + "\n");
-        productMonthlyClosingBal.setText(Integer.toString(closing) + "\n");
-        productMonthlyChange.setText(Integer.toString(closing - opening));
-        this.productInfo.getChildren().addAll(productOpeningDesc, productMonthlyOpeningBal, productClosingDesc, productMonthlyClosingBal, productChangeDesc, productMonthlyChange);
+
+        productOpeningBal.setText(Integer.toString(opening) + "\n");
+        productClosingBal.setText(Integer.toString(closing) + "\n");
+        productChangeBal.setText(Integer.toString(opening-closing));
+        this.productInfo.getChildren().addAll(productOpeningDesc, productOpeningBal, productClosingDesc, productClosingBal, productChangeDesc, productChangeBal);
+
+        productDailyBal.setText(Integer.toString(daily) + "\n");
+        productRenewalBal.setText(Integer.toString(renewal) + "\n");
+        productRejectBal.setText(Integer.toString(reject));
+        this.productTransfers.getChildren().addAll(productDailyDesc, productDailyBal, productRenewalDesc, productRenewalBal, productRejectDesc, productRejectBal);
     }
 
     private void updateProductNotes() {
@@ -213,5 +251,6 @@ public class InfoBar extends Component<HBox> {
 
     private void removeProductInfo() {
         this.productInfo.getChildren().clear();
+        this.productTransfers.getChildren().clear();
     }
 }

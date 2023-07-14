@@ -120,7 +120,7 @@ public class PartDAO {
         return parts.stream().filter(part -> part.getProduct().equals(product));
     }
 
-    public static void insertPart(String partName, int quantity, Product product) {
+    public static int insertPart(String partName, int quantity, Product product) {
         LocalDateTime now = LocalDateTime.now();
         int id = (int) CRUDUtil.create(
             tableName,
@@ -128,6 +128,7 @@ public class PartDAO {
             new Object[]{partName, now, quantity, product.getId()},
             new int []{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER, Types.INTEGER});
         parts.add(new Part(partName, now, quantity, product, id));
+        return id;
     }
 
     public static void updatePart(Part newPart) {

@@ -12,6 +12,7 @@
     <TextFlow fx:id="customerInfo"/>
     <Separator orientation="vertical"/>
     <TextFlow fx:id="productInfo"/>
+    <TextFlow fx:id="productTransfers"/>
     <TextField fx:id="productNotes"/>
     <Button fx:id="setDefaultPartBtn" text="Set Active Part"/>
     <Separator orientation="vertical"/>

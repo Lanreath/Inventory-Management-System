@@ -156,8 +156,8 @@ public class DataSync {
                 if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
-                    t.getTransferType() == Transfer.Action.DAILY)) {
-                    TransferDAO.insertTransfer(part, quantity, Transfer.Action.DAILY);
+                    t.getTransferType() == Transfer.Action.RENEWAL)) {
+                    TransferDAO.insertTransfer(part, quantity, Transfer.Action.RENEWAL);
 
                     // Update Part quantity
                     Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId());
