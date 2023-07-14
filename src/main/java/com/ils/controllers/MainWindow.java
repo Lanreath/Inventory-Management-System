@@ -87,7 +87,7 @@ public class MainWindow extends Component<Stage> {
     }
 
     private void fillInfoBar() {
-        infoBar = new InfoBar(logic, customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
+        infoBar = new InfoBar(logic, customerTable, productPartTable);
         infoBarPlaceholder.getChildren().add(infoBar.getRoot());
     }
 }

@@ -1,5 +1,6 @@
 package com.ils.controllers.panels;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -18,20 +19,23 @@ import javafx.scene.text.TextFlow;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.logging.Logger;
 
 import com.ils.controllers.Component;
+import com.ils.controllers.tables.CustomerTable;
+import com.ils.controllers.tables.ProductPartTable;
 import com.ils.logic.Logic;
 import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
-import com.ils.models.Transfer;
 
 public class InfoBar extends Component<HBox> {
     private static final String FXML = "InfoBar.fxml";
 
     @FXML
     private TextFlow customerInfo;
+
+    @FXML
+    private HBox productDetails;
 
     @FXML
     private TextFlow productInfo;
@@ -78,21 +82,21 @@ public class InfoBar extends Component<HBox> {
     private Text productRejectBal;
     private Text productReceiveBal;
 
-    public InfoBar(Logic logic, SelectionModel<Customer> cust, TreeTableViewSelectionModel<Object> prpt, SelectionModel<Transfer> xact) {
+    public InfoBar(Logic logic, CustomerTable cust, ProductPartTable prpt) {
         super(FXML, logic);
-        this.cust = cust;
-        this.prpt = prpt;
-        initLayout();
+        this.cust = cust.getSelectionModel();
+        this.prpt = prpt.getSelectionModel();
+        initLayout(cust, prpt);
         initTexts();
         initListeners();
         initDates();
     }
 
-    private void initLayout() {
+    private void initLayout(CustomerTable cust, ProductPartTable prpt) {
         getRoot().setAlignment(Pos.CENTER_LEFT);
-        customerInfo.setPrefWidth(191);
-        startDatePicker.setPrefWidth(162);
-        endDatePicker.setPrefWidth(161);
+        productDetails.setAlignment(Pos.CENTER_LEFT);
+        customerInfo.prefWidthProperty().bind(cust.getRoot().widthProperty());
+        productDetails.prefWidthProperty().bind(prpt.getRoot().widthProperty());
     }
 
     private void initTexts() {
@@ -165,13 +169,35 @@ public class InfoBar extends Component<HBox> {
                 }
             }
         });
-        setDefaultPartBtn.visibleProperty().bind(prpt.selectedItemProperty().isNotNull());
+        setDefaultPartBtn.visibleProperty().bind(new BooleanBinding() {
+            {
+                super.bind(prpt.selectedItemProperty());
+            }
+
+            @Override
+            protected boolean computeValue() {
+                if (prpt.getSelectedItem() == null) {
+                    return false;
+                }
+                if (prpt.getSelectedItem().getValue() instanceof Part) {
+                    return true;
+                } else if (prpt.getSelectedItem().getValue() instanceof Product) {
+                    return false;
+                } else {
+                    throw new AssertionError("Unexpected value: " + prpt.getSelectedItem().getValue());
+                }
+            }
+        });
         setDefaultPartBtn.setOnAction(event -> {
             if (prpt.getSelectedItem() == null) {
                 return;
             }
-            Part part = (Part) prpt.getSelectedItem().getValue();
-            this.logic.updateDefaultPart(part);
+            if (prpt.getSelectedItem().getValue() instanceof Part) {
+                Part part = (Part) prpt.getSelectedItem().getValue();
+                this.logic.updateDefaultPart(part);
+                return;
+            }
+            throw new AssertionError("Unexpected value: " + prpt.getSelectedItem().getValue()); 
         });
     }
 

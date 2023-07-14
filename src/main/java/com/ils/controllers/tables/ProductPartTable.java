@@ -169,6 +169,7 @@ public class ProductPartTable extends Component<Region> {
 
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         treeTable.getSelectionModel().clearSelection();
+        this.logic.setSelectedCustomer(null);
         dbNameSearchField.clear();
     };
 
