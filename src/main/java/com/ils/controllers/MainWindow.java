@@ -102,7 +102,7 @@ public class MainWindow extends Component<Stage> {
     }
 
     private void fillInputBar() {
-        inputBar = new InputBar(logic, customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
+        inputBar = new InputBar(customerManagement, productManagement, partManagement, transferManagement, customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
         inputBarPlaceholder.getChildren().add(inputBar.getRoot());
     }
 

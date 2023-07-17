@@ -6,6 +6,7 @@ import com.ils.logic.DAO.ProductDAO;
 import com.ils.models.Customer;
 import com.ils.models.Product;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -37,6 +38,10 @@ public class CustomerManagement {
         selectedCustomer.set(customer);
     }
 
+    public void addCustomer(String name) {
+        CustomerDAO.insertCustomer(name);
+    }
+
     public void updateCustomer(Customer customer, String name) {
         CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
         Customer cust = CustomerDAO.getCustomer(customer.getId()).get();
@@ -44,6 +49,16 @@ public class CustomerManagement {
             ProductDAO.updateProduct(new Product(product.getDBName(), product.getCreationDateTime(), cust,
                     product.getDefaultPart(), product.getProductName(), product.getProductNotes(), product.getId()));
         }
+    }
+
+    public void deleteCustomer(Customer customer) {
+        List<Product> list = ProductDAO.getProducts().stream().filter(p -> p.getCustomer().equals(customer))
+                .collect(Collectors.toList());
+        for (Product product : list) {
+            deleteProduct(product);
+        }
+        ;
+        CustomerDAO.deleteCustomer(customer.getId());
     }
 
     public void selectCustomer(Customer customer) {

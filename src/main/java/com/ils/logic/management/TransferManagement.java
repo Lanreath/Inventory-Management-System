@@ -1,12 +1,14 @@
 package com.ils.logic.management;
 
+import com.ils.logic.DAO.PartDAO;
+import com.ils.logic.DAO.ProductDAO;
 import com.ils.logic.DAO.TransferDAO;
 import com.ils.logic.Filters;
-import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
 import com.ils.models.Transfer;
 
+import java.util.Optional;
 import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -48,5 +50,40 @@ public class TransferManagement {
             return;
         }
         filters.filterTransferByAction(type);
+    }
+
+    public void addTransfer(Part part, int quantity, Transfer.Action action) {
+        TransferDAO.insertTransfer(part, quantity, action);
+        switch (action) {
+            case DAILY:
+            case DESTRUCT:
+            case PROJECT:
+            case REJECT_DAILY:
+            case REJECT_PROJECT:
+            case REJECT_RENEWAL:
+            case RENEWAL:
+            case SAMPLE:
+                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
+                        part.getPartQuantity() - quantity, part.getProduct(), part.getId()));
+                break;
+            case RECEIVED:
+                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
+                        part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
+                break;
+        }
+        // Check for default part change
+        if (part.getProduct().getDefaultPart().equals(part)) {
+            Optional<Part> newDefault = PartDAO.getPart(part.getId());
+            if (!newDefault.isPresent()) {
+                throw new RuntimeException("Part not found after insertion");
+            }
+            ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
+                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getId()));
+        }
+    }
+
+    public void deleteTransfer(Transfer transfer) {
+        // TODO: Should update part quantity
+        TransferDAO.deleteTransfer(transfer.getId());
     }
 }

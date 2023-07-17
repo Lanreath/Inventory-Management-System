@@ -15,6 +15,10 @@ import javafx.scene.input.KeyCode;
 
 import com.ils.controllers.Component;
 import com.ils.logic.Logic;
+import com.ils.logic.management.CustomerManagement;
+import com.ils.logic.management.PartManagement;
+import com.ils.logic.management.ProductManagement;
+import com.ils.logic.management.TransferManagement;
 import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
@@ -23,6 +27,10 @@ import com.ils.models.Transfer;
 public class InputBar extends Component<ToolBar> {
     private static final String FXML = "InputBar.fxml";
     
+    private CustomerManagement customerManagement;
+    private ProductManagement productManagement;
+    private PartManagement partManagement;
+    private TransferManagement transferManagement;
     private SelectionModel<Customer> cust;
     private TreeTableViewSelectionModel<Object> prpt;
     private SelectionModel<Transfer> xact;
@@ -39,8 +47,12 @@ public class InputBar extends Component<ToolBar> {
 
     private Button cancelBtn;
 
-    public InputBar(Logic logic, SelectionModel<Customer> cust, TreeTableViewSelectionModel<Object> prpt, SelectionModel<Transfer> xact) {
+    public InputBar(CustomerManagement customerManagement, ProductManagement productManagement, PartManagement partManagement, TransferManagement transferManagement, SelectionModel<Customer> cust, TreeTableViewSelectionModel<Object> prpt, SelectionModel<Transfer> xact) {
         super(FXML);
+        this.customerManagement = customerManagement;
+        this.productManagement = productManagement;
+        this.partManagement = partManagement;
+        this.transferManagement = transferManagement;
         this.cust = cust;
         this.prpt = prpt;
         this.xact = xact;
@@ -82,7 +94,7 @@ public class InputBar extends Component<ToolBar> {
             displayMsg("Please enter a name.");
             return;
         }
-        logic.addCustomer(nameInput.getText());
+        customerManagement.addCustomer(nameInput.getText());
         nameInput.setText("");
         getRoot().getItems().clear();
     };
@@ -92,7 +104,7 @@ public class InputBar extends Component<ToolBar> {
             displayMsg("Please enter a name.");
             return;
         }
-        logic.addProduct(nameInput.getText(), cust.getSelectedItem());
+        productManagement.addProduct(nameInput.getText(), cust.getSelectedItem());
         nameInput.setText("");
         getRoot().getItems().clear();
     };
@@ -106,7 +118,7 @@ public class InputBar extends Component<ToolBar> {
             displayMsg("Please enter a quantity.");
             return;
         }
-        logic.addPart(nameInput.getText(), Integer.parseInt(qtyInput.getText()), (Product) prpt.getSelectedItem().getValue());
+        partManagement.addPart(nameInput.getText(), Integer.parseInt(qtyInput.getText()), (Product) prpt.getSelectedItem().getValue());
         nameInput.setText("");
         qtyInput.clear();
         getRoot().getItems().clear();
@@ -121,7 +133,7 @@ public class InputBar extends Component<ToolBar> {
             displayMsg("Please select an action.");
             return;
         }
-        logic.addTransfer((Part) prpt.getSelectedItem().getValue(), Integer.parseInt(qtyInput.getText()), actionInput.getValue());
+        transferManagement.addTransfer((Part) prpt.getSelectedItem().getValue(), Integer.parseInt(qtyInput.getText()), actionInput.getValue());
         qtyInput.clear();
         getRoot().getItems().clear();
     };
@@ -236,7 +248,7 @@ public class InputBar extends Component<ToolBar> {
         Customer customer = cust.getSelectedItem();
         displayDelete("customer? " + customer.getCustomerName());
         confirmBtn.setOnAction(e -> {
-            logic.deleteCustomer(customer);
+            customerManagement.deleteCustomer(customer);
             getRoot().getItems().clear();
         });
     }
@@ -246,7 +258,7 @@ public class InputBar extends Component<ToolBar> {
             Product product = (Product) prpt.getSelectedItem().getValue();
             displayDelete("product and its parts/transfers? " + product.getDBName() + " by " + product.getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
-                logic.deleteProduct(product);
+                productManagement.deleteProduct(product);
                 getRoot().getItems().clear();
             });
         } else {
@@ -254,11 +266,11 @@ public class InputBar extends Component<ToolBar> {
             displayDelete("part and its transfers? " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 getRoot().getItems().clear();
-                if (logic.getProductParts(part.getProduct()).count() == 1) {
+                if (partManagement.getProductParts(part.getProduct()).count() == 1) {
                     displayMsg("Unable to delete part. Product must have at least one part.");     
                     return;
                 }
-                logic.deletePart(part);
+                partManagement.deletePart(part);
             });
         }
     }
@@ -267,7 +279,7 @@ public class InputBar extends Component<ToolBar> {
         Transfer transfer = xact.getSelectedItem();
         displayDelete("transfer? " + transfer.getTransferDateTime() + " Qty: " + transfer.getTransferQuantity() + " from " + transfer.getPart().getPartName() + " from " + transfer.getPart().getProduct().getDBName() + " by " + transfer.getPart().getProduct().getCustomer().getCustomerName());
         confirmBtn.setOnAction(e -> {
-            logic.deleteTransfer(transfer);
+            transferManagement.deleteTransfer(transfer);
             getRoot().getItems().clear();
         });
     }

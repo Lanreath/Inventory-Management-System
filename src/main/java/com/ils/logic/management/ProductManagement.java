@@ -4,10 +4,13 @@ import com.ils.logic.Filters;
 import com.ils.logic.DAO.PartDAO;
 import com.ils.logic.DAO.ProductDAO;
 import com.ils.logic.DAO.TransferDAO;
+import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
 import com.ils.models.Transfer;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javafx.beans.binding.Bindings;
@@ -61,6 +64,17 @@ public class ProductManagement {
         selectedProduct.set(product);
     }
 
+    public void addProduct(String name, Customer customer) {
+        ProductDAO.insertProduct(name, customer);
+        Optional<Product> prod = ProductDAO.getProductByDBName(name);
+        PartDAO.insertPart("Default", 0, prod.get());
+        Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
+        Product updatedProd = new Product(prod.get().getDBName(), prod.get().getCreationDateTime(),
+                prod.get().getCustomer(), part.get(), prod.get().getId());
+        ProductDAO.updateProduct(updatedProd);
+        part.get().getProduct().setDefaultPart(part.get());
+    }
+
     public void updateProductName(Product product, String name) {
         Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(),
                 product.getDefaultPart(), name, product.getProductNotes(), product.getId());
@@ -90,6 +104,16 @@ public class ProductManagement {
         }
         ProductDAO.updateProduct(newProd);
     }
+
+    public void deleteProduct(Product product) {
+        List<Part> list = PartDAO.getPartsByProduct(product).collect(Collectors.toList());
+        for (Part part : list) {
+            deletePart(part);
+        }
+        ;
+        ProductDAO.deleteProduct(product.getId());
+    }
+
 
     public void selectProduct(Product product) {
         if (product == null) {

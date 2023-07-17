@@ -3,9 +3,12 @@ package com.ils.logic.management;
 import com.ils.logic.Filters;
 import com.ils.logic.DAO.PartDAO;
 import com.ils.logic.DAO.ProductDAO;
+import com.ils.logic.DAO.TransferDAO;
 import com.ils.models.Part;
 import com.ils.models.Product;
+import com.ils.models.Transfer;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javafx.collections.transformation.FilteredList;
@@ -36,6 +39,21 @@ public class PartManagement {
         return sum;
     }
 
+    public void addPart(String name, int quantity, Product product) {
+        int id = PartDAO.insertPart(name, quantity, product);
+        Optional<Part> newPart = PartDAO.getPart(id);
+        if (!newPart.isPresent()) {
+            throw new RuntimeException("Part not found after insertion");
+        }
+        // Update next part of the last part of the product
+        Part curr = product.getDefaultPart();
+        while (curr.getNextPart() != null) {
+            curr = curr.getNextPart();
+        }
+        curr.setNextPart(newPart.get());
+        PartDAO.updatePart(curr);
+    }
+
     public void updatePartName(Part part, String name) {
         PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(),
                 part.getNextPart(), part.getPartNotes(), part.getId()));
@@ -57,6 +75,39 @@ public class PartManagement {
         }
     }
 
+    public void deletePart(Part part) {
+        // Delete all transfers associated with the part
+        List<Transfer> list = TransferDAO.getTransfersByPart(part).collect(Collectors.toList());
+        for (Transfer transfer : list) {
+            deleteTransfer(transfer);
+        }
+        ;
+        Part curr = part.getProduct().getDefaultPart();
+        // Check if the part to be deleted is the default part
+        if (curr.equals(part)) {
+            if (curr.getNextPart() != null) {
+                List<Part> affectedParts = PartDAO.getPartsByProduct(curr.getProduct()).collect(Collectors.toList());
+                // Update the next part of the part to be deleted to be the new default part
+                curr.getProduct().setDefaultPart(curr.getNextPart());
+                ProductDAO.updateProduct(curr.getProduct());
+                Optional<Product> updated = ProductDAO.getProduct(curr.getProduct().getId());
+                if (!updated.isPresent()) {
+                    throw new RuntimeException("Product not found after default part update");
+                }
+                // Update the current part to be the new default part
+                affectedParts.forEach(p -> PartDAO.updatePart(new Part(p.getPartName(), p.getCreationDateTime(),
+                        p.getPartQuantity(), updated.get(), p.getNextPart(), p.getPartNotes(), p.getId())));
+            }
+        } else {
+            // Find the previous part of the part to be deleted
+            while (curr.getNextPart() != null && !curr.getNextPart().equals(part)) {
+                curr = curr.getNextPart();
+            }
+            curr.setNextPart(part.getNextPart());
+            PartDAO.updatePart(curr);
+        }
+        PartDAO.deletePart(part.getId());
+    }
     public void selectPart(Part part) {
         if (part == null) {
             filters.clearTransferPartFilter();

@@ -207,66 +207,6 @@ public class Logic {
                 .mapToInt(t -> t.getTransferQuantity()).sum();
     }
 
-    public void addCustomer(String name) {
-        CustomerDAO.insertCustomer(name);
-    }
-
-    public void addProduct(String name, Customer customer) {
-        ProductDAO.insertProduct(name, customer);
-        Optional<Product> prod = ProductDAO.getProductByDBName(name);
-        PartDAO.insertPart("Default", 0, prod.get());
-        Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
-        Product updatedProd = new Product(prod.get().getDBName(), prod.get().getCreationDateTime(),
-                prod.get().getCustomer(), part.get(), prod.get().getId());
-        ProductDAO.updateProduct(updatedProd);
-        part.get().getProduct().setDefaultPart(part.get());
-    }
-
-    public void addPart(String name, int quantity, Product product) {
-        int id = PartDAO.insertPart(name, quantity, product);
-        Optional<Part> newPart = PartDAO.getPart(id);
-        if (!newPart.isPresent()) {
-            throw new RuntimeException("Part not found after insertion");
-        }
-        // Update next part of the last part of the product
-        Part curr = product.getDefaultPart();
-        while (curr.getNextPart() != null) {
-            curr = curr.getNextPart();
-        }
-        curr.setNextPart(newPart.get());
-        PartDAO.updatePart(curr);
-    }
-
-    public void addTransfer(Part part, int quantity, Transfer.Action action) {
-        TransferDAO.insertTransfer(part, quantity, action);
-        switch (action) {
-            case DAILY:
-            case DESTRUCT:
-            case PROJECT:
-            case REJECT_DAILY:
-            case REJECT_PROJECT:
-            case REJECT_RENEWAL:
-            case RENEWAL:
-            case SAMPLE:
-                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
-                        part.getPartQuantity() - quantity, part.getProduct(), part.getId()));
-                break;
-            case RECEIVED:
-                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
-                        part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
-                break;
-        }
-        // Check for default part change
-        if (part.getProduct().getDefaultPart().equals(part)) {
-            Optional<Part> newDefault = PartDAO.getPart(part.getId());
-            if (!newDefault.isPresent()) {
-                throw new RuntimeException("Part not found after insertion");
-            }
-            ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
-                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getId()));
-        }
-    }
-
     public void updateProductNotes(Product product, String notes) {
         Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(),
                 product.getDefaultPart(), product.getProductName(), notes, product.getId());
@@ -337,63 +277,6 @@ public class Logic {
             p.setNextPart(newPart.get());
             PartDAO.updatePart(p);
         }
-    }
-
-    public void deleteCustomer(Customer customer) {
-        List<Product> list = ProductDAO.getProducts().stream().filter(p -> p.getCustomer().equals(customer))
-                .collect(Collectors.toList());
-        for (Product product : list) {
-            deleteProduct(product);
-        }
-        ;
-        CustomerDAO.deleteCustomer(customer.getId());
-    }
-
-    public void deleteProduct(Product product) {
-        List<Part> list = PartDAO.getPartsByProduct(product).collect(Collectors.toList());
-        for (Part part : list) {
-            deletePart(part);
-        }
-        ;
-        ProductDAO.deleteProduct(product.getId());
-    }
-
-    public void deletePart(Part part) {
-        // Delete all transfers associated with the part
-        List<Transfer> list = TransferDAO.getTransfersByPart(part).collect(Collectors.toList());
-        for (Transfer transfer : list) {
-            deleteTransfer(transfer);
-        }
-        ;
-        Part curr = part.getProduct().getDefaultPart();
-        // Check if the part to be deleted is the default part
-        if (curr.equals(part)) {
-            if (curr.getNextPart() != null) {
-                List<Part> affectedParts = PartDAO.getPartsByProduct(curr.getProduct()).collect(Collectors.toList());
-                // Update the next part of the part to be deleted to be the new default part
-                curr.getProduct().setDefaultPart(curr.getNextPart());
-                ProductDAO.updateProduct(curr.getProduct());
-                Optional<Product> updated = ProductDAO.getProduct(curr.getProduct().getId());
-                if (!updated.isPresent()) {
-                    throw new RuntimeException("Product not found after default part update");
-                }
-                // Update the current part to be the new default part
-                affectedParts.forEach(p -> PartDAO.updatePart(new Part(p.getPartName(), p.getCreationDateTime(),
-                        p.getPartQuantity(), updated.get(), p.getNextPart(), p.getPartNotes(), p.getId())));
-            }
-        } else {
-            // Find the previous part of the part to be deleted
-            while (curr.getNextPart() != null && !curr.getNextPart().equals(part)) {
-                curr = curr.getNextPart();
-            }
-            curr.setNextPart(part.getNextPart());
-            PartDAO.updatePart(curr);
-        }
-        PartDAO.deletePart(part.getId());
-    }
-
-    public void deleteTransfer(Transfer transfer) {
-        TransferDAO.deleteTransfer(transfer.getId());
     }
 
 }
