@@ -12,7 +12,6 @@ import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -72,7 +71,7 @@ public class InfoBar extends Component<HBox> {
     private Text productDailyDesc;
     private Text productRenewalDesc;
     private Text productRejectDesc;
-    private Text productReceiveDesc;
+    // private Text productReceiveDesc;
 
     private Text productOpeningBal;
     private Text productClosingBal;
@@ -80,7 +79,7 @@ public class InfoBar extends Component<HBox> {
     private Text productDailyBal;
     private Text productRenewalBal;
     private Text productRejectBal;
-    private Text productReceiveBal;
+    // private Text productReceiveBal;
 
     public InfoBar(Logic logic, CustomerTable cust, ProductPartTable prpt) {
         super(FXML, logic);

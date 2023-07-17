@@ -26,10 +26,12 @@ title: Developer Guide
     - [Data Access Objects](#data-access-objects)
     - [Filters](#filters)
   - [UI](#ui)
+    - [Component](#component)
     - [MainWindow](#mainwindow)
     - [Action Bar](#action-bar)
     - [Tables](#tables)
-    - [Summary](#summary)
+    - [Input Bar](#input-bar)
+    - [Info Bar](#info-bar)
 
 ## Setting Up
 
@@ -123,18 +125,68 @@ When a `Transfer` object is created, the `part` is necessary. The `transferDate`
 
 ### Logic
 
+The `Logic` class serves as the interface between the UI and the underlying data acess objects, filters, and data synchronization classes. It is responsible for interacting with `CustomerDAO`, `ProductDAO`, `PartDAO`, `TransferDAO` to handle CRUD operations for each data model mentioned above. This class also provides the necessary data and table view modifications for display.
+
 #### Data Synchronization
+
+The `DataSync` class is used to synchronize data between the Oracle and SQLite databases. It uses the `Oracle` and `Database` classes to connect to the databases and the `ReadUtil` and `CRUDUtil` classes to read and write data to the databases.
+
+From the Oracle database, the `DataSync` class retrieves the following data: customers, product names, and work order quantities. The data is then remodeled into the following data: customers, products, parts and transfers by referencing the current default part in the SQLite database. The data access objects are then inserted or updated to the SQLite database and stored in lists.
+
+Synchronisation is separated into 3 main methods: `syncCustomers`, `syncDailyTransfers`, and `syncRenewalTransfers`. This facilitates future synchronisation requirements by reducing coupling. 
 
 #### Data Access Objects
 
+The `CustomerDAO`, `ProductDAO`, `PartDAO`, and `TransferDAO` classes are used to handle CRUD operations for each data model mentioned above. They use the `CRUDUtil` class to connect to the SQLite database and execute queries. They are responsible for reading and writing data to the SQLite database.
+
+Each data access object contains a list of the corresponding data model. The list is used to store the data retrieved from the SQLite database. The list is also used to store the data retrieved from the Oracle database during data synchronization. The getter methods allow the `Logic` class to pass filtered data to the UI.
+
 #### Filters
+
+The `Filter` class is used to filter data from the data access objects. It is used to filter data by customer name, product/part name, and transfer date/type.
+
+Each filter has a setter method and a clear method e.g. `filterCustomerByName()`, `clearCustomerNameFilter()`. These filters make use of `ObjectProperty` to bind changes in multiple `Predicate` objects to the `ObservableList` corresponding to each DAO model. Any changes to the filters are reflected in the list of the corresponding data model in the data access objects and is reflected in the UI.
 
 ### UI
 
+The UI is implemented with JavaFX and FXML. The basic layout is a BorderPane with a action bar at the top, an input bar at the bottom, and 3 table views in the center. The table views are used to display the data from the data access objects.
+
+#### Component
+
+The `Component` class is used to represent a component in the UI. It initializes the component with the relevant FXML file and controller. It also provides methods to retrieve the FXML file and controller root.
+
 #### MainWindow
+
+The `MainWindow` class is used to initialize the UI. It uses the `Logic` class to retrieve data from the data access objects and fills placeholders in the FXML file with the relevant components.
 
 #### Action Bar
 
+The `ActionBar` is used to handle user CRUD and synchronization operations. It uses the `Logic` class to handle the operations and the `InputBar` component to retrieve user text input.
+
+It consists of the following buttons: `addCustomerButton`, `addProductButton`, `addPartButton`, `addTransferButton`, `syncButton`, `deleteButton` and a synchronisation date picker `syncDate`.
+
+The `addCustomerButton`, `addProductButton`, `addPartButton`, `addTransferButton` buttons are used to add a new customer, product, part, and transfer respectively. The `syncButton` button is used to synchronize data between the Oracle and SQLite databases given a user input date. The `deleteButton` button is used to delete a customer, product, part, or transfer. The `syncDate` date picker is used to select a date for data synchronization.
+
 #### Tables
 
-#### Summary
+The table view classes `CustomerTable`, `ProductPartTable`, and `TransferTable` are used to display the data from the data access objects. The `Logic` class handles any data modifications and filtering operations.
+
+The `CustomerTable` displays the following columns: `customerName`. The `TextField` in the `customerName` column is used to filter the data by customer name. The table items are bound to the `ObservableList` in the `CustomerDAO` class.
+
+The `ProductPartTable` displays the following columns: `dbName`, `productName`/`partName`, `quantity`. The `TextField` above the tree table view is used to filter the data by product/part name. The table is not bound to the `ObservableList` in the `ProductDAO` and `PartDAO` classes because the tree table view requires `TreeItem` objects with parent-child relationships and different data types are displayed in the same columns. Hence, the `rebuild()` method is used to rebuild the tree table view with the filtered data after every change in the product/part lists and object properties.
+
+The `TransferTable` displays the following columns: `transferDate`, `transferType`, `transferQuantity`. The `TextField` above the table view is used to filter the data by transfer date/type. The table items are bound to the `ObservableList` in the `TransferDAO` class.
+
+#### Input Bar
+
+The `InputBar` component is used to retrieve user text input. It consists of the following optional components: `nameInput`, `qtyInput`, `actionInput`, `saveBtn`, `confirmBtn`, `cancelBtn`.
+
+The `nameInput` is enabled for adding new customers, products, and parts. The `qtyInput` is enabled for adding new parts and transfers. The `actionInput` is enabled for adding new transfers. The `saveBtn` is enabled for adding new customers, products, parts, and transfers. The `confirmBtn` and `cancelBtn` are enabled for deleting customers, products, parts, and transfers.
+
+Each of these user operations are triggered with the `ActionBar` and handled by the `Logic` class.
+
+#### Info Bar
+
+The `InfoBar` component is used to display information to the user. It consists of the following components: `customerInfo`, `productDetails`, `startDatePicker`, `endDatePicker`.
+
+The `customerInfo` is used to display the selected customer's opening/closing balances and inventory change. The `productDetails` is used to display the selected product/part's opening/closing balances and transfer totals. The `startDatePicker` and `endDatePicker` are used to select a date range for the summary report.
