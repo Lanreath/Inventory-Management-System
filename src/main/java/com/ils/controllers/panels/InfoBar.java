@@ -82,7 +82,7 @@ public class InfoBar extends Component<HBox> {
     // private Text productReceiveBal;
 
     public InfoBar(Logic logic, CustomerTable cust, ProductPartTable prpt) {
-        super(FXML, logic);
+        super(FXML);
         this.cust = cust.getSelectionModel();
         this.prpt = prpt.getSelectionModel();
         initLayout(cust, prpt);

@@ -1,7 +1,9 @@
 package com.ils.controllers.tables;
 
 import com.ils.controllers.Component;
-import com.ils.logic.Logic;
+import com.ils.logic.management.CustomerManagement;
+import com.ils.logic.management.PartManagement;
+import com.ils.logic.management.ProductManagement;
 import com.ils.models.Part;
 import com.ils.models.Product;
 
@@ -30,6 +32,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ProductPartTable extends Component<Region> {
+    private CustomerManagement customerManagement;
+    private ProductManagement productManagement;
+    private PartManagement partManagement;
+
     @FXML
     TreeTableView<Object> treeTable;
 
@@ -48,9 +54,12 @@ public class ProductPartTable extends Component<Region> {
     @FXML
     private TreeTableColumn<Object, Integer> quantityColumn;
 
-    public ProductPartTable(Logic logic) {
-        super("ProductPartTable.fxml", logic);
-
+    public ProductPartTable(CustomerManagement customerManagement, ProductManagement productManagement,
+            PartManagement partManagement) {
+        super("ProductPartTable.fxml");
+        this.customerManagement = customerManagement;
+        this.productManagement = productManagement;
+        this.partManagement = partManagement;
         initTable();
         initListeners();
         initProductColumn();
@@ -59,7 +68,7 @@ public class ProductPartTable extends Component<Region> {
         rebuild();
         initFilters();
     }
-    
+
     private void initTable() {
         treeTable.setMinWidth(400);
         treeTable.setPrefWidth(600);
@@ -72,29 +81,29 @@ public class ProductPartTable extends Component<Region> {
 
     private void initListeners() {
         treeTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
-        this.logic.getProducts().addListener(new ListChangeListener<Product>() {
+        this.productManagement.getProducts().addListener(new ListChangeListener<Product>() {
             @Override
             public void onChanged(Change<? extends Product> c) {
                 rebuild();
             }
         });
-        this.logic.getParts().addListener(new ListChangeListener<Part>() {
+        this.partManagement.getParts().addListener(new ListChangeListener<Part>() {
             @Override
             public void onChanged(Change<? extends Part> c) {
                 rebuild();
             }
         });
-        this.logic.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
+        this.productManagement.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-        this.logic.getDBNameFilter().addListener((observable, oldValue, newValue) -> {
+        this.productManagement.getDBNameFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-        this.logic.getSelectedProduct().addListener(this::handleForcedSelection);
+        this.productManagement.getSelectedProduct().addListener(this::handleForcedSelection);
     }
 
     private void initProductColumn() {
-         dbNameColumn.setCellValueFactory(cellData -> {
+        dbNameColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
                 Product product = (Product) rowItem.getValue();
@@ -129,23 +138,23 @@ public class ProductPartTable extends Component<Region> {
             Object prpt = event.getTreeTableView().getTreeItem(event.getTreeTablePosition().getRow()).getValue();
             if (prpt instanceof Part) {
                 Part part = (Part) prpt;
-                this.logic.updatePartName(part, event.getNewValue());
+                this.partManagement.updatePartName(part, event.getNewValue());
             } else if (prpt instanceof Product) {
                 Product product = (Product) prpt;
-                this.logic.updateProductName(product, event.getNewValue());
+                this.productManagement.updateProductName(product, event.getNewValue());
             } else {
                 throw new RuntimeException("Unknown row item type");
             }
             rebuild();
         });
-   }
+    }
 
     private void initQuantityColumn() {
         quantityColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
                 Product product = (Product) rowItem.getValue();
-                return new SimpleIntegerProperty(this.logic.getProductQuantity(product)).asObject();
+                return new SimpleIntegerProperty(this.partManagement.getProductQuantity(product)).asObject();
             } else if (rowItem != null && rowItem.getValue() instanceof Part) {
                 Part part = (Part) rowItem.getValue();
                 return new SimpleIntegerProperty(part.getPartQuantity()).asObject();
@@ -153,15 +162,15 @@ public class ProductPartTable extends Component<Region> {
                 throw new RuntimeException("Unknown row item type");
             }
         });
-   }
+    }
 
-   private void initFilters() {
+    private void initFilters() {
         dbNameSearchField.setPromptText("Filter by product name");
         dbNameSearchField.textProperty().addListener(this::handleNameFilter);
         HBox.setHgrow(dbNameSearchField, Priority.ALWAYS);
         clearBtn.setText("Clear");
-        clearBtn.setOnAction(clearFilterHandler);       
-   }
+        clearBtn.setOnAction(clearFilterHandler);
+    }
 
     public TreeTableViewSelectionModel<Object> getSelectionModel() {
         return treeTable.getSelectionModel();
@@ -169,7 +178,7 @@ public class ProductPartTable extends Component<Region> {
 
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         treeTable.getSelectionModel().clearSelection();
-        this.logic.setSelectedCustomer(null);
+        this.customerManagement.setSelectedCustomer(null);
         dbNameSearchField.clear();
     };
 
@@ -178,28 +187,29 @@ public class ProductPartTable extends Component<Region> {
         if (newSelection != null && newSelection.getValue() instanceof Product) {
             Product product = (Product) newSelection.getValue();
             // Hack to prevent double selection
-            if (product.equals(this.logic.getSelectedProduct().get())) {
+            if (product.equals(this.productManagement.getSelectedProduct().get())) {
                 // Removed null selection
                 return;
             }
-            this.logic.selectProduct(product);
-            this.logic.selectPart(null);
+            this.productManagement.selectProduct(product);
+            this.partManagement.selectPart(null);
         } else if (newSelection != null && newSelection.getValue() instanceof Part) {
             Part part = (Part) newSelection.getValue();
-            this.logic.selectPart(part);
-            this.logic.selectProduct(null);
+            this.partManagement.selectPart(part);
+            this.productManagement.selectProduct(null);
         } else {
-            this.logic.selectProduct(null);
-            this.logic.selectPart(null);
+            this.productManagement.selectProduct(null);
+            this.partManagement.selectPart(null);
         }
     }
 
     private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        this.logic.setProductNameFilter(newValue);
+        this.productManagement.setProductNameFilter(newValue);
         rebuild();
     }
 
-    private void handleForcedSelection(ObservableValue<? extends Product> observable, Product oldValue, Product newValue) {
+    private void handleForcedSelection(ObservableValue<? extends Product> observable, Product oldValue,
+            Product newValue) {
         if (newValue == null) {
             treeTable.getSelectionModel().clearSelection();
             return;
@@ -224,11 +234,11 @@ public class ProductPartTable extends Component<Region> {
     private void rebuild() {
         TreeItem<Object> root = treeTable.getRoot();
         root.getChildren().clear();
-        for (Product product : this.logic.getProducts()) {
+        for (Product product : this.productManagement.getProducts()) {
             TreeItem<Object> productItem = new TreeItem<>(product);
             root.getChildren().add(productItem);
             // List of linked parts
-            List<Integer> linkedParts = new ArrayList<>(); 
+            List<Integer> linkedParts = new ArrayList<>();
             Part start = product.getDefaultPart();
             while (start != null) {
                 linkedParts.add(start.getId());
@@ -237,7 +247,7 @@ public class ProductPartTable extends Component<Region> {
                 start = start.getNextPart();
             }
             // Add remaining parts
-            Stream<Part> parts = this.logic.getProductParts(product);
+            Stream<Part> parts = this.partManagement.getProductParts(product);
             parts.filter(part -> !linkedParts.contains(part.getId())).forEach(part -> {
                 TreeItem<Object> partItem = new TreeItem<>(part);
                 productItem.getChildren().add(partItem);

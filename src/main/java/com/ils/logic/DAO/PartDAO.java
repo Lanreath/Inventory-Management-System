@@ -1,4 +1,4 @@
-package com.ils.logic;
+package com.ils.logic.DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +40,7 @@ public class PartDAO {
         updateNextParts();
     }
 
-    protected static FilteredList<Part> getParts() {
+    public static FilteredList<Part> getParts() {
         return new FilteredList<>(parts);
     }
 

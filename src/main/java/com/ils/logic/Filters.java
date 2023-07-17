@@ -32,99 +32,99 @@ public class Filters {
         this.transferPartFilter = new SimpleObjectProperty<>(t -> true);
     }
 
-    protected ObjectProperty<Predicate<Customer>> getCustomerNameFilter() {
+    public ObjectProperty<Predicate<Customer>> getCustomerNameFilter() {
         return customerNameFilter;
     }
 
-    protected ObjectProperty<Predicate<Product>> getDBNameFilter() {
+    public ObjectProperty<Predicate<Product>> getDBNameFilter() {
         return dbNameFilter;
     }
 
-    protected ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
+    public ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
         return productCustomerFilter;
     }
 
-    protected ObjectProperty<Predicate<Transfer>> getTransferDateFilter() {
+    public ObjectProperty<Predicate<Transfer>> getTransferDateFilter() {
         return transferDateFilter;
     }
 
-    protected ObjectProperty<Predicate<Transfer>> getTransferActionFilter() {
+    public ObjectProperty<Predicate<Transfer>> getTransferActionFilter() {
         return transferActionFilter;
     }
 
-    protected ObjectProperty<Predicate<Transfer>> getTransferCustomerFilter() {
+    public ObjectProperty<Predicate<Transfer>> getTransferCustomerFilter() {
         return transferCustomerFilter;
     }
 
-    protected ObjectProperty<Predicate<Transfer>> getTransferProductFilter() {
+    public ObjectProperty<Predicate<Transfer>> getTransferProductFilter() {
         return transferProductFilter;
     }
 
-    protected ObjectProperty<Predicate<Transfer>> getTransferPartFilter() {
+    public ObjectProperty<Predicate<Transfer>> getTransferPartFilter() {
         return transferPartFilter;
     }
 
-    protected void clearCustomerNameFilter() {
+    public void clearCustomerNameFilter() {
         customerNameFilter.set(c -> true);
     }
 
-    protected void clearDBNameFilter() {
+    public void clearDBNameFilter() {
         dbNameFilter.set(p -> true);
     }
 
-    protected void clearProductCustomerFilter() {
+    public void clearProductCustomerFilter() {
         productCustomerFilter.set(p -> true);
     }
 
-    protected void clearTransferDateFilter() {
+    public void clearTransferDateFilter() {
         transferDateFilter.set(t -> true);
     }
 
-    protected void clearTransferActionFilter() {
+    public void clearTransferActionFilter() {
         transferActionFilter.set(t -> true);
     }
 
-    protected void clearTransferCustomerFilter() {
+    public void clearTransferCustomerFilter() {
         transferCustomerFilter.set(t -> true);
     }
 
-    protected void clearTransferProductFilter() {
+    public void clearTransferProductFilter() {
         transferProductFilter.set(t -> true);
     }
 
-    protected void clearTransferPartFilter() {
+    public void clearTransferPartFilter() {
         transferPartFilter.set(t -> true);
     }
 
-    protected void filterCustomerByName(String name) {
+    public void filterCustomerByName(String name) {
         customerNameFilter.set(customer -> customer.getCustomerName().toLowerCase().contains(name.toLowerCase()));
     }
 
-    protected void filterProductByName(String name) {
+    public void filterProductByName(String name) {
         dbNameFilter.set(product -> product.getDBName().toLowerCase().contains(name.toLowerCase()));
     }
 
-    protected void filterProductByCustomer(Customer c) {
+    public void filterProductByCustomer(Customer c) {
         productCustomerFilter.set(product -> product.getCustomer().equals(c));
     }
 
-    protected void filterTransferByDate(LocalDate date) {
+    public void filterTransferByDate(LocalDate date) {
         transferDateFilter.set(transfer -> transfer.getTransferDateTime().toLocalDate().equals(date));
     }
 
-    protected void filterTransferByAction(Transfer.Action action) {
+    public void filterTransferByAction(Transfer.Action action) {
         transferActionFilter.set(transfer -> transfer.getTransferType().equals(action));
     }
 
-    protected void filterTransferByCustomer(Customer c) {
+    public void filterTransferByCustomer(Customer c) {
         transferCustomerFilter.set(transfer -> transfer.getPart().getProduct().getCustomer().equals(c));
     }
 
-    protected void filterTransferByProduct(Product p) {
+    public void filterTransferByProduct(Product p) {
         transferProductFilter.set(transfer -> transfer.getPart().getProduct().equals(p));
     }
 
-    protected void filterTransferByPart(Part p) {
+    public void filterTransferByPart(Part p) {
         transferPartFilter.set(transfer -> transfer.getPart().equals(p));
     }
 }

@@ -18,10 +18,12 @@ import javafx.scene.layout.Region;
 import java.util.Optional;
 
 import com.ils.controllers.Component;
-import com.ils.logic.Logic;
+import com.ils.logic.management.CustomerManagement;
 import com.ils.models.Customer;
 
 public class CustomerTable extends Component<Region> {
+    private CustomerManagement customerManagement;
+
     @FXML
     TextField customerNameSearchField;
 
@@ -34,8 +36,9 @@ public class CustomerTable extends Component<Region> {
     @FXML
     private TableColumn<Customer, String> customerNameColumn;
 
-    public CustomerTable(Logic logic) {
-        super("CustomerTable.fxml", logic);
+    public CustomerTable(CustomerManagement customerManagement) {
+        super("CustomerTable.fxml");
+        this.customerManagement = customerManagement;
         initTable();
         initCol();
         initFilter();
@@ -44,11 +47,11 @@ public class CustomerTable extends Component<Region> {
     private void initTable() {
         customerTable.setPrefWidth(100);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        customerTable.setItems(this.logic.getCustomers());
+        customerTable.setItems(this.customerManagement.getCustomers());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         customerTable.setEditable(true);
-        this.logic.getCustomers().comparatorProperty().bind(customerTable.comparatorProperty());
-        this.logic.getSelectedCustomer().addListener(this::handleForcedSelection);
+        this.customerManagement.getCustomers().comparatorProperty().bind(customerTable.comparatorProperty());
+        this.customerManagement.getSelectedCustomer().addListener(this::handleForcedSelection);
     }
 
     private void initCol() {
@@ -56,7 +59,7 @@ public class CustomerTable extends Component<Region> {
         customerNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         customerNameColumn.setOnEditCommit((TableColumn.CellEditEvent<Customer, String> event) -> {
             Customer customer = event.getTableView().getItems().get(event.getTablePosition().getRow());
-            this.logic.updateCustomer(customer, event.getNewValue());
+            this.customerManagement.updateCustomer(customer, event.getNewValue());
         });
     }
 
@@ -72,25 +75,27 @@ public class CustomerTable extends Component<Region> {
         return customerTable.getSelectionModel();
     }
 
-    private EventHandler<ActionEvent> clearFilterHandler = (event) ->{
+    private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         customerTable.getSelectionModel().clearSelection();
         customerNameSearchField.clear();
     };
 
-    private void handleSelection(ObservableValue<? extends Customer> observable, Customer oldSelection, Customer newSelection) {
+    private void handleSelection(ObservableValue<? extends Customer> observable, Customer oldSelection,
+            Customer newSelection) {
         // Hack to prevent double selection
-        if (newSelection != null && newSelection.equals(this.logic.getSelectedCustomer().get())) {
+        if (newSelection != null && newSelection.equals(this.customerManagement.getSelectedCustomer().get())) {
             // Removed null selection
             return;
         }
-        this.logic.selectCustomer(newSelection);
+        this.customerManagement.selectCustomer(newSelection);
     }
 
     private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        this.logic.setCustomerNameFilter(newValue);
+        this.customerManagement.setCustomerNameFilter(newValue);
     }
 
-    private void handleForcedSelection(ObservableValue<? extends Customer> observable, Customer oldSelection, Customer newSelection) {
+    private void handleForcedSelection(ObservableValue<? extends Customer> observable, Customer oldSelection,
+            Customer newSelection) {
         if (newSelection == null) {
             customerTable.getSelectionModel().clearSelection();
             return;

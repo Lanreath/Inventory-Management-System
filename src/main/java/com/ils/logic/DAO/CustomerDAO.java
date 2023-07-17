@@ -1,4 +1,4 @@
-package com.ils.logic;
+package com.ils.logic.DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,7 +32,7 @@ public class CustomerDAO {
         updateCustomersFromDB();
     }
 
-    protected static FilteredList<Customer> getCustomers() {
+    public static FilteredList<Customer> getCustomers() {
         return new FilteredList<Customer>(customers);
     }
 

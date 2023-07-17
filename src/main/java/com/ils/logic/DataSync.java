@@ -12,6 +12,10 @@ import java.util.stream.Stream;
 
 import com.ils.MainApp;
 import com.ils.db.Database;
+import com.ils.logic.DAO.CustomerDAO;
+import com.ils.logic.DAO.PartDAO;
+import com.ils.logic.DAO.ProductDAO;
+import com.ils.logic.DAO.TransferDAO;
 import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
@@ -20,7 +24,7 @@ import com.ils.oracle.Oracle;
 import com.ils.oracle.ReadUtil;
 
 public class DataSync {
-    protected DataSync() {
+    public DataSync() {
         if (Database.isOK() && Oracle.isOK()) {
             return;
         }
@@ -183,4 +187,9 @@ public class DataSync {
         }
     }
 
+    public void syncData(LocalDate date) {
+        syncCustomers();
+        syncDailyTransfers(date);
+        syncRenewalTransfers(date);
+    }
 }

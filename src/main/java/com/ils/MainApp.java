@@ -33,7 +33,7 @@ public class MainApp extends Application {
             Platform.exit();
         }
         logic = new Logic();
-        window = new MainWindow(stage, logic);
+        window = new MainWindow(stage);
         window.fillInnerComponents();
         window.show();
     }

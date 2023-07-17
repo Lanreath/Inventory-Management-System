@@ -17,10 +17,12 @@ import java.util.logging.Logger;
 
 import com.ils.MainApp;
 import com.ils.controllers.Component;
+import com.ils.logic.DataSync;
 import com.ils.logic.Logic;
 
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
+    private DataSync dataSync;
 
     private InputBar inputBar;
 
@@ -48,8 +50,8 @@ public class ActionBar extends Component<Region> {
     @FXML
     private Label status;
 
-    public ActionBar(Logic logic, InputBar inputBar) {
-        super(FXML, logic);
+    public ActionBar(DataSync dataSync, InputBar inputBar) {
+        super(FXML);
         this.inputBar = inputBar;
         ImageView cust = new ImageView("/images/customer-v2.png");
         ImageView prod = new ImageView("/images/product-v2.png");
@@ -108,12 +110,11 @@ public class ActionBar extends Component<Region> {
         inputBar.deleteEntry();
     };
 
-
     private EventHandler<ActionEvent> syncEventHandler = (event) -> {
             status.setText("Syncing...");
             status.setStyle("-fx-text-fill: #000000;");
             try {
-                this.logic.syncData(syncDate.getValue());
+                dataSync.syncData(syncDate.getValue());
                 status.setText("Synced!");
                 status.setStyle("-fx-text-fill: #00ff00;");
             } catch (IllegalStateException e) {

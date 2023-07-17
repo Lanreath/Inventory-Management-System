@@ -40,7 +40,7 @@ public class InputBar extends Component<ToolBar> {
     private Button cancelBtn;
 
     public InputBar(Logic logic, SelectionModel<Customer> cust, TreeTableViewSelectionModel<Object> prpt, SelectionModel<Transfer> xact) {
-        super(FXML, logic);
+        super(FXML);
         this.cust = cust;
         this.prpt = prpt;
         this.xact = xact;

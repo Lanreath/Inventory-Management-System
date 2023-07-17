@@ -1,4 +1,4 @@
-package com.ils.logic;
+package com.ils.logic.DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +40,7 @@ public class TransferDAO {
         updateTransfersFromDB();
     }
 
-    protected static FilteredList<Transfer> getTransfers() {
+    public static FilteredList<Transfer> getTransfers() {
         return new FilteredList<>(transfers);
     }
 

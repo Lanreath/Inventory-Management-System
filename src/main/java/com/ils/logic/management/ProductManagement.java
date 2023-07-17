@@ -1,0 +1,101 @@
+package com.ils.logic.management;
+
+import com.ils.logic.Filters;
+import com.ils.logic.DAO.PartDAO;
+import com.ils.logic.DAO.ProductDAO;
+import com.ils.logic.DAO.TransferDAO;
+import com.ils.models.Part;
+import com.ils.models.Product;
+import com.ils.models.Transfer;
+
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+
+public class ProductManagement {
+    private Filters filters;
+    private ObjectProperty<Product> selectedProduct;
+    private FilteredList<Product> productFilteredList;
+    private SortedList<Product> productSortedList;
+
+    public ProductManagement(Filters filters) {
+        this.filters = filters;
+        this.selectedProduct = new SimpleObjectProperty<>(null);
+        this.productFilteredList = ProductDAO.getProducts();
+        this.productSortedList = new SortedList<>(productFilteredList);
+        productFilteredList.predicateProperty()
+                .bind(Bindings.createObjectBinding(
+                        () -> filters.getDBNameFilter().get().and(filters.getProductCustomerFilter().get()),
+                        filters.getDBNameFilter(), filters.getProductCustomerFilter()));
+    }
+
+    public SortedList<Product> getProducts() {
+        return this.productSortedList;
+    }
+
+    public ObjectProperty<Predicate<Product>> getDBNameFilter() {
+        return filters.getDBNameFilter();
+    }
+
+    public ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
+        return filters.getProductCustomerFilter();
+    }
+
+    public void setProductNameFilter(String name) {
+        if (name == null) {
+            filters.clearDBNameFilter();
+            return;
+        }
+        filters.filterProductByName(name);
+    }
+
+    public ObjectProperty<Product> getSelectedProduct() {
+        return selectedProduct;
+    }
+
+    public void setSelectedProduct(Product product) {
+        selectedProduct.set(product);
+    }
+
+    public void updateProductName(Product product, String name) {
+        Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(),
+                product.getDefaultPart(), name, product.getProductNotes(), product.getId());
+        // Update product of parts
+        for (Part part : PartDAO.getPartsByProduct(product).collect(Collectors.toList())) {
+            Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), newProd,
+                    part.getNextPart(), part.getPartNotes(), part.getId());
+            PartDAO.updatePart(newPart);
+            // Check for default part change
+            if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
+                newProd.setDefaultPart(newPart);
+            }
+            // Check for parts that have this part as next part
+            for (Part p : PartDAO.getPartsByProduct(part.getProduct()).collect(Collectors.toList())) {
+                if (p.getNextPart() != null && p.getNextPart().equals(part)) {
+                    p.setNextPart(newPart);
+                    PartDAO.updatePart(p);
+                }
+            }
+            // Update transfers of parts
+            for (Transfer transfer : TransferDAO.getTransfersByPart(part).collect(Collectors.toList())) {
+                Transfer newTransfer = new Transfer(transfer.getTransferDateTime(), newPart,
+                        transfer.getPrevPartQuantity(), transfer.getTransferQuantity(), transfer.getTransferType(),
+                        transfer.getId());
+                TransferDAO.updateTransfer(newTransfer);
+            }
+        }
+        ProductDAO.updateProduct(newProd);
+    }
+
+    public void selectProduct(Product product) {
+        if (product == null) {
+            filters.clearTransferProductFilter();
+            return;
+        }
+        filters.filterTransferByProduct(product);
+    }
+}

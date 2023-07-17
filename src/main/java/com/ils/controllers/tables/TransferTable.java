@@ -3,7 +3,12 @@ package com.ils.controllers.tables;
 import java.time.LocalDateTime;
 
 import com.ils.controllers.Component;
-import com.ils.logic.Logic;
+import com.ils.logic.management.CustomerManagement;
+import com.ils.logic.management.ProductManagement;
+import com.ils.logic.management.TransferManagement;
+import com.ils.models.Customer;
+import com.ils.models.Part;
+import com.ils.models.Product;
 import com.ils.models.Transfer;
 
 import javafx.beans.value.ObservableValue;
@@ -21,6 +26,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Region;
 
 public class TransferTable extends Component<Region> {
+    private CustomerManagement customerManagement;
+    private ProductManagement productManagement;
+    private TransferManagement transferManagement;
+
     @FXML
     DatePicker transferDatePicker;
 
@@ -42,8 +51,11 @@ public class TransferTable extends Component<Region> {
     @FXML
     private TableColumn<Transfer, Transfer.Action> transferTypeColumn;
 
-    public TransferTable(Logic logic) {
-        super("TransferTable.fxml", logic);
+    public TransferTable(CustomerManagement customerManagement, ProductManagement productManagement, TransferManagement transferManagement) {
+        super("TransferTable.fxml");
+        this.customerManagement = customerManagement;
+        this.productManagement = productManagement;
+        this.transferManagement = transferManagement;
         initTable();
         initCol();
         initFilter();
@@ -52,9 +64,9 @@ public class TransferTable extends Component<Region> {
     private void initTable() {
         transferTable.setPrefWidth(300);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        transferTable.setItems(logic.getTransfers());
+        transferTable.setItems(transferManagement.getTransfers());
         transferTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
-        this.logic.getTransfers().comparatorProperty().bind(transferTable.comparatorProperty());
+        this.transferManagement.getTransfers().comparatorProperty().bind(transferTable.comparatorProperty());
     }
 
     private void initCol() {
@@ -89,7 +101,7 @@ public class TransferTable extends Component<Region> {
     }
 
     private EventHandler<ActionEvent> dateFilterHandler = (event) -> {
-        logic.setTransferDateFilter(transferDatePicker.getValue());
+        transferManagement.setTransferDateFilter(transferDatePicker.getValue());
     };
 
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
@@ -99,10 +111,15 @@ public class TransferTable extends Component<Region> {
     };
 
     private void handleSelection(ObservableValue<? extends Transfer> observable, Transfer oldValue, Transfer newValue) {
-        logic.selectTransfer(newValue);
+        if (newValue == null) return;
+        Part part = newValue.getPart();
+        Product product = part.getProduct();
+        Customer customer = product.getCustomer();
+        productManagement.setSelectedProduct(product);
+        customerManagement.setSelectedCustomer(customer);
     }
 
     private void handleTypeFilter(ObservableValue<? extends Transfer.Action> observable, Transfer.Action oldValue, Transfer.Action newValue) {
-        logic.setTransferActionFilter(newValue);
+        transferManagement.setTransferActionFilter(newValue);
     }
 }
