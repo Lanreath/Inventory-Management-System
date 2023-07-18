@@ -1,8 +1,9 @@
 package com.ils.logic.management;
 
-import com.ils.logic.Filters;
 import com.ils.logic.DAO.CustomerDAO;
 import com.ils.logic.DAO.ProductDAO;
+import com.ils.logic.Filters;
+import com.ils.logic.Logic;
 import com.ils.models.Customer;
 import com.ils.models.Product;
 
@@ -20,6 +21,7 @@ public class CustomerManagement {
     private ObjectProperty<Customer> selectedCustomer;
 
     public CustomerManagement(Filters filters) {
+        this.filters = filters;
         this.customerFilteredList = CustomerDAO.getCustomers();
         this.customerSortedList = new SortedList<>(customerFilteredList);
         this.selectedCustomer = new SimpleObjectProperty<>(null);
@@ -55,7 +57,7 @@ public class CustomerManagement {
         List<Product> list = ProductDAO.getProducts().stream().filter(p -> p.getCustomer().equals(customer))
                 .collect(Collectors.toList());
         for (Product product : list) {
-            deleteProduct(product);
+            Logic.getProductManagement().deleteProduct(product);
         }
         ;
         CustomerDAO.deleteCustomer(customer.getId());

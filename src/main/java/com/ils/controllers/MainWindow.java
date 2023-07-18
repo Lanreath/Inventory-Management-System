@@ -21,13 +21,6 @@ import javafx.stage.Stage;
 public class MainWindow extends Component<Stage> {
     private static final String FXML = "MainWindow.fxml";
     private Stage stage;
-    private Logic logic;
-    private Filters filters;
-    private DataSync dataSync;
-    private CustomerManagement customerManagement;
-    private ProductManagement productManagement;
-    private PartManagement partManagement;
-    private TransferManagement transferManagement;
 
     private ActionBar actionBar;
     private CustomerTable customerTable;
@@ -57,13 +50,6 @@ public class MainWindow extends Component<Stage> {
     public MainWindow(Stage stage){
         super(FXML, stage);
         this.stage = stage;
-        // this.logic = logic;
-        this.filters = new Filters();
-        this.dataSync = new DataSync();
-        this.customerManagement = new CustomerManagement(filters);
-        this.productManagement = new ProductManagement(filters);
-        this.partManagement = new PartManagement(filters);
-        this.transferManagement = new TransferManagement(filters);
         stage.setMinHeight(600);
         stage.setMinWidth(1000);
     };
@@ -82,32 +68,32 @@ public class MainWindow extends Component<Stage> {
     }
 
     private void fillActionBar() {
-        actionBar = new ActionBar(dataSync, inputBar);
+        actionBar = new ActionBar(Logic.getDataSync(), inputBar);
         actionBarPlaceholder.getChildren().add(actionBar.getRoot());
     }
 
     private void fillCustomerTable() {
-        customerTable = new CustomerTable(customerManagement);
+        customerTable = new CustomerTable(Logic.getCustomerManagement());
         customerTablePlaceholder.getChildren().add(customerTable.getRoot());
     }
 
     private void fillProductPartTable() {
-        productPartTable = new ProductPartTable(customerManagement, productManagement, partManagement);
+        productPartTable = new ProductPartTable(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getPartManagement());
         productPartTablePlaceholder.getChildren().add(productPartTable.getRoot());
     }
 
     private void fillTransferTable() {
-        transferTable = new TransferTable(customerManagement, productManagement, transferManagement);
+        transferTable = new TransferTable(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getTransferManagement());
         transferTablePlaceholder.getChildren().add(transferTable.getRoot());
     }
 
     private void fillInputBar() {
-        inputBar = new InputBar(customerManagement, productManagement, partManagement, transferManagement, customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
+        inputBar = new InputBar(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getPartManagement(), Logic.getTransferManagement(), customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
         inputBarPlaceholder.getChildren().add(inputBar.getRoot());
     }
 
     private void fillInfoBar() {
-        infoBar = new InfoBar(logic, customerTable, productPartTable);
+        infoBar = new InfoBar(Logic.getProductManagement(), Logic.getPartManagement(), Logic.getQuantities(), customerTable, productPartTable);
         infoBarPlaceholder.getChildren().add(infoBar.getRoot());
     }
 }

@@ -6,7 +6,6 @@ import java.util.logging.SimpleFormatter;
 
 import com.ils.controllers.MainWindow;
 import com.ils.db.Database;
-import com.ils.logic.Logic;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -14,7 +13,6 @@ import javafx.stage.Stage;
 
 public class MainApp extends Application {
     private MainWindow window;
-    private Logic logic;
     private Logger logger = Logger.getLogger(MainApp.class.getName());
     private FileHandler fh;
 
@@ -32,7 +30,6 @@ public class MainApp extends Application {
         if (!Database.isOK()) {
             Platform.exit();
         }
-        logic = new Logic();
         window = new MainWindow(stage);
         window.fillInnerComponents();
         window.show();

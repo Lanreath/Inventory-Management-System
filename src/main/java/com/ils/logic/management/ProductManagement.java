@@ -1,6 +1,7 @@
 package com.ils.logic.management;
 
 import com.ils.logic.Filters;
+import com.ils.logic.Logic;
 import com.ils.logic.DAO.PartDAO;
 import com.ils.logic.DAO.ProductDAO;
 import com.ils.logic.DAO.TransferDAO;
@@ -108,12 +109,11 @@ public class ProductManagement {
     public void deleteProduct(Product product) {
         List<Part> list = PartDAO.getPartsByProduct(product).collect(Collectors.toList());
         for (Part part : list) {
-            deletePart(part);
+            Logic.getPartManagement().deletePart(part);
         }
         ;
         ProductDAO.deleteProduct(product.getId());
     }
-
 
     public void selectProduct(Product product) {
         if (product == null) {
@@ -121,5 +121,55 @@ public class ProductManagement {
             return;
         }
         filters.filterTransferByProduct(product);
+    }
+
+    public void updateProductNotes(Product product, String notes) {
+        Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(),
+                product.getDefaultPart(), product.getProductName(), notes, product.getId());
+        // Update product of parts
+        for (Part part : PartDAO.getPartsByProduct(product).collect(Collectors.toList())) {
+            PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
+                    part.getPartQuantity(), newProd,
+                    part.getNextPart(), part.getPartNotes(), part.getId()));
+        }
+        // Update nextPart of parts
+        for (Part part : PartDAO.getPartsByProduct(product).collect(Collectors.toList())) {
+            if (part.getNextPart() != null) {
+                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
+                        part.getPartQuantity(),
+                        part.getProduct(), PartDAO.getPart(part.getNextPart().getId()).get(),
+                        part.getPartNotes(),
+                        part.getId()));
+            }
+        }
+        // Update default part
+        if (product.getDefaultPart() != null) {
+            Part newDefault = PartDAO.getPart(product.getDefaultPart().getId()).get();
+            newProd.setDefaultPart(newDefault);
+        }
+        // Update product
+        ProductDAO.updateProduct(newProd);
+    }
+
+    public void updateDefaultPart(Part newDefault) {
+        if (newDefault.getProduct().getDefaultPart().equals(newDefault)) {
+            return;
+        }
+        // Update next part of the part that is pointing to the new default part
+        Optional<Part> prev = PartDAO.getPartsByProduct(newDefault.getProduct())
+                .filter(p -> p.getNextPart() != null && p.getNextPart().equals(newDefault)).findFirst();
+        prev.ifPresent(p -> {
+            p.setNextPart(newDefault.getNextPart());
+            PartDAO.updatePart(p);
+        });
+        // Update next part of the new default part to be the old default part
+        Part oldDefault = newDefault.getProduct().getDefaultPart();
+        if (oldDefault != null) {
+            newDefault.setNextPart(oldDefault);
+            PartDAO.updatePart(newDefault);
+        }
+        // Update default part of the product
+        newDefault.getProduct().setDefaultPart(newDefault);
+        ProductDAO.updateProduct(newDefault.getProduct());
     }
 }

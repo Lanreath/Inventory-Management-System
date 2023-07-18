@@ -23,6 +23,9 @@ import com.ils.controllers.Component;
 import com.ils.controllers.tables.CustomerTable;
 import com.ils.controllers.tables.ProductPartTable;
 import com.ils.logic.Logic;
+import com.ils.logic.Quantities;
+import com.ils.logic.management.PartManagement;
+import com.ils.logic.management.ProductManagement;
 import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
@@ -53,7 +56,10 @@ public class InfoBar extends Component<HBox> {
 
     @FXML
     private DatePicker endDatePicker;
-    
+
+    private ProductManagement productManagement;
+    private PartManagement partManagement;
+    private Quantities quantities;    
     private SelectionModel<Customer> cust;
     private TreeTableViewSelectionModel<Object> prpt;
 
@@ -81,8 +87,11 @@ public class InfoBar extends Component<HBox> {
     private Text productRejectBal;
     // private Text productReceiveBal;
 
-    public InfoBar(Logic logic, CustomerTable cust, ProductPartTable prpt) {
+    public InfoBar(ProductManagement productManagement, PartManagement partManagement, Quantities quantities, CustomerTable cust, ProductPartTable prpt) {
         super(FXML);
+        this.productManagement = productManagement;
+        this.partManagement = partManagement;
+        this.quantities = quantities;
         this.cust = cust.getSelectionModel();
         this.prpt = prpt.getSelectionModel();
         initLayout(cust, prpt);
@@ -158,10 +167,10 @@ public class InfoBar extends Component<HBox> {
                 if (ke.getCode().equals(KeyCode.ENTER)) {
                     if (prpt.getSelectedItem().getValue() instanceof Part) {
                         Part part = (Part) prpt.getSelectedItem().getValue();
-                        logic.updatePartNotes(part, productNotes.getText());
+                        partManagement.updatePartNotes(part, productNotes.getText());
                     } else if (prpt.getSelectedItem().getValue() instanceof Product) {
                         Product product = (Product) prpt.getSelectedItem().getValue();
-                        logic.updateProductNotes(product, productNotes.getText());
+                        productManagement.updateProductNotes(product, productNotes.getText());
                     } else {
                         return;
                     }
@@ -193,7 +202,7 @@ public class InfoBar extends Component<HBox> {
             }
             if (prpt.getSelectedItem().getValue() instanceof Part) {
                 Part part = (Part) prpt.getSelectedItem().getValue();
-                this.logic.updateDefaultPart(part);
+                this.productManagement.updateDefaultPart(part);
                 return;
             }
             throw new AssertionError("Unexpected value: " + prpt.getSelectedItem().getValue()); 
@@ -209,8 +218,8 @@ public class InfoBar extends Component<HBox> {
         if (cust.getSelectedItem() == null) {
             return;
         }
-        Integer opening = this.logic.getOpeningBalByCustomer(cust.getSelectedItem(), startDatePicker.getValue());
-        Integer closing = this.logic.getClosingBalByCustomer(cust.getSelectedItem(), endDatePicker.getValue());
+        Integer opening = this.quantities.getOpeningBalByCustomer(cust.getSelectedItem(), startDatePicker.getValue());
+        Integer closing = this.quantities.getClosingBalByCustomer(cust.getSelectedItem(), endDatePicker.getValue());
         customerOpeningBal.setText(Integer.toString(opening) + "\n");
         customerClosingBal.setText(Integer.toString(closing) + "\n");
         customerChangeBal.setText(Integer.toString(closing - opening));
@@ -230,18 +239,18 @@ public class InfoBar extends Component<HBox> {
         }
         if (prpt.getSelectedItem().getValue() instanceof Product) {
             product = (Product) prpt.getSelectedItem().getValue();
-            opening = this.logic.getOpeningBalByProduct(product, startDatePicker.getValue());
-            closing = this.logic.getClosingBalByProduct(product, endDatePicker.getValue());
-            daily = this.logic.getDailyTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
-            renewal = this.logic.getRenewalTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
-            reject = this.logic.getRejectTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
+            opening = this.quantities.getOpeningBalByProduct(product, startDatePicker.getValue());
+            closing = this.quantities.getClosingBalByProduct(product, endDatePicker.getValue());
+            daily = this.quantities.getDailyTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
+            renewal = this.quantities.getRenewalTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
+            reject = this.quantities.getRejectTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
         } else if (prpt.getSelectedItem().getValue() instanceof Part) {
             part = (Part) prpt.getSelectedItem().getValue();
-            opening = this.logic.getOpeningBalByPart(part, startDatePicker.getValue());
-            closing = this.logic.getClosingBalByPart(part, endDatePicker.getValue());
-            daily = this.logic.getDailyTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
-            renewal = this.logic.getRenewalTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
-            reject = this.logic.getRejectTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
+            opening = this.quantities.getOpeningBalByPart(part, startDatePicker.getValue());
+            closing = this.quantities.getClosingBalByPart(part, endDatePicker.getValue());
+            daily = this.quantities.getDailyTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
+            renewal = this.quantities.getRenewalTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
+            reject = this.quantities.getRejectTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
         } else {
             throw new RuntimeException("Invalid selection type for Product/Part table");
         }
