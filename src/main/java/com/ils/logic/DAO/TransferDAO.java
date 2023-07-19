@@ -88,6 +88,10 @@ public class TransferDAO {
         return transfers.stream().filter(t -> t.getPart().getProduct().equals(product));
     }
 
+    public static Stream<Transfer> getTransfersByProductAndDate(Product prod, LocalDate date) {
+        return transfers.stream().filter(t -> t.getPart().getProduct().equals(prod) && t.getTransferDateTime().toLocalDate().equals(date));
+    }
+
     public static Stream<Transfer> getTransfersByPart(Part part) {
         return transfers.stream().filter(t -> t.getPart().equals(part));
     }

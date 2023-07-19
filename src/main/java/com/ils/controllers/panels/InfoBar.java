@@ -22,7 +22,6 @@ import java.time.YearMonth;
 import com.ils.controllers.Component;
 import com.ils.controllers.tables.CustomerTable;
 import com.ils.controllers.tables.ProductPartTable;
-import com.ils.logic.Logic;
 import com.ils.logic.Quantities;
 import com.ils.logic.management.PartManagement;
 import com.ils.logic.management.ProductManagement;

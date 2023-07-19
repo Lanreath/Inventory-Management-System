@@ -83,7 +83,6 @@ public class TransferManagement {
     }
 
     public void deleteTransfer(Transfer transfer) {
-        // TODO: Should update part quantity
         TransferDAO.deleteTransfer(transfer.getId());
     }
 }

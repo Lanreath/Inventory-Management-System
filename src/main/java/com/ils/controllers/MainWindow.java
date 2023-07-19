@@ -6,13 +6,7 @@ import com.ils.controllers.panels.InputBar;
 import com.ils.controllers.tables.CustomerTable;
 import com.ils.controllers.tables.ProductPartTable;
 import com.ils.controllers.tables.TransferTable;
-import com.ils.logic.DataSync;
-import com.ils.logic.Filters;
 import com.ils.logic.Logic;
-import com.ils.logic.management.CustomerManagement;
-import com.ils.logic.management.PartManagement;
-import com.ils.logic.management.ProductManagement;
-import com.ils.logic.management.TransferManagement;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;

@@ -92,25 +92,48 @@ public class DataSync {
                     t.getPart().getProduct().getDBName().equals(product) &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.DAILY)) {
+                    // Check if part has enough quantity
+                    while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
+                        // Deduct and check again
+                        TransferDAO.insertTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY);
+                        Part emptyPart = new Part(part.getPartName(), part.getCreationDateTime(), 0, part.getProduct(), part.getId());
+                        PartDAO.updatePart(emptyPart);
+                        quantity -= part.getPartQuantity();
+                        part = part.getNextPart();
+                        Logic.getProductManagement().updateDefaultPart(part);
+                    } 
                     TransferDAO.insertTransfer(part, quantity, Transfer.Action.DAILY);
-
-                    // Update Part quantity
                     Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId());
                     PartDAO.updatePart(newPart);
                 } else {
                     // Transfer already exists, but quantity might be different
-                    Optional<Transfer> t = TransferDAO.getTransferByPartAndDate(part, date);
-                    t.orElseThrow(() -> new IllegalStateException("Could not find matching transfer in database"));    
+                    Stream<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY);
+                    int total = ts.mapToInt((t) -> t.getTransferQuantity()).sum();
+                    quantity -= total;
+                    Part copyPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getId());
+                    Optional<Transfer> t = ts.filter((tr) -> tr.getPart().equals(copyPart)).findFirst();
+                    t.orElseThrow(() -> new IllegalStateException("Could not find matching transfer for part in database"));
                     Transfer transfer = t.get();
-                    if (transfer.getTransferQuantity() != quantity) {
-                        // Update Transfer quantity
-                        Transfer newTransfer = new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity(), transfer.getTransferType(), transfer.getId());
-                        TransferDAO.updateTransfer(newTransfer);
-
-                        // Update Part quantity, subtracting the difference
-                        Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), quantity - transfer.getTransferQuantity(), part.getProduct(), part.getId());
-                        PartDAO.updatePart(newPart);
+                    while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
+                        // Deduct and check again
+                        if (part.equals(transfer.getPart())){
+                            TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
+                        } else {
+                            TransferDAO.insertTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY);
+                        }
+                        Part emptyPart = new Part(part.getPartName(), part.getCreationDateTime(), 0, part.getProduct(), part.getId());
+                        PartDAO.updatePart(emptyPart);
+                        quantity -= part.getPartQuantity();
+                        part = part.getNextPart();
+                        Logic.getProductManagement().updateDefaultPart(part);
                     }
+                    if (part.equals(transfer.getPart())){
+                        TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
+                    } else {
+                        TransferDAO.insertTransfer(part, quantity, Transfer.Action.DAILY);
+                    }
+                    Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId());
+                    PartDAO.updatePart(newPart);
                 }
             }
         } catch (SQLException e) {

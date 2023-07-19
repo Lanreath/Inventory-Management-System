@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import com.ils.MainApp;
 import com.ils.controllers.Component;
 import com.ils.logic.DataSync;
-import com.ils.logic.Logic;
 
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";

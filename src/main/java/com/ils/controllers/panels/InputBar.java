@@ -14,7 +14,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 
 import com.ils.controllers.Component;
-import com.ils.logic.Logic;
 import com.ils.logic.management.CustomerManagement;
 import com.ils.logic.management.PartManagement;
 import com.ils.logic.management.ProductManagement;
