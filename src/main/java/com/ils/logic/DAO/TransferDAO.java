@@ -111,6 +111,16 @@ public class TransferDAO {
         transfers.add(new Transfer(transferDateTime, part, part.getPartQuantity(), quantity, transferType, id));
     }
 
+    public static void insertTransfer(Part part, int quantity, Transfer.Action transferType, LocalDate date) {
+        int id = (int) CRUDUtil.create(
+            tableName,
+            new String[] { transferTimeColumn, partIdColumn, prevPartQuantityColumn, quantityColumn, transferTypeColumn },
+            new Object[] { date.atStartOfDay(), part.getId(), part.getPartQuantity(), quantity, transferType.name() },
+            new int[] { Types.TIMESTAMP, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.VARCHAR }
+        );
+        transfers.add(new Transfer(date.atStartOfDay(), part, part.getPartQuantity(), quantity, transferType, id));
+    }
+
     public static void updateTransfer(Transfer newTransfer) {
         int rows = CRUDUtil.update(
             tableName,

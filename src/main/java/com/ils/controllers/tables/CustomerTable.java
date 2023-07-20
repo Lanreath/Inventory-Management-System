@@ -45,7 +45,7 @@ public class CustomerTable extends Component<Region> {
     }
 
     private void initTable() {
-        customerTable.setPrefWidth(100);
+        customerTable.setPrefWidth(80);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         customerTable.setItems(this.customerManagement.getCustomers());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);

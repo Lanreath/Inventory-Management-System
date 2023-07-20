@@ -19,7 +19,7 @@ public class MainApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         try {
-            fh = new FileHandler("database/ILSLogs.log");
+            fh = new FileHandler("database/ILSLogs.log", true);
             logger.addHandler(fh);
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
