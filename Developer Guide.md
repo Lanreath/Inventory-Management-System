@@ -24,7 +24,9 @@ title: Developer Guide
   - [Logic](#logic)
     - [Data Synchronization](#data-synchronization)
     - [Data Access Objects](#data-access-objects)
+    - [Management](#management)
     - [Filters](#filters)
+    - [Quantities](#quantities)
   - [UI](#ui)
     - [Component](#component)
     - [MainWindow](#mainwindow)
@@ -43,7 +45,11 @@ title: Developer Guide
 
 ### Configuration
 
-- Database connection details (found in `sync\Oracle.java` and `db\Database.java`)
+- Database connection details (found in `database/oracle.properties`)
+  - `db.url`: Oracle database URL
+  - `username`: Oracle database username
+  - `password`: Oracle database password
+  - `enable_offline`: Enable offline mode (true/false)
 
 ## Design
 
@@ -125,7 +131,7 @@ When a `Transfer` object is created, the `part` is necessary. The `transferDate`
 
 ### Logic
 
-The `Logic` class serves as the interface between the UI and the underlying data acess objects, filters, and data synchronization classes. It is responsible for interacting with `CustomerDAO`, `ProductDAO`, `PartDAO`, `TransferDAO` to handle CRUD operations for each data model mentioned above. This class also provides the necessary data and table view modifications for display.
+The `Logic` class serves as the interface between the UI and the underlying data access objects, filters, and data synchronization classes. It is responsible for interacting with the management classes to handle CRUD operations for each data model mentioned above. This class also provides the necessary data and table view modifications for display.
 
 #### Data Synchronization
 
@@ -141,11 +147,17 @@ The `CustomerDAO`, `ProductDAO`, `PartDAO`, and `TransferDAO` classes are used t
 
 Each data access object contains a list of the corresponding data model. The list is used to store the data retrieved from the SQLite database. The list is also used to store the data retrieved from the Oracle database during data synchronization. The getter methods allow the `Logic` class to pass filtered data to the UI.
 
+#### Management
+
+The `CustomerManagement`,
+
 #### Filters
 
 The `Filter` class is used to filter data from the data access objects. It is used to filter data by customer name, product/part name, and transfer date/type.
 
 Each filter has a setter method and a clear method e.g. `filterCustomerByName()`, `clearCustomerNameFilter()`. These filters make use of `ObjectProperty` to bind changes in multiple `Predicate` objects to the `ObservableList` corresponding to each DAO model. Any changes to the filters are reflected in the list of the corresponding data model in the data access objects and is reflected in the UI.
+
+#### Quantities
 
 ### UI
 
