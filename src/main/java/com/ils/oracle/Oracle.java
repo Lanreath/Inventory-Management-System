@@ -72,7 +72,7 @@ public abstract class Oracle {
         String offline = prop.getProperty("enable_offline");
         if (offline.equals("true")) {
             Logger.getLogger(MainApp.class.getName()).log(Level.INFO,
-                    LocalDateTime.now() + ": Oracle is offline.");
+                    LocalDateTime.now() + ": Oracle is set to offline.");
             return true;
         }
         return checkDrivers() && checkConnection();

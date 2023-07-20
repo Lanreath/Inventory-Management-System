@@ -22,7 +22,6 @@ import com.ils.logic.DataSync;
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
     private DataSync dataSync;
-
     private InputBar inputBar;
 
     @FXML
@@ -51,6 +50,7 @@ public class ActionBar extends Component<Region> {
 
     public ActionBar(DataSync dataSync, InputBar inputBar) {
         super(FXML);
+        this.dataSync = dataSync;
         this.inputBar = inputBar;
         ImageView cust = new ImageView("/images/customer-v2.png");
         ImageView prod = new ImageView("/images/product-v2.png");

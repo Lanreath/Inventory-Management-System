@@ -59,7 +59,6 @@ public class CustomerManagement {
         for (Product product : list) {
             Logic.getProductManagement().deleteProduct(product);
         }
-        ;
         CustomerDAO.deleteCustomer(customer.getId());
     }
 
