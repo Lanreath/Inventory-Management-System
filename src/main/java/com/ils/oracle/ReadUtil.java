@@ -94,8 +94,12 @@ public class ReadUtil {
         "end as vaultname, \r\n";
     private static final String woId = "wo.workorderid as workorderid,\r\n";
     private static final String qty = "wo.quantity as qty\r\n";
-    private static final String tableNames = "from customerorder co, workorder wo, product pr, part pt, (\r\n" + //
-            "SELECT workorderid, get_token(exportedkeyvalue4,'9',';') as custom FROM card\r\n" + //
+    private static final String tableNames = "from customerorder co, workorder wo, product pr, part pt,\r\n";
+    private static final String cards1 = "(SELECT workorderid, get_token(exportedkeyvalue4,'9',';') as custom FROM card\r\n" + //
+            ") ca\r\n";
+    private static final String cards2 = "(SELECT workorderid, get_token(exportedkeyvalue4,'9',';') as custom FROM card\r\n" + //
+            "UNION\r\n" + //
+            "SELECT workorderid, get_token(exportedkeyvalue4, '9', ';') as custom FROM card_arc" + //
             ") ca\r\n";
     private static final String join1 = "where wo.productid = pr.productid\r\n" + //
             "and pr.productkey1 = pt.productkey1\r\n" + //
@@ -143,7 +147,13 @@ public class ReadUtil {
 
     public static ResultSet readDailyTransfersByDate(LocalDate date) {
         Connection conn;
-        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + daily + ")\r\n";
+        String cards;
+        if (date.equals(LocalDate.now())) {
+            cards = cards1;
+        } else {
+            cards = cards2;
+        }
+        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + daily + ")\r\n";
         String query = subquery + union1 + "UNION\r\n" + union2 + order;
         try {
             conn = Oracle.connect();
@@ -156,7 +166,13 @@ public class ReadUtil {
     }
     public static ResultSet readRenewalTransfersByDate(LocalDate date) {
         Connection conn;
-        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + renewal + ")\r\n";
+        String cards;
+        if (date.equals(LocalDate.now())) {
+            cards = cards1;
+        } else {
+            cards = cards2;
+        }
+        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards +join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + renewal + ")\r\n";
         String query = subquery + union1 + "UNION\r\n" + union2 + order;
         try {
             conn = Oracle.connect();

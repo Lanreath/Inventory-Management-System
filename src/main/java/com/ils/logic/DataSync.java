@@ -33,7 +33,7 @@ public class DataSync {
         throw new IllegalArgumentException("Could not connect to database, please check your properties file at database/oracle.properties");
     }
 
-    protected void syncCustomers() {
+    private void syncCustomers() {
         ResultSet customers = ReadUtil.readCustomers();
         Supplier<Stream<String>> savedCustomers = () -> CustomerDAO.getCustomers().stream().map(Customer::getCustomerName);
         try {
@@ -50,7 +50,7 @@ public class DataSync {
         }
     }
     
-    protected void syncDailyTransfers(LocalDate date) {
+    private void syncDailyTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readDailyTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
@@ -64,7 +64,6 @@ public class DataSync {
                 String customer = transfers.getString("CUSTOMER");
                 String product = transfers.getString("VAULTNAME");
                 int quantity = transfers.getInt("QTY");
-
                 if (savedProducts.get().noneMatch((p) -> p.equals(product))) {
                     // Product does not exist in database
                     Optional<Customer> c = CustomerDAO.getCustomer(customer);
@@ -152,7 +151,7 @@ public class DataSync {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Daily Transfers from database " + e.getMessage());
         }
     }
-    protected void syncRenewalTransfers(LocalDate date) {
+    private void syncRenewalTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readRenewalTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
@@ -166,7 +165,6 @@ public class DataSync {
                 String customer = transfers.getString("CUSTOMER");
                 String product = transfers.getString("VAULTNAME");
                 int quantity = transfers.getInt("QTY");
-
                 if (savedProducts.get().noneMatch((p) -> p.equals(product))) {
                     // Product does not exist in database
                     Optional<Customer> c = CustomerDAO.getCustomer(customer);
@@ -209,7 +207,6 @@ public class DataSync {
                     TransferDAO.insertTransfer(part, quantity, Transfer.Action.RENEWAL);
                     Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getId());
                     PartDAO.updatePart(newPart);
-
                 } else {
                     // Transfer already exists, but quantity might be different
                     List<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL).collect(Collectors.toList());
