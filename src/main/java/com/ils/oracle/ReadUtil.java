@@ -110,7 +110,6 @@ public class ReadUtil {
             "and wo.testflag <> 1\r\n" + //
             "and wo.customerorderid = co.customerorderid " + //
             "and ca.workorderid = wo.workorderid\r\n" +
-            "and co.customername <> 'CSG'\r\n" + //
             "and to_date(wo.creationdate,'DD/MM/YY') = to_date(";
     private static final String join2 = ", 'DD/MM/YY')\r\n";
     private static final String daily = "and get_token(pr.productname, 5,'_') != 'RNW'\r\n";

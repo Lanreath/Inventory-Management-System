@@ -49,18 +49,12 @@ public class CustomerTable extends Component<Region> {
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         customerTable.setItems(this.customerManagement.getCustomers());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
-        customerTable.setEditable(true);
         this.customerManagement.getCustomers().comparatorProperty().bind(customerTable.comparatorProperty());
         this.customerManagement.getSelectedCustomer().addListener(this::handleForcedSelection);
     }
 
     private void initCol() {
         customerNameColumn.setCellValueFactory(new PropertyValueFactory<>("customerName"));
-        customerNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        customerNameColumn.setOnEditCommit((TableColumn.CellEditEvent<Customer, String> event) -> {
-            Customer customer = event.getTableView().getItems().get(event.getTablePosition().getRow());
-            this.customerManagement.updateCustomer(customer, event.getNewValue());
-        });
     }
 
     private void initFilter() {
