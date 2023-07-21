@@ -1,6 +1,50 @@
-.text{
+* {
+    -primary-background: #F5F5F5;
+    -secondary-background: #FFFFFF;
+    -primary-text: #333333;
+    -secondary-text: #666666;
+    -primary-action: #4169E1;
+    -secondary-action: #87CEEB;
+    -highlight: #FFFF00;
+    -error: #FF0000;
+}
+.root {
+    -fx-background: -primary-background;
+    -fx-background-color: -primary-background;
+    -fx-text-base-color: -primary-text;
+}
+.text, .text-field{
     -fx-font-size: 14px;
 }
-.text-field {
-    -fx-font-size: 14px;
+.table-row-cell:selected, .tree-table-row-cell:selected {
+    -fx-background-color: -primary-action;
 }
+.tree-table-row-cell:selected {
+    -fx-background-insets: 0, 1, 2;
+}
+.tree-table-row-cell:odd {
+    -fx-background-color: -primary-background;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+.tree-table-row-cell:selected:odd {
+    -fx-background-color: -primary-action;
+    -fx-background-insets: 0, 1, 2;
+}
+.button {
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+.button:pressed, .arrow-button:pressed {
+    -fx-background-color: -secondary-action;
+    -fx-border-color: -primary-action;
+}
+.button:focused {
+    -fx-border-color: -primary-action;
+}
+.error {
+    -fx-text-fill: -error;
+}
+/* .default-part {
+    -fx-background: -highlight;
+    -fx-background-color: -highlight;
+} */

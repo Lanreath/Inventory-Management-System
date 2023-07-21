@@ -166,7 +166,9 @@ public class InputBar extends Component<ToolBar> {
 
     private void displayMsg(String msg) {
         getRoot().getItems().clear();
-        getRoot().getItems().add(new Label(msg));
+        Label label = new Label(msg);
+        label.getStyleClass().add("error");
+        getRoot().getItems().add(label);
     }
 
     protected void addCustomer() {

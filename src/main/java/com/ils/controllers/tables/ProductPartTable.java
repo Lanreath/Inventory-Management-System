@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
@@ -29,6 +30,7 @@ import javafx.util.converter.DefaultStringConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class ProductPartTable extends Component<Region> {
@@ -77,6 +79,25 @@ public class ProductPartTable extends Component<Region> {
         treeTable.setEditable(true);
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
+        // Row factory to highlight the default part corresponding to the first child of every product
+        // treeTable.setRowFactory(tv -> {
+        //     TreeTableRow<Object> row = new TreeTableRow<>();
+        //     row.treeItemProperty().addListener((obs, oldTreeItem, newTreeItem) -> {
+        //         if (newTreeItem != null && newTreeItem.getValue() instanceof Product) {
+        //             row.getStyleClass().add("product");
+        //         } else if (newTreeItem != null && newTreeItem.getValue() instanceof Part) {
+        //             Part part = (Part) newTreeItem.getValue();
+        //             if (part.equals(part.getProduct().getDefaultPart())) {
+        //                 row.getStyleClass().add("default-part");
+        //             } else {
+        //                 row.getStyleClass().add("part");
+        //             }
+        //         } else if (newTreeItem != null) {
+        //             throw new RuntimeException("Unknown row item type");
+        //         }
+        //     });
+        //     return row;
+        // });
     }
 
     private void initListeners() {
