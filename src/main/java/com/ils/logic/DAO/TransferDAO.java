@@ -45,7 +45,7 @@ public class TransferDAO {
     }
 
     private static void updateTransfersFromDB() {
-        String query = "SELECT * FROM " + tableName + " LIMIT 500";
+        String query = "SELECT * FROM " + tableName;
         try (Connection connection = Database.connect()) {
             PreparedStatement statement = connection.prepareStatement(query); 
             ResultSet rs = statement.executeQuery();

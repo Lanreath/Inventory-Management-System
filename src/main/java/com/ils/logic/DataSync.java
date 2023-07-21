@@ -125,7 +125,7 @@ public class DataSync {
                     if (transfer == null) {
                         throw new IllegalStateException("Could not find matching transfer for part in database");
                     }
-                    while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
+                    while (quantity >= 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
                         if (part.equals(transfer.getPart())){
                             TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
@@ -226,7 +226,7 @@ public class DataSync {
                     if (transfer == null) {
                         throw new IllegalStateException("Could not find matching transfer for part in database");
                     }
-                    while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
+                    while (quantity >= 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
                         if (part.equals(transfer.getPart())){
                             TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
