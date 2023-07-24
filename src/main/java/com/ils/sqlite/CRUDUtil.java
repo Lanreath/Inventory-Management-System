@@ -1,4 +1,4 @@
-package com.ils.db;
+package com.ils.sqlite;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 import com.ils.MainApp;
 
-public class CRUDUtil {
+public abstract class CRUDUtil {
     private static final List<String> nullableColumns = Arrays.asList("defaultPart", "productName", "nextPart", "productNotes", "partNotes");
 
     public static Object read(String tableName, String fieldName, int fieldDataType,

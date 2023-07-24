@@ -1,11 +1,7 @@
 package com.ils;
 
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
 import com.ils.controllers.MainWindow;
-import com.ils.db.Database;
+import com.ils.sqlite.Database;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -13,20 +9,10 @@ import javafx.stage.Stage;
 
 public class MainApp extends Application {
     private MainWindow window;
-    private Logger logger = Logger.getLogger(MainApp.class.getName());
-    private FileHandler fh;
 
     @Override
     public void start(Stage stage) throws Exception {
-        try {
-            fh = new FileHandler("database/ILSLogs.log", true);
-            logger.addHandler(fh);
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        logger.info("Starting ILS...");
+        Config.init();
         if (!Database.isOK()) {
             Platform.exit();
         }
@@ -37,5 +23,4 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 }

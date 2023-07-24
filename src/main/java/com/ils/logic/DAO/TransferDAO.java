@@ -13,12 +13,12 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import com.ils.MainApp;
-import com.ils.db.CRUDUtil;
-import com.ils.db.Database;
 import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
 import com.ils.models.Transfer;
+import com.ils.sqlite.CRUDUtil;
+import com.ils.sqlite.Database;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

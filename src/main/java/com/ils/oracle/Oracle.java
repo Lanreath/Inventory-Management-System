@@ -10,11 +10,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.Config;
 import com.ils.MainApp;
 
 public abstract class Oracle {
-    private static final Properties prop = new Properties();
-
     private static final String location = "@10.151.40.55:1521:PCMS";
 
     private static boolean checkDrivers() {
@@ -29,17 +28,9 @@ public abstract class Oracle {
     }
 
     protected static Connection connect() {
-        try {
-            FileInputStream ip = new FileInputStream("database/database.properties");
-            prop.load(ip);
-        } catch (IOException e) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not load database properties file " + e.getMessage());
-            return null;
-        }
-        String username = prop.getProperty("oracle.username");
-        String password = prop.getProperty("oracle.password");
-        String dbURL = prop.getProperty("oracle.url");
+        String username = Config.getValue("oracle.username");
+        String password = Config.getValue("oracle.password");
+        String dbURL = Config.getValue("oracle.url");
         Connection connection;
         try {
             connection = DriverManager.getConnection("jdbc:oracle:thin:" + dbURL, username, password);
@@ -62,14 +53,7 @@ public abstract class Oracle {
     }
 
     public static boolean isOK() {
-        try {
-            FileInputStream ip = new FileInputStream("database/database.properties");
-            prop.load(ip);
-        } catch (IOException e) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not load Oracle properties file " + e.getMessage());
-        }
-        String offline = prop.getProperty("enable_offline");
+        String offline = Config.getValue("enable_offline");
         if (offline.equals("true")) {
             Logger.getLogger(MainApp.class.getName()).log(Level.INFO,
                     LocalDateTime.now() + ": Oracle is set to offline.");
@@ -77,5 +61,4 @@ public abstract class Oracle {
         }
         return checkDrivers() && checkConnection();
     }
-
 }

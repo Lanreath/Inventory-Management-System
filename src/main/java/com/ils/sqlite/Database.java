@@ -1,4 +1,4 @@
-package com.ils.db;
+package com.ils.sqlite;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,11 +14,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import com.ils.Config;
 import com.ils.MainApp;
 import com.ils.models.Model;
 
 public abstract class Database {
-    private static final Properties prop = new Properties();
+    // private static final Properties prop = new Properties();
 
     private static final Class<?>[] requiredTables = Model.getModels().toArray(Class[]::new);
 
@@ -33,15 +34,7 @@ public abstract class Database {
     }
 
     public static Connection connect() {
-        try {
-            FileInputStream ip = new FileInputStream("database/database.properties");
-            prop.load(ip);
-        } catch (IOException e) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not load database properties file " + e.getMessage());
-            return null;
-        }
-        String location = prop.getProperty("sqlite.location");
+        String location = Config.getValue("sqlite.location");
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:" + location);
             if (conn != null) {
