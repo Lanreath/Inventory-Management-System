@@ -1,14 +1,11 @@
 package com.ils.sqlite;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +16,6 @@ import com.ils.MainApp;
 import com.ils.models.Model;
 
 public abstract class Database {
-    // private static final Properties prop = new Properties();
 
     private static final Class<?>[] requiredTables = Model.getModels().toArray(Class[]::new);
 

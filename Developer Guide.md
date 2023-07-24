@@ -46,9 +46,11 @@ title: Developer Guide
 ### Configuration
 
 - Database connection details (found in `database/oracle.properties`)
-  - `db.url`: Oracle database URL
-  - `username`: Oracle database username
-  - `password`: Oracle database password
+  - `oracle.username`: Oracle database username
+  - `oracle.password`: Oracle database password
+  - `oracle.url`: Oracle database URL
+  - `sqlite.location`: SQLite database location
+  - `export.location`: Exported CSV file location
   - `enable_offline`: Enable offline mode (true/false)
 
 ## Design

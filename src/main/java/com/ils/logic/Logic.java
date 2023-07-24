@@ -15,40 +15,40 @@ public class Logic {
 	private static Quantities quantities;
 
 	static {
-			filters = new Filters();
-			dataSync = new DataSync();
-			customerManagement = new CustomerManagement(filters);
-			productManagement = new ProductManagement(filters);
-			partManagement = new PartManagement(filters);
-			transferManagement = new TransferManagement(filters);
-			quantities = new Quantities();
+		filters = new Filters();
+		dataSync = new DataSync();
+		customerManagement = new CustomerManagement(filters);
+		productManagement = new ProductManagement(filters);
+		partManagement = new PartManagement(filters);
+		transferManagement = new TransferManagement(filters);
+		quantities = new Quantities();
 	}
 
 	public static CustomerManagement getCustomerManagement() {
-			return customerManagement;
+		return customerManagement;
 	}
 
 	public static ProductManagement getProductManagement() {
-			return productManagement;
+		return productManagement;
 	}
 
 	public static PartManagement getPartManagement() {
-			return partManagement;
+		return partManagement;
 	}
 
 	public static TransferManagement getTransferManagement() {
-			return transferManagement;
+		return transferManagement;
 	}
 
 	public static Filters getFilters() {
-			return filters;
+		return filters;
 	}
 
 	public static DataSync getDataSync() {
-			return dataSync;
+		return dataSync;
 	}
 
 	public static Quantities getQuantities() {
-			return quantities;
+		return quantities;
 	}
 }
