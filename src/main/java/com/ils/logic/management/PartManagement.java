@@ -49,6 +49,10 @@ public class PartManagement {
         }
         // Update next part of the last part of the product
         Part curr = product.getDefaultPart();
+        if (curr == null) {
+            Logic.getProductManagement().updateDefaultPart(newPart.get());
+            return;
+        }
         while (curr.getNextPart() != null) {
             curr = curr.getNextPart();
         }
@@ -72,8 +76,9 @@ public class PartManagement {
                 });
         // Check if product's default part is this part
         if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
-            part.getProduct().setDefaultPart(newPart.get());
-            ProductDAO.updateProduct(part.getProduct());
+            // part.getProduct().setDefaultPart(newPart.get());
+            // ProductDAO.updateProduct(part.getProduct());
+            Logic.getProductManagement().updateDefaultPart(newPart.get());
         }
     }
 
@@ -90,8 +95,7 @@ public class PartManagement {
             if (curr.getNextPart() != null) {
                 List<Part> affectedParts = PartDAO.getPartsByProduct(curr.getProduct()).collect(Collectors.toList());
                 // Update the next part of the part to be deleted to be the new default part
-                curr.getProduct().setDefaultPart(curr.getNextPart());
-                ProductDAO.updateProduct(curr.getProduct());
+                Logic.getProductManagement().updateDefaultPart(curr.getNextPart());
                 Optional<Product> updated = ProductDAO.getProduct(curr.getProduct().getId());
                 if (!updated.isPresent()) {
                     throw new RuntimeException("Product not found after default part update");
@@ -133,8 +137,7 @@ public class PartManagement {
         }
         // Check if product's default part is this part
         if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
-            part.getProduct().setDefaultPart(newPart.get());
-            ProductDAO.updateProduct(part.getProduct());
+            Logic.getProductManagement().updateDefaultPart(newPart.get());
         }
         List<Part> list = PartDAO.getPartsByProduct(part.getProduct())
                 .filter(p -> p.getNextPart() != null && p.getNextPart().equals(part))

@@ -68,12 +68,13 @@ public class ProductManagement {
     public void addProduct(String name, Customer customer) {
         ProductDAO.insertProduct(name, customer);
         Optional<Product> prod = ProductDAO.getProductByDBName(name);
-        PartDAO.insertPart("Default", 0, prod.get());
-        Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
-        Product updatedProd = new Product(prod.get().getDBName(), prod.get().getCreationDateTime(),
-                prod.get().getCustomer(), part.get(), prod.get().getId());
-        ProductDAO.updateProduct(updatedProd);
-        part.get().getProduct().setDefaultPart(part.get());
+        Logic.getPartManagement().addPart("Default", 0, prod.get());
+        // Not needed because addPart already sets the default part
+        // Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
+        // Product updatedProd = new Product(prod.get().getDBName(), prod.get().getCreationDateTime(),
+        //         prod.get().getCustomer(), part.get(), prod.get().getId());
+        // ProductDAO.updateProduct(updatedProd);
+        // part.get().getProduct().setDefaultPart(part.get());
     }
 
     public void updateProductName(Product product, String name) {
@@ -110,8 +111,7 @@ public class ProductManagement {
         List<Part> list = PartDAO.getPartsByProduct(product).collect(Collectors.toList());
         for (Part part : list) {
             Logic.getPartManagement().deletePart(part);
-        }
-        ;
+        };
         ProductDAO.deleteProduct(product.getId());
     }
 

@@ -1,11 +1,10 @@
 package com.ils.logic.management;
 
 import com.ils.logic.DAO.PartDAO;
-import com.ils.logic.DAO.ProductDAO;
 import com.ils.logic.DAO.TransferDAO;
 import com.ils.logic.Filters;
+import com.ils.logic.Logic;
 import com.ils.models.Part;
-import com.ils.models.Product;
 import com.ils.models.Transfer;
 
 import java.util.Optional;
@@ -63,12 +62,10 @@ public class TransferManagement {
             case REJECT_RENEWAL:
             case RENEWAL:
             case SAMPLE:
-                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
-                        part.getPartQuantity() - quantity, part.getProduct(), part.getId()));
+                Logic.getPartManagement().updatePartQuantity(part, part.getPartQuantity() - quantity);
                 break;
             case RECEIVED:
-                PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(),
-                        part.getPartQuantity() + quantity, part.getProduct(), part.getId()));
+                Logic.getPartManagement().updatePartQuantity(part, part.getPartQuantity() + quantity);
                 break;
         }
         // Check for default part change
@@ -77,12 +74,35 @@ public class TransferManagement {
             if (!newDefault.isPresent()) {
                 throw new RuntimeException("Part not found after insertion");
             }
-            ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
-                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getId()));
+            Logic.getProductManagement().updateDefaultPart(newDefault.get()); 
         }
     }
 
     public void deleteTransfer(Transfer transfer) {
-        TransferDAO.deleteTransfer(transfer.getId());
+        switch (transfer.getTransferType()) {
+            case DAILY:
+            case DESTRUCT:
+            case PROJECT:
+            case REJECT_DAILY:
+            case REJECT_PROJECT:
+            case REJECT_RENEWAL:
+            case RENEWAL:
+            case SAMPLE:
+                for (Transfer t : TransferDAO.getTransfersByPart(transfer.getPart()).filter(t -> t.getTransferDateTime().isAfter(transfer.getTransferDateTime())).toArray(Transfer[]::new)) {
+                        TransferDAO.updateTransfer(new Transfer(t.getTransferDateTime(), t.getPart(),
+                                t.getPrevPartQuantity() + transfer.getTransferQuantity(), t.getTransferQuantity(), t.getTransferType(),
+                                t.getId()));
+                }
+                Logic.getPartManagement().updatePartQuantity(transfer.getPart(), transfer.getPart().getPartQuantity() + transfer.getTransferQuantity());
+                break;
+            case RECEIVED:
+                for (Transfer t : TransferDAO.getTransfersByPart(transfer.getPart()).filter(t -> t.getTransferDateTime().isAfter(transfer.getTransferDateTime())).toArray(Transfer[]::new)) {
+                        TransferDAO.updateTransfer(new Transfer(t.getTransferDateTime(), t.getPart(),
+                                t.getPrevPartQuantity() - transfer.getTransferQuantity(), t.getTransferQuantity(), t.getTransferType(),
+                                t.getId()));
+                }
+                Logic.getPartManagement().updatePartQuantity(transfer.getPart(), transfer.getPart().getPartQuantity() - transfer.getTransferQuantity());
+                break;
+        }
     }
 }
