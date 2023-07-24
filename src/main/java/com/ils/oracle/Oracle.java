@@ -30,16 +30,16 @@ public abstract class Oracle {
 
     protected static Connection connect() {
         try {
-            FileInputStream ip = new FileInputStream("database/oracle.properties");
+            FileInputStream ip = new FileInputStream("database/database.properties");
             prop.load(ip);
         } catch (IOException e) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not load Oracle properties file " + e.getMessage());
+                    LocalDateTime.now() + ": Could not load database properties file " + e.getMessage());
             return null;
         }
-        String username = prop.getProperty("username");
-        String password = prop.getProperty("password");
-        String dbURL = prop.getProperty("db.url");
+        String username = prop.getProperty("oracle.username");
+        String password = prop.getProperty("oracle.password");
+        String dbURL = prop.getProperty("oracle.url");
         Connection connection;
         try {
             connection = DriverManager.getConnection("jdbc:oracle:thin:" + dbURL, username, password);
