@@ -63,7 +63,7 @@ public abstract class Oracle {
 
     public static boolean isOK() {
         try {
-            FileInputStream ip = new FileInputStream("database/oracle.properties");
+            FileInputStream ip = new FileInputStream("database/database.properties");
             prop.load(ip);
         } catch (IOException e) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
