@@ -4,8 +4,10 @@ import com.ils.controllers.Component;
 import com.ils.logic.management.CustomerManagement;
 import com.ils.logic.management.PartManagement;
 import com.ils.logic.management.ProductManagement;
+import com.ils.logic.management.TransferManagement;
 import com.ils.models.Part;
 import com.ils.models.Product;
+import com.ils.models.Transfer;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -35,6 +37,7 @@ public class ProductPartTable extends Component<Region> {
     private CustomerManagement customerManagement;
     private ProductManagement productManagement;
     private PartManagement partManagement;
+    private TransferManagement transferManagement;
 
     @FXML
     TreeTableView<Object> treeTable;
@@ -55,11 +58,12 @@ public class ProductPartTable extends Component<Region> {
     private TreeTableColumn<Object, Integer> quantityColumn;
 
     public ProductPartTable(CustomerManagement customerManagement, ProductManagement productManagement,
-            PartManagement partManagement) {
+            PartManagement partManagement, TransferManagement transferManagement) {
         super("ProductPartTable.fxml");
         this.customerManagement = customerManagement;
         this.productManagement = productManagement;
         this.partManagement = partManagement;
+        this.transferManagement = transferManagement;
         initTable();
         initListeners();
         initProductColumn();
@@ -112,13 +116,19 @@ public class ProductPartTable extends Component<Region> {
                 rebuild();
             }
         });
+        // this.transferManagement.getTransfers().addListener(new ListChangeListener<Transfer>() {
+        //     @Override
+        //     public void onChanged(Change<? extends Transfer> c) {
+        //         rebuild();
+        //     }
+        // });
         this.productManagement.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
         this.productManagement.getDBNameFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-        this.productManagement.getSelectedProduct().addListener(this::handleForcedSelection);
+        // this.productManagement.getSelectedProduct().addListener(this::handleForcedSelection);
     }
 
     private void initProductColumn() {
@@ -227,28 +237,28 @@ public class ProductPartTable extends Component<Region> {
         rebuild();
     }
 
-    private void handleForcedSelection(ObservableValue<? extends Product> observable, Product oldValue,
-            Product newValue) {
-        if (newValue == null) {
-            treeTable.getSelectionModel().clearSelection();
-            return;
-        }
-        // Check for product in treetable
-        Optional<TreeItem<Object>> prod = treeTable.getRoot().getChildren().stream().filter(item -> {
-            if (item.getValue() instanceof Product) {
-                Product product = (Product) item.getValue();
-                return product.equals(newValue);
-            } else {
-                return false;
-            }
-        }).findFirst();
-        if (!prod.isPresent()) {
-            // Product not found
-            throw new RuntimeException("Product not found in treetable");
-        }
-        // Select product
-        treeTable.getSelectionModel().select(prod.get());
-    }
+    // private void handleForcedSelection(ObservableValue<? extends Product> observable, Product oldValue,
+    //         Product newValue) {
+    //     if (newValue == null) {
+    //         treeTable.getSelectionModel().clearSelection();
+    //         return;
+    //     }
+    //     // Check for product in treetable
+    //     Optional<TreeItem<Object>> prod = treeTable.getRoot().getChildren().stream().filter(item -> {
+    //         if (item.getValue() instanceof Product) {
+    //             Product product = (Product) item.getValue();
+    //             return product.equals(newValue);
+    //         } else {
+    //             return false;
+    //         }
+    //     }).findFirst();
+    //     if (!prod.isPresent()) {
+    //         // Product not found
+    //         throw new RuntimeException("Product not found in treetable");
+    //     }
+    //     // Select product
+    //     treeTable.getSelectionModel().select(prod.get());
+    // }
 
     private void rebuild() {
         TreeItem<Object> root = treeTable.getRoot();

@@ -68,17 +68,21 @@ public class PartManagement {
             throw new RuntimeException("Part not found after update");
         }
         // Check for parts that are pointing to this part
-        PartDAO.getPartsByProduct(part.getProduct())
-                .filter(p -> p.getNextPart() != null && p.getNextPart().equals(part))
-                .forEach(p -> {
-                    p.setNextPart(newPart.get());
-                    PartDAO.updatePart(p);
-                });
+        List<Part> list = PartDAO.getPartsByProduct(part.getProduct())
+                .filter(p -> p.getNextPart() != null && p.getNextPart().equals(part)).collect(Collectors.toList());
+        list.forEach(p -> {
+            p.setNextPart(newPart.get());
+            PartDAO.updatePart(p);
+        });
         // Check if product's default part is this part
         if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().getId() == part.getId()) {
             part.getProduct().setDefaultPart(newPart.get());
             ProductDAO.updateProduct(part.getProduct());
         }
+        List<Transfer> transfers = TransferDAO.getTransfersByPart(part).collect(Collectors.toList());        
+        for (Transfer t : transfers) {
+            TransferDAO.updateTransfer(new Transfer(t.getTransferDateTime(), newPart.get(), t.getPrevPartQuantity(), t.getTransferQuantity(), t.getTransferType(), t.getId()));
+        }        
     }
 
     public void deletePart(Part part) {
@@ -87,7 +91,6 @@ public class PartManagement {
         for (Transfer transfer : list) {
             Logic.getTransferManagement().deleteTransfer(transfer);
         }
-        ;
         Part curr = part.getProduct().getDefaultPart();
         // Check if the part to be deleted is the default part
         if (curr.equals(part)) {
@@ -125,6 +128,24 @@ public class PartManagement {
     public void updatePartQuantity(Part part, int quantity) {
         PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), quantity, part.getProduct(),
                 part.getNextPart(), part.getPartNotes(), part.getId()));
+        Optional<Part> newPart = PartDAO.getPart(part.getId());
+        if (!newPart.isPresent()) {
+            throw new RuntimeException("Part not found after update");
+        }
+        // Check if product's default part is this part
+        if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
+            newPart.get().getProduct().setDefaultPart(newPart.get());
+            ProductDAO.updateProduct(newPart.get().getProduct());
+        }
+        // Check for parts that are pointing to this part
+        List<Part> list = PartDAO.getPartsByProduct(part.getProduct())
+                .filter(p -> p.getNextPart() != null && p.getNextPart().equals(part))
+                .collect(Collectors.toList());
+        // Update the next part of the parts
+        for (Part p : list) {
+            p.setNextPart(newPart.get());
+            PartDAO.updatePart(p);
+        }
     }
 
     public void updatePartNotes(Part part, String notes) {
@@ -136,11 +157,14 @@ public class PartManagement {
         }
         // Check if product's default part is this part
         if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
-            Logic.getProductManagement().updateDefaultPart(newPart.get());
+            newPart.get().getProduct().setDefaultPart(newPart.get());
+            ProductDAO.updateProduct(newPart.get().getProduct());
         }
+        // Check for parts that are pointing to this part
         List<Part> list = PartDAO.getPartsByProduct(part.getProduct())
                 .filter(p -> p.getNextPart() != null && p.getNextPart().equals(part))
                 .collect(Collectors.toList());
+        // Update the next part of the parts
         for (Part p : list) {
             p.setNextPart(newPart.get());
             PartDAO.updatePart(p);

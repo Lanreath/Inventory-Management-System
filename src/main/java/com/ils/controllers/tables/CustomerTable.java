@@ -49,7 +49,7 @@ public class CustomerTable extends Component<Region> {
         customerTable.setItems(this.customerManagement.getCustomers());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         this.customerManagement.getCustomers().comparatorProperty().bind(customerTable.comparatorProperty());
-        this.customerManagement.getSelectedCustomer().addListener(this::handleForcedSelection);
+        // this.customerManagement.getSelectedCustomer().addListener(this::handleForcedSelection);
     }
 
     private void initCol() {
@@ -87,19 +87,19 @@ public class CustomerTable extends Component<Region> {
         this.customerManagement.setCustomerNameFilter(newValue);
     }
 
-    private void handleForcedSelection(ObservableValue<? extends Customer> observable, Customer oldSelection,
-            Customer newSelection) {
-        if (newSelection == null) {
-            customerTable.getSelectionModel().clearSelection();
-            return;
-        }
-        // Check for customer tableitem
-        Optional<Customer> customer = customerTable.getItems().stream().filter(c -> c.equals(newSelection)).findFirst();
-        if (!customer.isPresent()) {
-            // Customer not found in table
-            throw new RuntimeException("Customer not found in table");
-        }
-        // Select customer
-        customerTable.getSelectionModel().select(customer.get());
-    }
+    // private void handleForcedSelection(ObservableValue<? extends Customer> observable, Customer oldSelection,
+    //         Customer newSelection) {
+    //     if (newSelection == null) {
+    //         customerTable.getSelectionModel().clearSelection();
+    //         return;
+    //     }
+    //     // Check for customer tableitem
+    //     Optional<Customer> customer = customerTable.getItems().stream().filter(c -> c.equals(newSelection)).findFirst();
+    //     if (!customer.isPresent()) {
+    //         // Customer not found in table
+    //         throw new RuntimeException("Customer not found in table");
+    //     }
+    //     // Select customer
+    //     customerTable.getSelectionModel().select(customer.get());
+    // }
 }

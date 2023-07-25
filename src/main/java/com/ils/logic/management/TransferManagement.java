@@ -72,7 +72,7 @@ public class TransferManagement {
         if (part.getProduct().getDefaultPart().equals(part)) {
             Optional<Part> newDefault = PartDAO.getPart(part.getId());
             if (!newDefault.isPresent()) {
-                throw new RuntimeException("Part not found after insertion");
+                throw new RuntimeException("Updated part not found");
             }
             Logic.getProductManagement().updateDefaultPart(newDefault.get()); 
         }
@@ -88,21 +88,30 @@ public class TransferManagement {
             case REJECT_RENEWAL:
             case RENEWAL:
             case SAMPLE:
-                for (Transfer t : TransferDAO.getTransfersByPart(transfer.getPart()).filter(t -> t.getTransferDateTime().isAfter(transfer.getTransferDateTime())).toArray(Transfer[]::new)) {
-                        TransferDAO.updateTransfer(new Transfer(t.getTransferDateTime(), t.getPart(),
-                                t.getPrevPartQuantity() + transfer.getTransferQuantity(), t.getTransferQuantity(), t.getTransferType(),
-                                t.getId()));
+                for (Transfer t : TransferDAO.getTransfersByPart(transfer.getPart())
+                        .filter(t -> t.getTransferDateTime().isAfter(transfer.getTransferDateTime()))
+                        .toArray(Transfer[]::new)) {
+                    TransferDAO.updateTransfer(new Transfer(t.getTransferDateTime(), t.getPart(),
+                            t.getPrevPartQuantity() + transfer.getTransferQuantity(), t.getTransferQuantity(),
+                            t.getTransferType(),
+                            t.getId()));
                 }
-                Logic.getPartManagement().updatePartQuantity(transfer.getPart(), transfer.getPart().getPartQuantity() + transfer.getTransferQuantity());
+                Logic.getPartManagement().updatePartQuantity(transfer.getPart(),
+                        transfer.getPart().getPartQuantity() + transfer.getTransferQuantity());
                 break;
             case RECEIVED:
-                for (Transfer t : TransferDAO.getTransfersByPart(transfer.getPart()).filter(t -> t.getTransferDateTime().isAfter(transfer.getTransferDateTime())).toArray(Transfer[]::new)) {
-                        TransferDAO.updateTransfer(new Transfer(t.getTransferDateTime(), t.getPart(),
-                                t.getPrevPartQuantity() - transfer.getTransferQuantity(), t.getTransferQuantity(), t.getTransferType(),
-                                t.getId()));
+                for (Transfer t : TransferDAO.getTransfersByPart(transfer.getPart())
+                        .filter(t -> t.getTransferDateTime().isAfter(transfer.getTransferDateTime()))
+                        .toArray(Transfer[]::new)) {
+                    TransferDAO.updateTransfer(new Transfer(t.getTransferDateTime(), t.getPart(),
+                            t.getPrevPartQuantity() - transfer.getTransferQuantity(), t.getTransferQuantity(),
+                            t.getTransferType(),
+                            t.getId()));
                 }
-                Logic.getPartManagement().updatePartQuantity(transfer.getPart(), transfer.getPart().getPartQuantity() - transfer.getTransferQuantity());
+                Logic.getPartManagement().updatePartQuantity(transfer.getPart(),
+                        transfer.getPart().getPartQuantity() - transfer.getTransferQuantity());
                 break;
         }
+        TransferDAO.deleteTransfer(transfer.getId());
     }
 }

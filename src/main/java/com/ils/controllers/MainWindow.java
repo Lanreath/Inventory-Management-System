@@ -72,7 +72,7 @@ public class MainWindow extends Component<Stage> {
     }
 
     private void fillProductPartTable() {
-        productPartTable = new ProductPartTable(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getPartManagement());
+        productPartTable = new ProductPartTable(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getPartManagement(), Logic.getTransferManagement());
         productPartTablePlaceholder.getChildren().add(productPartTable.getRoot());
     }
 
