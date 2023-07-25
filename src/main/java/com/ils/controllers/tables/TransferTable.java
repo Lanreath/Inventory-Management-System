@@ -80,7 +80,7 @@ public class TransferTable extends Component<Region> {
                 if (item == null || empty) {
                     setText(null);
                 } else {
-                    setText(item.toLocalDate().toString() + " " + item.toLocalTime().getHour() + ":" + item.toLocalTime().getMinute());
+                    setText(item.toLocalDate().toString() + " " + item.toLocalTime().getHour() + ":" + String.format("%02d", item.toLocalTime().getMinute()));
                 }
             }
         });

@@ -40,6 +40,10 @@ public class PartDAO {
         updateNextParts();
     }
 
+    public static ObservableList<Part> getAllParts() {
+        return FXCollections.observableArrayList(parts);
+    }
+
     public static FilteredList<Part> getParts() {
         return new FilteredList<>(parts);
     }

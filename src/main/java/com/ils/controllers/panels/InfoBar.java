@@ -5,7 +5,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
@@ -15,9 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-
-import java.time.LocalDate;
-import java.time.YearMonth;
 
 import com.ils.controllers.Component;
 import com.ils.controllers.tables.CustomerTable;
@@ -33,16 +29,19 @@ public class InfoBar extends Component<HBox> {
     private static final String FXML = "InfoBar.fxml";
 
     @FXML
-    private TextFlow customerInfo;
+    private TextFlow customerQuantities;
 
     @FXML
-    private HBox productDetails;
+    private HBox productInfo;
 
     @FXML
-    private TextFlow productInfo;
+    private HBox transferInfo;
 
     @FXML
-    private TextFlow productTransfers;
+    private TextFlow productQuantities;
+
+    @FXML
+    private TextFlow transferQuantities;
 
     @FXML
     private TextField productNotes;
@@ -50,15 +49,8 @@ public class InfoBar extends Component<HBox> {
     @FXML
     private Button setDefaultPartBtn;
 
-    @FXML
-    private DatePicker startDatePicker;
-
-    @FXML
-    private DatePicker endDatePicker;
-
     private ProductManagement productManagement;
     private PartManagement partManagement;
-    private Quantities quantities;    
     private SelectionModel<Customer> cust;
     private TreeTableViewSelectionModel<Object> prpt;
 
@@ -86,30 +78,28 @@ public class InfoBar extends Component<HBox> {
     private Text productRejectBal;
     // private Text productReceiveBal;
 
-    public InfoBar(ProductManagement productManagement, PartManagement partManagement, Quantities quantities, CustomerTable cust, ProductPartTable prpt) {
+    public InfoBar(ProductManagement productManagement, PartManagement partManagement, CustomerTable cust, ProductPartTable prpt) {
         super(FXML);
         this.productManagement = productManagement;
         this.partManagement = partManagement;
-        this.quantities = quantities;
         this.cust = cust.getSelectionModel();
         this.prpt = prpt.getSelectionModel();
         initLayout(cust, prpt);
         initTexts();
         initListeners();
-        initDates();
     }
 
     private void initLayout(CustomerTable cust, ProductPartTable prpt) {
         getRoot().setAlignment(Pos.CENTER_LEFT);
-        productDetails.setAlignment(Pos.CENTER_LEFT);
-        customerInfo.prefWidthProperty().bind(cust.getRoot().widthProperty());
-        productDetails.prefWidthProperty().bind(prpt.getRoot().widthProperty());
+        productInfo.setAlignment(Pos.CENTER_LEFT);
+        customerQuantities.prefWidthProperty().bind(cust.getRoot().widthProperty());
+        productInfo.prefWidthProperty().bind(prpt.getRoot().widthProperty());
     }
 
     private void initTexts() {
-        customerInfo.setLineSpacing(1);
-        productInfo.setLineSpacing(1);
-        productTransfers.setLineSpacing(1);
+        customerQuantities.setLineSpacing(1);
+        productQuantities.setLineSpacing(1);
+        transferQuantities.setLineSpacing(1);
 
         Font descFont = new Font("System Bold", 14);
 
@@ -208,21 +198,17 @@ public class InfoBar extends Component<HBox> {
         });
     }
 
-    private void initDates() {
-        startDatePicker.setValue(YearMonth.from(LocalDate.now()).atDay(1));
-        endDatePicker.setValue(YearMonth.from(LocalDate.now()).atEndOfMonth());
-    }
 
     private void updateCustomerInfo() {
         if (cust.getSelectedItem() == null) {
             return;
         }
-        Integer opening = this.quantities.getOpeningBalByCustomer(cust.getSelectedItem(), startDatePicker.getValue());
-        Integer closing = this.quantities.getClosingBalByCustomer(cust.getSelectedItem(), endDatePicker.getValue());
+        Integer opening = Quantities.getOpeningBalByCustomer(cust.getSelectedItem());
+        Integer closing = Quantities.getClosingBalByCustomer(cust.getSelectedItem());
         customerOpeningBal.setText(Integer.toString(opening) + "\n");
         customerClosingBal.setText(Integer.toString(closing) + "\n");
         customerChangeBal.setText(Integer.toString(closing - opening));
-        this.customerInfo.getChildren().addAll(customerOpeningDesc, customerOpeningBal, customerClosingDesc, customerClosingBal, customerChangeDesc, customerChangeBal);
+        this.customerQuantities.getChildren().addAll(customerOpeningDesc, customerOpeningBal, customerClosingDesc, customerClosingBal, customerChangeDesc, customerChangeBal);
     }
 
     private void updateProductInfo() {
@@ -238,18 +224,18 @@ public class InfoBar extends Component<HBox> {
         }
         if (prpt.getSelectedItem().getValue() instanceof Product) {
             product = (Product) prpt.getSelectedItem().getValue();
-            opening = this.quantities.getOpeningBalByProduct(product, startDatePicker.getValue());
-            closing = this.quantities.getClosingBalByProduct(product, endDatePicker.getValue());
-            daily = this.quantities.getDailyTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
-            renewal = this.quantities.getRenewalTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
-            reject = this.quantities.getRejectTransferSumByProduct(product, startDatePicker.getValue(), endDatePicker.getValue());
+            opening = Quantities.getOpeningBalByProduct(product);
+            closing = Quantities.getClosingBalByProduct(product);
+            daily = Quantities.getDailyTransferSumByProduct(product);
+            renewal = Quantities.getRenewalTransferSumByProduct(product);
+            reject = Quantities.getRejectTransferSumByProduct(product);
         } else if (prpt.getSelectedItem().getValue() instanceof Part) {
             part = (Part) prpt.getSelectedItem().getValue();
-            opening = this.quantities.getOpeningBalByPart(part, startDatePicker.getValue());
-            closing = this.quantities.getClosingBalByPart(part, endDatePicker.getValue());
-            daily = this.quantities.getDailyTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
-            renewal = this.quantities.getRenewalTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
-            reject = this.quantities.getRejectTransferSumByPart(part, startDatePicker.getValue(), endDatePicker.getValue());
+            opening = Quantities.getOpeningBalByPart(part);
+            closing = Quantities.getClosingBalByPart(part);
+            daily = Quantities.getDailyTransferSumByPart(part);
+            renewal = Quantities.getRenewalTransferSumByPart(part);
+            reject = Quantities.getRejectTransferSumByPart(part);
         } else {
             throw new RuntimeException("Invalid selection type for Product/Part table");
         }
@@ -262,7 +248,7 @@ public class InfoBar extends Component<HBox> {
         productDailyBal.setText(Integer.toString(daily) + "\n");
         productRenewalBal.setText(Integer.toString(renewal) + "\n");
         productRejectBal.setText(Integer.toString(reject));
-        this.productTransfers.getChildren().addAll(productDailyDesc, productDailyBal, productRenewalDesc, productRenewalBal, productRejectDesc, productRejectBal);
+        this.transferQuantities.getChildren().addAll(productDailyDesc, productDailyBal, productRenewalDesc, productRenewalBal, productRejectDesc, productRejectBal);
     }
 
     private void updateProductNotes() {
@@ -279,11 +265,11 @@ public class InfoBar extends Component<HBox> {
     }
 
     private void removeCustomerInfo() {
-        this.customerInfo.getChildren().clear();
+        this.customerQuantities.getChildren().clear();
     }
 
     private void removeProductInfo() {
         this.productInfo.getChildren().clear();
-        this.productTransfers.getChildren().clear();
+        this.transferQuantities.getChildren().clear();
     }
 }

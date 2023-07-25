@@ -14,8 +14,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
-import java.util.Optional;
-
 import com.ils.controllers.Component;
 import com.ils.logic.management.CustomerManagement;
 import com.ils.models.Customer;

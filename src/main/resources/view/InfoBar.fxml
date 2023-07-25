@@ -11,19 +11,22 @@
 <?import javafx.scene.text.TextFlow?>
 
 <HBox xmlns="http//javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
-    <TextFlow fx:id="customerInfo"/>
+    <TextFlow fx:id="customerQuantities"/>
     <Separator orientation="vertical"/>
-    <HBox fx:id="productDetails" spacing='10'>
+    <HBox fx:id="productInfo" spacing='10'>
         <padding>
             <Insets left="5" right="5"/>
         </padding>
-        <TextFlow fx:id="productInfo"/>
-        <TextFlow fx:id="productTransfers"/>
-        <Region HBox.hgrow="ALWAYS"/>
+        <TextFlow fx:id="productQuantities"/>
+        <!-- <Region HBox.hgrow="ALWAYS"/> -->
         <TextField fx:id="productNotes"/>
         <Button fx:id="setDefaultPartBtn" text="Set Active Part"/>
     </HBox>
     <Separator orientation="vertical"/>
-    <DatePicker fx:id="startDatePicker" promptText="Start Date"/>
-    <DatePicker fx:id="endDatePicker" promptText="End Date"/>
+    <HBox fx:id="transferInfo">
+        <padding>
+            <Insets left="5" right="5"/>
+        </padding>
+        <TextFlow fx:id="transferQuantities"/>
+    </HBox>
 </HBox>

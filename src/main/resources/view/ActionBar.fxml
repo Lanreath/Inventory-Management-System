@@ -5,24 +5,22 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 
 <ToolBar xmlns="http//javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
     <items>
-        <Button fx:id="addCustomerBtn">
-        </Button>
-        <Button fx:id="addProductBtn">
-        </Button>
-        <Button fx:id="addPartBtn">
-        </Button>
-        <Button fx:id="addTransferBtn">
-        </Button>
-        <Button fx:id="deleteBtn">
-        </Button>
-        <DatePicker fx:id="syncDate">
-        </DatePicker>
-        <Button fx:id="syncBtn">
-        </Button>
-        <Label fx:id="status">
-        </Label>
+        <Button fx:id="addCustomerBtn"/>
+        <Button fx:id="addProductBtn"/>
+        <Button fx:id="addPartBtn"/>
+        <Button fx:id="addTransferBtn"/>
+        <Button fx:id="deleteBtn"/>
+        <DatePicker fx:id="syncDate"/>
+        <Button fx:id="syncBtn"/>
+        <Label fx:id="status"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <DatePicker fx:id="startDatePicker" promptText="Start Date"/>
+        <DatePicker fx:id="endDatePicker" promptText="End Date"/>
+        <Button fx:id="exportBtn"/>
     </items>
 </ToolBar>

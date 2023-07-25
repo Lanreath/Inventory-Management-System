@@ -12,3 +12,4 @@ database
 *.sql
 *.pdf
 *.jar
+*.csv

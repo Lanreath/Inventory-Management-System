@@ -12,7 +12,6 @@ public class Logic {
 	private static ProductManagement productManagement;
 	private static PartManagement partManagement;
 	private static TransferManagement transferManagement;
-	private static Quantities quantities;
 
 	static {
 		filters = new Filters();
@@ -21,7 +20,6 @@ public class Logic {
 		productManagement = new ProductManagement(filters);
 		partManagement = new PartManagement(filters);
 		transferManagement = new TransferManagement(filters);
-		quantities = new Quantities();
 	}
 
 	public static CustomerManagement getCustomerManagement() {
@@ -48,7 +46,4 @@ public class Logic {
 		return dataSync;
 	}
 
-	public static Quantities getQuantities() {
-		return quantities;
-	}
 }
