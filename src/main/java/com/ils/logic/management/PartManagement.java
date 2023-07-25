@@ -75,10 +75,9 @@ public class PartManagement {
                     PartDAO.updatePart(p);
                 });
         // Check if product's default part is this part
-        if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().equals(part)) {
-            // part.getProduct().setDefaultPart(newPart.get());
-            // ProductDAO.updateProduct(part.getProduct());
-            Logic.getProductManagement().updateDefaultPart(newPart.get());
+        if (part.getProduct().getDefaultPart() != null && part.getProduct().getDefaultPart().getId() == part.getId()) {
+            part.getProduct().setDefaultPart(newPart.get());
+            ProductDAO.updateProduct(part.getProduct());
         }
     }
 

@@ -152,7 +152,7 @@ public class ProductManagement {
     }
 
     public void updateDefaultPart(Part newDefault) {
-        if (newDefault.getProduct().getDefaultPart().equals(newDefault)) {
+        if (newDefault.getProduct().getDefaultPart() != null && newDefault.getProduct().getDefaultPart().equals(newDefault)) {
             return;
         }
         // Update next part of the part that is pointing to the new default part
