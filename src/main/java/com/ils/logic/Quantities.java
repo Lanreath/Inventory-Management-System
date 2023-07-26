@@ -236,6 +236,19 @@ public abstract class Quantities {
                 .mapToInt(t -> t.getTransferQuantity()).sum();
     }
 
+    public static Integer getSampleTransferSumByProduct(Product prod) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod)
+                .sorted((t1, t2) -> t1.getTransferDateTime()
+                        .compareTo(t2.getTransferDateTime()));
+        return matches
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from)
+                        || t.getTransferDateTime().toLocalDate().isAfter(from))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to)
+                        || t.getTransferDateTime().toLocalDate().isBefore(to))
+                .filter(t -> t.getTransferType() == Transfer.Action.SAMPLE)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
     public static Integer getSampleTransferSumByPart(Part part) {
         Stream<Transfer> matches = TransferDAO.getTransfersByPart(part)
                 .sorted((t1, t2) -> t1.getTransferDateTime()
@@ -246,6 +259,19 @@ public abstract class Quantities {
                 .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to)
                         || t.getTransferDateTime().toLocalDate().isBefore(to))
                 .filter(t -> t.getTransferType() == Transfer.Action.SAMPLE)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
+    public static Integer getReceivedTransferSumByProduct(Product prod) {
+        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod)
+                .sorted((t1, t2) -> t1.getTransferDateTime()
+                        .compareTo(t2.getTransferDateTime()));
+        return matches
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from)
+                        || t.getTransferDateTime().toLocalDate().isAfter(from))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to)
+                        || t.getTransferDateTime().toLocalDate().isBefore(to))
+                .filter(t -> t.getTransferType() == Transfer.Action.RECEIVED)
                 .mapToInt(t -> t.getTransferQuantity()).sum();
     }
 

@@ -18,6 +18,7 @@ import javafx.scene.text.TextFlow;
 import com.ils.controllers.Component;
 import com.ils.controllers.tables.CustomerTable;
 import com.ils.controllers.tables.ProductPartTable;
+import com.ils.controllers.tables.TransferTable;
 import com.ils.logic.Quantities;
 import com.ils.logic.management.PartManagement;
 import com.ils.logic.management.ProductManagement;
@@ -41,7 +42,10 @@ public class InfoBar extends Component<HBox> {
     private TextFlow productQuantities;
 
     @FXML
-    private TextFlow transferQuantities;
+    private TextFlow transferQuantities1;
+
+    @FXML
+    private TextFlow transferQuantities2;
 
     @FXML
     private TextField productNotes;
@@ -65,42 +69,45 @@ public class InfoBar extends Component<HBox> {
     private Text productOpeningDesc;
     private Text productClosingDesc;
     private Text productChangeDesc;
+    private Text productReceiveDesc;
     private Text productDailyDesc;
     private Text productRenewalDesc;
     private Text productRejectDesc;
-    // private Text productReceiveDesc;
+    private Text productSampleDesc;
 
     private Text productOpeningBal;
     private Text productClosingBal;
     private Text productChangeBal;
+    private Text productReceiveBal;
     private Text productDailyBal;
     private Text productRenewalBal;
     private Text productRejectBal;
-    // private Text productReceiveBal;
+    private Text productSampleBal;
 
-    public InfoBar(ProductManagement productManagement, PartManagement partManagement, CustomerTable cust, ProductPartTable prpt) {
+    public InfoBar(ProductManagement productManagement, PartManagement partManagement, CustomerTable cust, ProductPartTable prpt, TransferTable trnf) {
         super(FXML);
         this.productManagement = productManagement;
         this.partManagement = partManagement;
         this.cust = cust.getSelectionModel();
         this.prpt = prpt.getSelectionModel();
-        initLayout(cust, prpt);
-        initTexts();
         initListeners();
+        initLayout(cust, prpt, trnf);
+        initTexts();
     }
 
-    private void initLayout(CustomerTable cust, ProductPartTable prpt) {
-        getRoot().setAlignment(Pos.CENTER_LEFT);
+    private void initLayout(CustomerTable cust, ProductPartTable prpt, TransferTable trnf) {
         productInfo.setAlignment(Pos.CENTER_LEFT);
+        productInfo.setSpacing(10);
+        transferInfo.setSpacing(10);
+        transferInfo.prefWidthProperty().bind(trnf.getRoot().widthProperty());
         customerQuantities.prefWidthProperty().bind(cust.getRoot().widthProperty());
-        productInfo.prefWidthProperty().bind(prpt.getRoot().widthProperty());
+        customerQuantities.setLineSpacing(1);
+        productQuantities.setLineSpacing(1);
+        transferQuantities1.setLineSpacing(1);
+        transferQuantities2.setLineSpacing(1);
     }
 
     private void initTexts() {
-        customerQuantities.setLineSpacing(1);
-        productQuantities.setLineSpacing(1);
-        transferQuantities.setLineSpacing(1);
-
         Font descFont = new Font("System Bold", 14);
 
         customerOpeningDesc = new Text("Opening Balance: ");
@@ -117,22 +124,30 @@ public class InfoBar extends Component<HBox> {
         productOpeningDesc = new Text("Opening Balance: ");
         productClosingDesc = new Text("Closing Balance: ");
         productChangeDesc = new Text("Change: ");
+        productReceiveDesc = new Text("Received: ");
         productDailyDesc = new Text("Daily: ");
         productRenewalDesc = new Text("Renewal: ");
         productRejectDesc = new Text("Reject: ");
+        productReceiveDesc = new Text("Received: ");
+        productSampleDesc = new Text("Sample: ");
+
         productOpeningDesc.setFont(descFont);
         productClosingDesc.setFont(descFont);
         productChangeDesc.setFont(descFont);
+        productReceiveDesc.setFont(descFont);
         productDailyDesc.setFont(descFont);
         productRenewalDesc.setFont(descFont);
         productRejectDesc.setFont(descFont);
+        productSampleDesc.setFont(descFont);
 
         productOpeningBal = new Text();
         productClosingBal = new Text();
         productChangeBal = new Text();
+        productReceiveBal = new Text();
         productDailyBal = new Text();
         productRenewalBal = new Text();
         productRejectBal = new Text();
+        productSampleBal = new Text();
     }
 
     private void initListeners() {
@@ -216,9 +231,11 @@ public class InfoBar extends Component<HBox> {
         Part part;
         Integer opening;
         Integer closing;
+        Integer received;
         Integer daily;
         Integer renewal;
         Integer reject;
+        Integer sample;
         if (prpt.getSelectedItem() == null) {
             return;
         }
@@ -226,16 +243,20 @@ public class InfoBar extends Component<HBox> {
             product = (Product) prpt.getSelectedItem().getValue();
             opening = Quantities.getOpeningBalByProduct(product);
             closing = Quantities.getClosingBalByProduct(product);
+            received = Quantities.getReceivedTransferSumByProduct(product);
             daily = Quantities.getDailyTransferSumByProduct(product);
             renewal = Quantities.getRenewalTransferSumByProduct(product);
             reject = Quantities.getRejectTransferSumByProduct(product);
+            sample = Quantities.getSampleTransferSumByProduct(product);
         } else if (prpt.getSelectedItem().getValue() instanceof Part) {
             part = (Part) prpt.getSelectedItem().getValue();
             opening = Quantities.getOpeningBalByPart(part);
             closing = Quantities.getClosingBalByPart(part);
+            received = Quantities.getReceivedTransferSumByPart(part);
             daily = Quantities.getDailyTransferSumByPart(part);
             renewal = Quantities.getRenewalTransferSumByPart(part);
             reject = Quantities.getRejectTransferSumByPart(part);
+            sample = Quantities.getSampleTransferSumByPart(part);
         } else {
             throw new RuntimeException("Invalid selection type for Product/Part table");
         }
@@ -243,12 +264,15 @@ public class InfoBar extends Component<HBox> {
         productOpeningBal.setText(Integer.toString(opening) + "\n");
         productClosingBal.setText(Integer.toString(closing) + "\n");
         productChangeBal.setText(Integer.toString(opening-closing));
-        this.productInfo.getChildren().addAll(productOpeningDesc, productOpeningBal, productClosingDesc, productClosingBal, productChangeDesc, productChangeBal);
+        this.productQuantities.getChildren().addAll(productOpeningDesc, productOpeningBal, productClosingDesc, productClosingBal, productChangeDesc, productChangeBal);
 
+        productReceiveBal.setText(Integer.toString(received) + "\n");
         productDailyBal.setText(Integer.toString(daily) + "\n");
-        productRenewalBal.setText(Integer.toString(renewal) + "\n");
-        productRejectBal.setText(Integer.toString(reject));
-        this.transferQuantities.getChildren().addAll(productDailyDesc, productDailyBal, productRenewalDesc, productRenewalBal, productRejectDesc, productRejectBal);
+        productRenewalBal.setText(Integer.toString(renewal));
+        productRejectBal.setText(Integer.toString(reject) + "\n");
+        productSampleBal.setText(Integer.toString(sample));
+        this.transferQuantities1.getChildren().addAll(productReceiveDesc, productReceiveBal, productDailyDesc, productDailyBal, productRenewalDesc, productRenewalBal);
+        this.transferQuantities2.getChildren().addAll(productRejectDesc, productRejectBal, productSampleDesc, productSampleBal);
     }
 
     private void updateProductNotes() {
@@ -269,7 +293,8 @@ public class InfoBar extends Component<HBox> {
     }
 
     private void removeProductInfo() {
-        this.productInfo.getChildren().clear();
-        this.transferQuantities.getChildren().clear();
+        this.productQuantities.getChildren().clear();
+        this.transferQuantities1.getChildren().clear();
+        this.transferQuantities2.getChildren().clear();
     }
 }

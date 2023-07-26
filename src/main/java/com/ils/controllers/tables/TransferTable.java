@@ -62,7 +62,7 @@ public class TransferTable extends Component<Region> {
     }
 
     private void initTable() {
-        transferTable.setPrefWidth(300);
+        transferTable.setPrefWidth(100);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         transferTable.setItems(transferManagement.getTransfers());
         transferTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
