@@ -62,7 +62,7 @@ public class MainWindow extends Component<Stage> {
     }
 
     private void fillActionBar() {
-        actionBar = new ActionBar(Logic.getDataSync(), inputBar);
+        actionBar = new ActionBar(Logic.getDataSync(), Logic.getFilters(), inputBar);
         actionBarPlaceholder.getChildren().add(actionBar.getRoot());
     }
 

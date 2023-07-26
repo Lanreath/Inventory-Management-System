@@ -17,7 +17,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -29,9 +28,6 @@ public class TransferTable extends Component<Region> {
     private CustomerManagement customerManagement;
     private ProductManagement productManagement;
     private TransferManagement transferManagement;
-
-    @FXML
-    DatePicker transferDatePicker;
 
     @FXML
     ComboBox<Transfer.Action> transferTypeComboBox;
@@ -58,11 +54,11 @@ public class TransferTable extends Component<Region> {
         this.transferManagement = transferManagement;
         initTable();
         initCol();
-        initFilter();
+        initFilters();
     }
 
     private void initTable() {
-        transferTable.setPrefWidth(100);
+        transferTable.setPrefWidth(300);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         transferTable.setItems(transferManagement.getTransfers());
         transferTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
@@ -86,12 +82,11 @@ public class TransferTable extends Component<Region> {
         });
     }
 
-    private void initFilter() {
-        transferDatePicker.setOnAction(dateFilterHandler);
-        transferDatePicker.setPromptText("Filter by date");
+    private void initFilters() {
         transferTypeComboBox.getItems().addAll(Transfer.Action.values());
         transferTypeComboBox.getSelectionModel().selectedItemProperty().addListener(this::handleTypeFilter);
         transferTypeComboBox.setPromptText("Filter by type");
+        transferTypeComboBox.setMaxWidth(Double.MAX_VALUE);
         clearBtn.setText("Clear");
         clearBtn.setOnAction(clearFilterHandler);
     }
@@ -100,13 +95,8 @@ public class TransferTable extends Component<Region> {
         return transferTable.getSelectionModel();
     }
 
-    private EventHandler<ActionEvent> dateFilterHandler = (event) -> {
-        transferManagement.setTransferDateFilter(transferDatePicker.getValue());
-    };
-
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         transferTable.getSelectionModel().clearSelection();
-        transferDatePicker.setValue(null);
         transferTypeComboBox.getSelectionModel().clearSelection();
     };
 

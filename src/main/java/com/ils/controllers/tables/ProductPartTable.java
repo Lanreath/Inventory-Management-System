@@ -73,8 +73,6 @@ public class ProductPartTable extends Component<Region> {
     }
 
     private void initTable() {
-        treeTable.setMinWidth(400);
-        treeTable.setPrefWidth(600);
         treeTable.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         treeTable.setShowRoot(false);
         treeTable.setEditable(true);

@@ -12,8 +12,6 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-import java.time.LocalDate;
-
 public class TransferManagement {
     private Filters filters;
     private FilteredList<Transfer> transferFilteredList;
@@ -24,23 +22,15 @@ public class TransferManagement {
         this.transferFilteredList = TransferDAO.getTransfers();
         this.transferSortedList = new SortedList<>(transferFilteredList);
         transferFilteredList.predicateProperty().bind(Bindings.createObjectBinding(
-                () -> filters.getTransferDateFilter().get().and(filters.getTransferActionFilter().get())
+                () -> filters.getTransferFromFilter().get().and(filters.getTransferToFilter().get()).and(filters.getTransferActionFilter().get())
                         .and(filters.getTransferCustomerFilter().get()).and(filters.getTransferProductFilter().get())
                         .and(filters.getTransferPartFilter().get()),
-                filters.getTransferDateFilter(), filters.getTransferActionFilter(), filters.getTransferCustomerFilter(),
+                filters.getTransferFromFilter(), filters.getTransferToFilter(), filters.getTransferActionFilter(), filters.getTransferCustomerFilter(),
                 filters.getTransferProductFilter(), filters.getTransferPartFilter()));
     }
 
     public SortedList<Transfer> getTransfers() {
         return this.transferSortedList;
-    }
-
-    public void setTransferDateFilter(LocalDate date) {
-        if (date == null) {
-            filters.clearTransferDateFilter();
-            return;
-        }
-        filters.filterTransferByDate(date);
     }
 
     public void setTransferActionFilter(Transfer.Action type) {

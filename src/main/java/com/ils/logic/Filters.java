@@ -15,7 +15,8 @@ public class Filters {
     private ObjectProperty<Predicate<Customer>> customerNameFilter;
     private ObjectProperty<Predicate<Product>> dbNameFilter;
     private ObjectProperty<Predicate<Product>> productCustomerFilter;
-    private ObjectProperty<Predicate<Transfer>> transferDateFilter;
+    private ObjectProperty<Predicate<Transfer>> transferFromFilter;
+    private ObjectProperty<Predicate<Transfer>> transferToFilter;
     private ObjectProperty<Predicate<Transfer>> transferActionFilter;
     private ObjectProperty<Predicate<Transfer>> transferCustomerFilter;
     private ObjectProperty<Predicate<Transfer>> transferProductFilter;
@@ -25,7 +26,8 @@ public class Filters {
         this.customerNameFilter = new SimpleObjectProperty<>(c -> true);
         this.dbNameFilter = new SimpleObjectProperty<>(p -> true);
         this.productCustomerFilter = new SimpleObjectProperty<>(p -> true);
-        this.transferDateFilter = new SimpleObjectProperty<>(t -> true);
+        this.transferFromFilter = new SimpleObjectProperty<>(p -> true);
+        this.transferToFilter = new SimpleObjectProperty<>(p -> true);
         this.transferActionFilter = new SimpleObjectProperty<>(t -> true);
         this.transferCustomerFilter = new SimpleObjectProperty<>(t -> true);
         this.transferProductFilter = new SimpleObjectProperty<>(t -> true);
@@ -44,8 +46,12 @@ public class Filters {
         return productCustomerFilter;
     }
 
-    public ObjectProperty<Predicate<Transfer>> getTransferDateFilter() {
-        return transferDateFilter;
+    public ObjectProperty<Predicate<Transfer>> getTransferFromFilter() {
+        return transferFromFilter;
+    }
+
+    public ObjectProperty<Predicate<Transfer>> getTransferToFilter() {
+        return transferToFilter;
     }
 
     public ObjectProperty<Predicate<Transfer>> getTransferActionFilter() {
@@ -76,8 +82,12 @@ public class Filters {
         productCustomerFilter.set(p -> true);
     }
 
-    public void clearTransferDateFilter() {
-        transferDateFilter.set(t -> true);
+    public void clearTransferFromFilter() {
+        transferFromFilter.set(t -> true);
+    }
+
+    public void clearTransferToFilter() {
+        transferToFilter.set(t -> true);
     }
 
     public void clearTransferActionFilter() {
@@ -108,8 +118,12 @@ public class Filters {
         productCustomerFilter.set(product -> product.getCustomer().equals(c));
     }
 
-    public void filterTransferByDate(LocalDate date) {
-        transferDateFilter.set(transfer -> transfer.getTransferDateTime().toLocalDate().equals(date));
+    public void filterTransferByFromDate(LocalDate from) {
+        transferFromFilter.set(transfer -> transfer.getTransferDateTime().toLocalDate().isEqual(from) || transfer.getTransferDateTime().toLocalDate().isAfter(from));
+    }
+
+    public void filterTransferByToDate(LocalDate to) {
+        transferFromFilter.set(transfer -> transfer.getTransferDateTime().toLocalDate().isEqual(to) || transfer.getTransferDateTime().toLocalDate().isBefore(to));
     }
 
     public void filterTransferByAction(Transfer.Action action) {

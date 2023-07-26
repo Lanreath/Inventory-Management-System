@@ -12,7 +12,6 @@ import javafx.scene.layout.Region;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,11 +19,13 @@ import com.ils.MainApp;
 import com.ils.controllers.Component;
 import com.ils.logic.DataSync;
 import com.ils.logic.ExportUtil;
+import com.ils.logic.Filters;
 import com.ils.logic.Quantities;
 
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
     private DataSync dataSync;
+    private Filters filters;
     private InputBar inputBar;
 
     @FXML
@@ -60,9 +61,10 @@ public class ActionBar extends Component<Region> {
     @FXML
     Button exportBtn;
 
-    public ActionBar(DataSync dataSync, InputBar inputBar) {
+    public ActionBar(DataSync dataSync, Filters filters, InputBar inputBar) {
         super(FXML);
         this.dataSync = dataSync;
+        this.filters = filters;
         this.inputBar = inputBar;
         initCustBtn();
         initProdBtn();
@@ -146,12 +148,14 @@ public class ActionBar extends Component<Region> {
                 startDatePicker.setValue(endDatePicker.getValue());
             }
             Quantities.setFrom(newValue);
+            filters.filterTransferByFromDate(newValue);
         });
         endDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.isBefore(startDatePicker.getValue())) {
                 endDatePicker.setValue(startDatePicker.getValue());
             }
             Quantities.setTo(newValue);
+            filters.filterTransferByToDate(newValue);
         });
     }
 
