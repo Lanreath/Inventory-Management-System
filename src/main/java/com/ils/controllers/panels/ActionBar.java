@@ -129,10 +129,10 @@ public class ActionBar extends Component<Region> {
     }
 
     private void initExportBtn() {
-        // ImageView export = new ImageView("/images/export.png");
-        // export.setPreserveRatio(true);
-        // export.setFitHeight(24);
-        // exportBtn.setGraphic(export);
+        ImageView export = new ImageView("/images/export.png");
+        export.setPreserveRatio(true);
+        export.setFitHeight(24);
+        exportBtn.setGraphic(export);
         exportBtn.setTooltip(new Tooltip("Export monthly report"));
         exportBtn.setOnAction(exportEventHandler);
     }

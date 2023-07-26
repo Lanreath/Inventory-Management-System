@@ -29,7 +29,7 @@ public class ExportUtil {
 
     private static void exportArray(Object[] list) {
         try {
-            printer.printRecords(list);
+            printer.printRecord(list);
         } catch (IOException e) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
                     LocalDateTime.now() + ": Could not export query result: " + e.getMessage());
@@ -37,6 +37,9 @@ public class ExportUtil {
     }
 
     public static void exportMonthlyReport() {
+        // Print headers
+        exportArray(new String[] { "Customer", "Product", "Part", "Opening Balance", "Sample", "Received",
+                "Daily (Output)", "Daily (Reject)", "Closing Balance" });
         // Get all parts and their quantities
         for (Part p :PartDAO.getAllParts()) {
             Object[] row = new String[9];
@@ -50,7 +53,6 @@ public class ExportUtil {
             row[7] = Integer.toString(Quantities.getRejectTransferSumByPart(p));
             row[8] = Integer.toString(Quantities.getClosingBalByPart(p));
             exportArray(row);
-            Logger.getLogger(MainApp.class.getName()).log(Level.INFO, "Exported part: " + p.getPartName());
         }
         try {
             printer.close();
