@@ -205,36 +205,36 @@ public abstract class Quantities {
                 .filter(t -> t.getTransferType() == Transfer.Action.RENEWAL)
                 .mapToInt(t -> t.getTransferQuantity()).sum();
     }
-    // Separate methods for each reject type sum
-    public static Integer getRejectTransferSumByProduct(Product prod) {
-        Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod)
-                .sorted((t1, t2) -> t1.getTransferDateTime()
-                        .compareTo(t2.getTransferDateTime()));
-        return matches
-                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from)
-                        || t.getTransferDateTime().toLocalDate().isAfter(from))
-                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to)
-                        || t.getTransferDateTime().toLocalDate().isBefore(to))
-                .filter(t -> t.getTransferType() == Transfer.Action.REJECT_DAILY
-                        || t.getTransferType() == Transfer.Action.REJECT_PROJECT
-                        || t.getTransferType() == Transfer.Action.REJECT_RENEWAL)
-                .mapToInt(t -> t.getTransferQuantity()).sum();
-    }
 
-    public static Integer getRejectTransferSumByPart(Part part) {
-        Stream<Transfer> matches = TransferDAO.getTransfersByPart(part)
-                .sorted((t1, t2) -> t1.getTransferDateTime()
-                        .compareTo(t2.getTransferDateTime()));
-        return matches
-                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from)
-                        || t.getTransferDateTime().toLocalDate().isAfter(from))
-                .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to)
-                        || t.getTransferDateTime().toLocalDate().isBefore(to))
-                .filter(t -> t.getTransferType() == Transfer.Action.REJECT_DAILY
-                        || t.getTransferType() == Transfer.Action.REJECT_PROJECT
-                        || t.getTransferType() == Transfer.Action.REJECT_RENEWAL)
-                .mapToInt(t -> t.getTransferQuantity()).sum();
-    }
+//     public static Integer getRejectTransferSumByProduct(Product prod) {
+//         Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod)
+//                 .sorted((t1, t2) -> t1.getTransferDateTime()
+//                         .compareTo(t2.getTransferDateTime()));
+//         return matches
+//                 .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from)
+//                         || t.getTransferDateTime().toLocalDate().isAfter(from))
+//                 .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to)
+//                         || t.getTransferDateTime().toLocalDate().isBefore(to))
+//                 .filter(t -> t.getTransferType() == Transfer.Action.REJECT_DAILY
+//                         || t.getTransferType() == Transfer.Action.REJECT_PROJECT
+//                         || t.getTransferType() == Transfer.Action.REJECT_RENEWAL)
+//                 .mapToInt(t -> t.getTransferQuantity()).sum();
+//     }
+
+//     public static Integer getRejectTransferSumByPart(Part part) {
+//         Stream<Transfer> matches = TransferDAO.getTransfersByPart(part)
+//                 .sorted((t1, t2) -> t1.getTransferDateTime()
+//                         .compareTo(t2.getTransferDateTime()));
+//         return matches
+//                 .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(from)
+//                         || t.getTransferDateTime().toLocalDate().isAfter(from))
+//                 .filter(t -> t.getTransferDateTime().toLocalDate().isEqual(to)
+//                         || t.getTransferDateTime().toLocalDate().isBefore(to))
+//                 .filter(t -> t.getTransferType() == Transfer.Action.REJECT_DAILY
+//                         || t.getTransferType() == Transfer.Action.REJECT_PROJECT
+//                         || t.getTransferType() == Transfer.Action.REJECT_RENEWAL)
+//                 .mapToInt(t -> t.getTransferQuantity()).sum();
+//     }
 
     public static Integer getRejectDailyTransferSumByProduct(Product prod) {
         Stream<Transfer> matches = TransferDAO.getTransfersByProduct(prod)

@@ -39,10 +39,11 @@ public class ExportUtil {
     public static void exportMonthlyReport() {
         // Print headers
         exportArray(new String[] { "Customer", "Product", "Part", "Opening Balance", "Sample", "Received",
-                "Daily (Output)", "Daily (Reject)", "Closing Balance" });
+                "Daily (Output)", "Daily (Reject)", "Renewal (Output)", "Renewal (Reject)", "Project (Reject)",
+                "Closing Balance" });
         // Get all parts and their quantities
-        for (Part p :PartDAO.getAllParts()) {
-            Object[] row = new String[9];
+        for (Part p : PartDAO.getAllParts()) {
+            Object[] row = new String[12];
             row[0] = p.getProduct().getCustomer().getCustomerName();
             row[1] = p.getProduct().getProductName();
             row[2] = p.getPartName();
@@ -50,8 +51,11 @@ public class ExportUtil {
             row[4] = Integer.toString(Quantities.getSampleTransferSumByPart(p));
             row[5] = Integer.toString(Quantities.getReceivedTransferSumByPart(p));
             row[6] = Integer.toString(Quantities.getDailyTransferSumByPart(p));
-            row[7] = Integer.toString(Quantities.getRejectTransferSumByPart(p));
-            row[8] = Integer.toString(Quantities.getClosingBalByPart(p));
+            row[7] = Integer.toString(Quantities.getRejectDailyTransferSumByPart(p));
+            row[8] = Integer.toString(Quantities.getRenewalTransferSumByPart(p));
+            row[9] = Integer.toString(Quantities.getRejectRenewalTransferSumByPart(p));
+            row[10] = Integer.toString(Quantities.getRejectProjectTransferSumByPart(p));
+            row[11] = Integer.toString(Quantities.getClosingBalByPart(p));
             exportArray(row);
         }
         try {
@@ -64,4 +68,3 @@ public class ExportUtil {
                 LocalDateTime.now() + ": Monthly report exported to " + Config.getValue("export.location"));
     }
 }
- 

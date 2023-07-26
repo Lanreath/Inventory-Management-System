@@ -44,12 +44,12 @@ public class MainWindow extends Component<Stage> {
     public MainWindow(Stage stage){
         super(FXML, stage);
         this.stage = stage;
-        stage.setMinHeight(600);
-        stage.setMinWidth(1000);
     };
 
     public void show() {
         this.stage.show();
+        this.stage.setMinHeight(600);
+        this.stage.setMinWidth(1000);
     }
 
     public void fillInnerComponents() {
