@@ -102,7 +102,6 @@ public class PartManagement {
                 if (!updated.isPresent()) {
                     throw new RuntimeException("Product not found after default part update");
                 }
-                // Update the current part to be the new default part
                 affectedParts.forEach(p -> PartDAO.updatePart(new Part(p.getPartName(), p.getCreationDateTime(),
                         p.getPartQuantity(), updated.get(), p.getNextPart(), p.getPartNotes(), p.getId())));
             }
