@@ -25,15 +25,19 @@ import com.ils.oracle.Oracle;
 import com.ils.oracle.ReadUtil;
 import com.ils.sqlite.Database;
 
-public class DataSync {
-    public DataSync() {
+public abstract class DataSync {
+    static {
+        init();
+    }
+
+    private static void init() {
         if (Database.isOK() && Oracle.isOK()) {
             return;
         }
         throw new IllegalArgumentException("Could not connect to database, please check your properties file at database/oracle.properties");
     }
 
-    private void syncCustomers() {
+    private static void syncCustomers() {
         ResultSet customers = ReadUtil.readCustomers();
         Supplier<Stream<String>> savedCustomers = () -> CustomerDAO.getCustomers().stream().map(Customer::getCustomerName);
         try {
@@ -50,7 +54,7 @@ public class DataSync {
         }
     }
     
-    private void syncDailyTransfers(LocalDate date) {
+    private static void syncDailyTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readDailyTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
@@ -151,7 +155,7 @@ public class DataSync {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Daily Transfers from database " + e.getMessage());
         }
     }
-    private void syncRenewalTransfers(LocalDate date) {
+    private static void syncRenewalTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readRenewalTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
@@ -253,7 +257,7 @@ public class DataSync {
         }
     }
 
-    public void syncData(LocalDate date) {
+    public static void syncData(LocalDate date) {
         syncCustomers();
         syncDailyTransfers(date);
         syncRenewalTransfers(date);

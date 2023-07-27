@@ -7,7 +7,6 @@ import com.ils.logic.management.TransferManagement;
 
 public class Logic {
 	private static Filters filters;
-	private static DataSync dataSync;
 	private static CustomerManagement customerManagement;
 	private static ProductManagement productManagement;
 	private static PartManagement partManagement;
@@ -15,7 +14,6 @@ public class Logic {
 
 	static {
 		filters = new Filters();
-		dataSync = new DataSync();
 		customerManagement = new CustomerManagement(filters);
 		productManagement = new ProductManagement(filters);
 		partManagement = new PartManagement(filters);
@@ -41,9 +39,4 @@ public class Logic {
 	public static Filters getFilters() {
 		return filters;
 	}
-
-	public static DataSync getDataSync() {
-		return dataSync;
-	}
-
 }

@@ -24,9 +24,10 @@ title: Developer Guide
   - [Logic](#logic)
     - [Data Synchronization](#data-synchronization)
     - [Data Access Objects](#data-access-objects)
-    - [Management](#management)
     - [Filters](#filters)
+    - [Management](#management)
     - [Quantities](#quantities)
+    - [Export Util](#export-util)
   - [UI](#ui)
     - [Component](#component)
     - [MainWindow](#mainwindow)
@@ -133,7 +134,15 @@ When a `Transfer` object is created, the `part` is necessary. The `transferDate`
 
 ### Logic
 
-The `Logic` class serves as the interface between the UI and the underlying data access objects, filters, and data synchronization classes. It is responsible for interacting with the management classes to handle CRUD operations for each data model mentioned above. This class also provides the necessary data and table view modifications for display.
+The `Logic` class serves as the interface between the UI and the underlying data access objects, filters, and data synchronization classes. It is responsible for interacting with the management classes to handle various operations for each data model mentioned above. This class also provides the necessary quantitative data and table view modifications for display.
+
+When initialised, the `Logic` creates and stores every sublogic class, comprising of:
+
+1. Filters
+2. CustomerManagement
+3. ProductManagement
+4. PartManagement
+5. TransferManagement
 
 #### Data Synchronization
 
@@ -149,9 +158,6 @@ The `CustomerDAO`, `ProductDAO`, `PartDAO`, and `TransferDAO` classes are used t
 
 Each data access object contains a list of the corresponding data model. The list is used to store the data retrieved from the SQLite database. The list is also used to store the data retrieved from the Oracle database during data synchronization. The getter methods allow the `Logic` class to pass filtered data to the UI.
 
-#### Management
-
-The `CustomerManagement`,
 
 #### Filters
 
@@ -159,7 +165,15 @@ The `Filter` class is used to filter data from the data access objects. It is us
 
 Each filter has a setter method and a clear method e.g. `filterCustomerByName()`, `clearCustomerNameFilter()`. These filters make use of `ObjectProperty` to bind changes in multiple `Predicate` objects to the `ObservableList` corresponding to each DAO model. Any changes to the filters are reflected in the list of the corresponding data model in the data access objects and is reflected in the UI.
 
+#### Management
+
+The `CustomerManagement`, `ProductManagement`, `PartManagement`, and `TransferManagement` classes are used to handle any user operations which involve CRUD and filtering operations. These classes interact with DAO and filters while ensuring relationships between the models are maintained.
+
+Each management object is initialised
+
 #### Quantities
+
+#### Export Util
 
 ### UI
 

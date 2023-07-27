@@ -163,7 +163,7 @@ public class PartDAO {
             throw new IllegalStateException("Part to be updated with id" + newPart.getId() + " does not exist in database");
         }
 
-        Optional<Part> optionalPart= getPart(newPart.getId());
+        Optional<Part> optionalPart = getPart(newPart.getId());
         optionalPart.ifPresent((oldPart) -> {
             parts.remove(oldPart);
             parts.add(newPart);

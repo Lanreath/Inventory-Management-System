@@ -94,17 +94,18 @@ public class PartManagement {
         Part curr = part.getProduct().getDefaultPart();
         // Check if the part to be deleted is the default part
         if (curr.equals(part)) {
-            if (curr.getNextPart() != null) {
-                List<Part> affectedParts = PartDAO.getPartsByProduct(curr.getProduct()).collect(Collectors.toList());
-                // Update the next part of the part to be deleted to be the new default part
-                Logic.getProductManagement().updateDefaultPart(curr.getNextPart());
-                Optional<Product> updated = ProductDAO.getProduct(curr.getProduct().getId());
-                if (!updated.isPresent()) {
-                    throw new RuntimeException("Product not found after default part update");
-                }
-                affectedParts.forEach(p -> PartDAO.updatePart(new Part(p.getPartName(), p.getCreationDateTime(),
-                        p.getPartQuantity(), updated.get(), p.getNextPart(), p.getPartNotes(), p.getId())));
+            assert curr.getNextPart() != null;
+            List<Part> affectedParts = PartDAO.getPartsByProduct(curr.getProduct()).collect(Collectors.toList());
+            // Update the next part of the part to be deleted to be the new default part
+            // Logic.getProductManagement().updateDefaultPart(curr.getNextPart());
+            curr.getProduct().setDefaultPart(curr.getNextPart());
+            ProductDAO.updateProduct(curr.getProduct());
+            Optional<Product> updated = ProductDAO.getProduct(curr.getProduct().getId());
+            if (!updated.isPresent()) {
+                throw new RuntimeException("Product not found after default part update");
             }
+            affectedParts.forEach(p -> PartDAO.updatePart(new Part(p.getPartName(), p.getCreationDateTime(),
+                    p.getPartQuantity(), updated.get(), p.getNextPart(), p.getPartNotes(), p.getId())));
         } else {
             // Find the previous part of the part to be deleted
             while (curr.getNextPart() != null && !curr.getNextPart().equals(part)) {

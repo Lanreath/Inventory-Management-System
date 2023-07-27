@@ -31,9 +31,6 @@ public abstract class Quantities {
         Quantities.to = to;
     }
 
-    // Refactor methods below to use static variables from and to
-
-
     public static Integer getOpeningBalByCustomer(Customer cust) {
         Stream<Transfer> matches = TransferDAO.getTransfersByCustomer(cust)
                 .sorted((t1, t2) -> t1.getTransferDateTime()

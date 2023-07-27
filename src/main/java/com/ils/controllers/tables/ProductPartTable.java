@@ -273,11 +273,11 @@ public class ProductPartTable extends Component<Region> {
                 start = start.getNextPart();
             }
             // Add remaining parts
-            Stream<Part> parts = this.partManagement.getProductParts(product);
-            parts.filter(part -> !linkedParts.contains(part.getId())).forEach(part -> {
-                TreeItem<Object> partItem = new TreeItem<>(part);
-                productItem.getChildren().add(partItem);
-            });
+            // Stream<Part> parts = this.partManagement.getProductParts(product);
+            // parts.filter(part -> !linkedParts.contains(part.getId())).forEach(part -> {
+            //     TreeItem<Object> partItem = new TreeItem<>(part);
+            //     productItem.getChildren().add(partItem);
+            // });
         }
         // Hack to ensure products cells are updated
         treeTable.refresh();

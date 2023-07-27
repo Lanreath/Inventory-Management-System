@@ -24,7 +24,6 @@ import com.ils.logic.Quantities;
 
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
-    private DataSync dataSync;
     private Filters filters;
     private InputBar inputBar;
 
@@ -61,9 +60,8 @@ public class ActionBar extends Component<Region> {
     @FXML
     Button exportBtn;
 
-    public ActionBar(DataSync dataSync, Filters filters, InputBar inputBar) {
+    public ActionBar(Filters filters, InputBar inputBar) {
         super(FXML);
-        this.dataSync = dataSync;
         this.filters = filters;
         this.inputBar = inputBar;
         initCustBtn();
@@ -183,7 +181,7 @@ public class ActionBar extends Component<Region> {
             status.setText("Syncing...");
             status.setStyle("-fx-text-fill: #000000;");
             try {
-                dataSync.syncData(syncDate.getValue());
+                DataSync.syncData(syncDate.getValue());
                 status.setText("Synced!");
                 status.setStyle("-fx-text-fill: #00ff00;");
             } catch (IllegalStateException e) {

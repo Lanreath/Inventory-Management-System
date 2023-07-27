@@ -48,8 +48,8 @@ public class MainWindow extends Component<Stage> {
 
     public void show() {
         this.stage.show();
-        this.stage.setMinHeight(600);
-        this.stage.setMinWidth(1000);
+        this.stage.setMinHeight(800);
+        this.stage.setMinWidth(1200);
     }
 
     public void fillInnerComponents() {
@@ -62,7 +62,7 @@ public class MainWindow extends Component<Stage> {
     }
 
     private void fillActionBar() {
-        actionBar = new ActionBar(Logic.getDataSync(), Logic.getFilters(), inputBar);
+        actionBar = new ActionBar(Logic.getFilters(), inputBar);
         actionBarPlaceholder.getChildren().add(actionBar.getRoot());
     }
 

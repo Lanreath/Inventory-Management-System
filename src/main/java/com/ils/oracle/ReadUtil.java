@@ -146,13 +146,13 @@ public class ReadUtil {
 
     public static ResultSet readDailyTransfersByDate(LocalDate date) {
         Connection conn;
-        String cards;
-        if (date.equals(LocalDate.now())) {
-            cards = cards1;
-        } else {
-            cards = cards2;
-        }
-        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + daily + ")\r\n";
+        // String cards;
+        // if (date.equals(LocalDate.now())) {
+        //     cards = cards1;
+        // } else {
+        //     cards = cards2;
+        // }
+        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards2 + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + daily + ")\r\n";
         String query = subquery + union1 + "UNION\r\n" + union2 + order;
         try {
             conn = Oracle.connect();
@@ -165,13 +165,13 @@ public class ReadUtil {
     }
     public static ResultSet readRenewalTransfersByDate(LocalDate date) {
         Connection conn;
-        String cards;
-        if (date.equals(LocalDate.now())) {
-            cards = cards1;
-        } else {
-            cards = cards2;
-        }
-        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards +join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + renewal + ")\r\n";
+        // String cards;
+        // if (date.equals(LocalDate.now())) {
+        //     cards = cards1;
+        // } else {
+        //     cards = cards2;
+        // }
+        String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards2 + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + renewal + ")\r\n";
         String query = subquery + union1 + "UNION\r\n" + union2 + order;
         try {
             conn = Oracle.connect();
