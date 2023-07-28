@@ -17,8 +17,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import java.util.logging.Logger;
-
 import com.ils.controllers.Component;
 import com.ils.controllers.tables.CustomerTable;
 import com.ils.controllers.tables.ProductPartTable;
@@ -99,9 +97,9 @@ public class InfoBar extends Component<HBox> {
         this.partManagement = partManagement;
         this.cust = cust.getSelectionModel();
         this.prpt = prpt.getSelectionModel();
-        initListeners();
         initLayout(cust, prpt, trnf);
         initTexts();
+        initListeners();
     }
 
     private void initLayout(CustomerTable cust, ProductPartTable prpt, TransferTable trnf) {
@@ -225,9 +223,8 @@ public class InfoBar extends Component<HBox> {
     }
 
     private void updateCustomerInfo(ObservableValue<? extends Customer> observable, Customer oldValue, Customer newValue) {
-        this.customerQuantities.getChildren().clear();
-
         if (oldValue != null && oldValue.equals(newValue) || newValue == null) {
+            this.customerQuantities.getChildren().clear();
             return;
         }
 
@@ -237,16 +234,17 @@ public class InfoBar extends Component<HBox> {
         customerOpeningBal.setText(Integer.toString(opening) + "\n");
         customerClosingBal.setText(Integer.toString(closing) + "\n");
         customerChangeBal.setText(Integer.toString(closing - opening));
-        this.customerQuantities.getChildren().addAll(customerOpeningDesc, customerOpeningBal, customerClosingDesc,
-                customerClosingBal, customerChangeDesc, customerChangeBal);
+        if (this.customerQuantities.getChildren().isEmpty()) {
+            this.customerQuantities.getChildren().addAll(customerOpeningDesc, customerOpeningBal, customerClosingDesc,
+                    customerClosingBal, customerChangeDesc, customerChangeBal);
+        }
     }
 
     private void updateProductInfo(ObservableValue<? extends TreeItem<Object>> observable, TreeItem<Object> oldValue, TreeItem<Object> newValue) {
-        this.productQuantities.getChildren().clear();
-        this.transferQuantities1.getChildren().clear();
-        this.transferQuantities2.getChildren().clear();
-
         if (oldValue != null && oldValue.equals(newValue) || newValue == null) {
+            this.productQuantities.getChildren().clear();
+            this.transferQuantities1.getChildren().clear();
+            this.transferQuantities2.getChildren().clear();
             return;
         }
 
@@ -293,9 +291,6 @@ public class InfoBar extends Component<HBox> {
         productOpeningBal.setText(Integer.toString(opening) + "\n");
         productClosingBal.setText(Integer.toString(closing) + "\n");
         productChangeBal.setText(Integer.toString(closing - opening));
-        this.productQuantities.getChildren().addAll(productOpeningDesc, productOpeningBal, productClosingDesc,
-                productClosingBal, productChangeDesc, productChangeBal);
-        
         productReceiveBal.setText(Integer.toString(received) + "\n");
         productDailyBal.setText(Integer.toString(daily) + "\n");
         productRenewalBal.setText(Integer.toString(renewal));
@@ -303,9 +298,15 @@ public class InfoBar extends Component<HBox> {
         productRejectDailyBal.setText(Integer.toString(rejectDaily) + "\n");
         productRejectRenewalBal.setText(Integer.toString(rejectRenewal));
         productRejectProjectBal.setText(Integer.toString(rejectProject));
-        this.transferQuantities1.getChildren().addAll(productReceiveDesc, productReceiveBal, productDailyDesc,
-                productDailyBal, productRenewalDesc, productRenewalBal);
-        this.transferQuantities2.getChildren().addAll(productSampleDesc, productSampleBal, productRejectDailyDesc,
-                productRejectDailyBal, productRejectRenewalDesc, productRejectRenewalBal);
+
+        if (this.productQuantities.getChildren().isEmpty() && this.transferQuantities1.getChildren().isEmpty()
+                && this.transferQuantities2.getChildren().isEmpty()) {
+            this.productQuantities.getChildren().addAll(productOpeningDesc, productOpeningBal, productClosingDesc,
+                    productClosingBal, productChangeDesc, productChangeBal);
+            this.transferQuantities1.getChildren().addAll(productReceiveDesc, productReceiveBal, productDailyDesc,
+                    productDailyBal, productRenewalDesc, productRenewalBal);
+            this.transferQuantities2.getChildren().addAll(productSampleDesc, productSampleBal, productRejectDailyDesc,
+                    productRejectDailyBal, productRejectRenewalDesc, productRejectRenewalBal);
+        }
     }
 }

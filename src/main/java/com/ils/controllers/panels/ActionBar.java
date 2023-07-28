@@ -145,6 +145,7 @@ public class ActionBar extends Component<Region> {
         startDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.isAfter(endDatePicker.getValue())) {
                 startDatePicker.setValue(endDatePicker.getValue());
+                newValue = endDatePicker.getValue();
             }
             Quantities.setFrom(newValue);
             filters.filterTransferByFromDate(newValue);
@@ -152,6 +153,7 @@ public class ActionBar extends Component<Region> {
         endDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.isBefore(startDatePicker.getValue())) {
                 endDatePicker.setValue(startDatePicker.getValue());
+                newValue = startDatePicker.getValue();
             }
             Quantities.setTo(newValue);
             filters.filterTransferByToDate(newValue);
