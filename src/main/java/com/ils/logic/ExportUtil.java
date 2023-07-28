@@ -36,7 +36,7 @@ public class ExportUtil {
         }
     }
 
-    public static void exportMonthlyReport() {
+    public static void exportMonthlyReport() throws IOException {
         // Print headers
         exportArray(new String[] { "Customer", "Product", "Part", "Opening Balance", "Sample", "Received",
                 "Daily (Output)", "Daily (Reject)", "Renewal (Output)", "Renewal (Reject)", "Project (Reject)",
@@ -58,12 +58,7 @@ public class ExportUtil {
             row[11] = Integer.toString(Quantities.getClosingBalByPart(p));
             exportArray(row);
         }
-        try {
-            printer.close();
-        } catch (IOException e) {
-            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not close CSVPrinter: " + e.getMessage());
-        }
+        printer.close();
         Logger.getLogger(MainApp.class.getName()).log(Level.INFO,
                 LocalDateTime.now() + ": Monthly report exported to " + Config.getValue("export.location"));
     }

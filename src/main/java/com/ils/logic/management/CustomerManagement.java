@@ -18,26 +18,16 @@ public class CustomerManagement {
     private Filters filters;
     private FilteredList<Customer> customerFilteredList;
     private SortedList<Customer> customerSortedList;
-    private ObjectProperty<Customer> selectedCustomer;
 
     public CustomerManagement(Filters filters) {
         this.filters = filters;
         this.customerFilteredList = CustomerDAO.getCustomers();
         this.customerSortedList = new SortedList<>(customerFilteredList);
-        this.selectedCustomer = new SimpleObjectProperty<>(null);
         customerFilteredList.predicateProperty().bind(filters.getCustomerNameFilter());
     }
 
     public SortedList<Customer> getCustomers() {
         return this.customerSortedList;
-    }
-
-    public ObjectProperty<Customer> getSelectedCustomer() {
-        return selectedCustomer;
-    }
-
-    public void setSelectedCustomer(Customer customer) {
-        selectedCustomer.set(customer);
     }
 
     public void addCustomer(String name) {

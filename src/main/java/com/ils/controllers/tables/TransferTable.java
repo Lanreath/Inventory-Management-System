@@ -61,7 +61,6 @@ public class TransferTable extends Component<Region> {
         transferTable.setPrefWidth(300);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         transferTable.setItems(transferManagement.getTransfers());
-        transferTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         this.transferManagement.getTransfers().comparatorProperty().bind(transferTable.comparatorProperty());
     }
 
@@ -99,15 +98,6 @@ public class TransferTable extends Component<Region> {
         transferTable.getSelectionModel().clearSelection();
         transferTypeComboBox.getSelectionModel().clearSelection();
     };
-
-    private void handleSelection(ObservableValue<? extends Transfer> observable, Transfer oldValue, Transfer newValue) {
-        if (newValue == null) return;
-        Part part = newValue.getPart();
-        Product product = part.getProduct();
-        Customer customer = product.getCustomer();
-        productManagement.setSelectedProduct(product);
-        customerManagement.setSelectedCustomer(customer);
-    }
 
     private void handleTypeFilter(ObservableValue<? extends Transfer.Action> observable, Transfer.Action oldValue, Transfer.Action newValue) {
         transferManagement.setTransferActionFilter(newValue);

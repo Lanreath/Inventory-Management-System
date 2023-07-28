@@ -89,9 +89,10 @@ public abstract class DataSync {
                     Optional<Part> dflt = PartDAO.getPartByNameAndProduct("Default", prod);
                     dflt.orElseThrow(() -> new IllegalStateException("Could not find Part Default in database"));
                     // Update Product with default part
-                    Product newProd = new Product(prod.getDBName(), prod.getCreationDateTime(), prod.getCustomer(), dflt.get(), prod.getId());
-                    ProductDAO.updateProduct(newProd);
                     part = dflt.get();
+                    part.getProduct().setDefaultPart(part);
+                    ProductDAO.updateProduct(part.getProduct());
+                    
                 }
                 if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
@@ -100,16 +101,11 @@ public abstract class DataSync {
                     // Check if part has enough quantity
                     while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
-                        TransferDAO.insertTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY, date);
-                        Part emptyPart = new Part(part.getPartName(), part.getCreationDateTime(), 0, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                        PartDAO.updatePart(emptyPart);
+                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
                         quantity -= part.getPartQuantity();
                         part = part.getNextPart();
-                        Logic.getProductManagement().updateDefaultPart(part);
                     } 
-                    TransferDAO.insertTransfer(part, quantity, Transfer.Action.DAILY, date);
-                    Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                    PartDAO.updatePart(newPart);
+                    Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
                 } else {
                     // Transfer already exists, but quantity might be different
                     List<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY).collect(Collectors.toList());
@@ -132,23 +128,18 @@ public abstract class DataSync {
                     while (quantity >= 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
                         if (part.equals(transfer.getPart())){
-                            TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
+                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()), total);
                         } else {
-                            TransferDAO.insertTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY, date);
+                            Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY, date);
                         }
-                        Part emptyPart = new Part(part.getPartName(), part.getCreationDateTime(), 0, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                        PartDAO.updatePart(emptyPart);
                         quantity -= part.getPartQuantity();
                         part = part.getNextPart();
-                        Logic.getProductManagement().updateDefaultPart(part);
                     }
                     if (part.equals(transfer.getPart())){
-                        TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
+                        Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()), total);
                     } else {
-                        TransferDAO.insertTransfer(part, quantity, Transfer.Action.DAILY, date);
+                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
                     }
-                    Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                    PartDAO.updatePart(newPart);
                 }
             }
         } catch (SQLException e) {
@@ -190,9 +181,9 @@ public abstract class DataSync {
                     Optional<Part> dflt = PartDAO.getPartByNameAndProduct("Default", prod);
                     dflt.orElseThrow(() -> new IllegalStateException("Could not find Part Default in database"));
                     // Update Product with default part
-                    Product newProd = new Product(prod.getDBName(), prod.getCreationDateTime(), prod.getCustomer(), dflt.get(), prod.getId());
-                    ProductDAO.updateProduct(newProd);
                     part = dflt.get();
+                    part.getProduct().setDefaultPart(part);
+                    ProductDAO.updateProduct(part.getProduct());
                 }
                 if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
@@ -201,16 +192,11 @@ public abstract class DataSync {
                     // Check if part has enough quantity
                     while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
-                        TransferDAO.insertTransfer(part, part.getPartQuantity(), Transfer.Action.RENEWAL, date);
-                        Part emptyPart = new Part(part.getPartName(), part.getCreationDateTime(), 0, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                        PartDAO.updatePart(emptyPart);
+                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
                         quantity -= part.getPartQuantity();
                         part = part.getNextPart();
-                        Logic.getProductManagement().updateDefaultPart(part);
                     } 
-                    TransferDAO.insertTransfer(part, quantity, Transfer.Action.RENEWAL, date);
-                    Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                    PartDAO.updatePart(newPart);
+                    Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
                 } else {
                     // Transfer already exists, but quantity might be different
                     List<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL).collect(Collectors.toList());
@@ -233,23 +219,18 @@ public abstract class DataSync {
                     while (quantity >= 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
                         if (part.equals(transfer.getPart())){
-                            TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
+                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()), total);
                         } else {
-                            TransferDAO.insertTransfer(part, part.getPartQuantity(), Transfer.Action.RENEWAL, date);
+                            Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.RENEWAL, date);
                         }
-                        Part emptyPart = new Part(part.getPartName(), part.getCreationDateTime(), 0, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                        PartDAO.updatePart(emptyPart);
                         quantity -= part.getPartQuantity();
                         part = part.getNextPart();
-                        Logic.getProductManagement().updateDefaultPart(part);
                     }
                     if (part.equals(transfer.getPart())){
-                        TransferDAO.updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
+                        Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()), total);
                     } else {
-                        TransferDAO.insertTransfer(part, quantity, Transfer.Action.RENEWAL, date);
+                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
                     }
-                    Part newPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity() - quantity, part.getProduct(), part.getNextPart(), part.getPartNotes(), part.getId());
-                    PartDAO.updatePart(newPart);
                 }
             }
         } catch (SQLException e) {

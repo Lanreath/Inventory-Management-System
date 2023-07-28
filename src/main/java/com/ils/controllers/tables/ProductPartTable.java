@@ -204,7 +204,6 @@ public class ProductPartTable extends Component<Region> {
 
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         treeTable.getSelectionModel().clearSelection();
-        this.customerManagement.setSelectedCustomer(null);
         dbNameSearchField.clear();
     };
 
@@ -212,11 +211,6 @@ public class ProductPartTable extends Component<Region> {
             TreeItem<Object> newSelection) {
         if (newSelection != null && newSelection.getValue() instanceof Product) {
             Product product = (Product) newSelection.getValue();
-            // Hack to prevent double selection
-            if (product.equals(this.productManagement.getSelectedProduct().get())) {
-                // Removed null selection
-                return;
-            }
             this.productManagement.selectProduct(product);
             this.partManagement.selectPart(null);
         } else if (newSelection != null && newSelection.getValue() instanceof Part) {

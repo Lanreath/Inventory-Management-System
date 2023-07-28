@@ -73,11 +73,6 @@ public class CustomerTable extends Component<Region> {
 
     private void handleSelection(ObservableValue<? extends Customer> observable, Customer oldSelection,
             Customer newSelection) {
-        // Hack to prevent double selection
-        if (newSelection != null && newSelection.equals(this.customerManagement.getSelectedCustomer().get())) {
-            // Removed null selection
-            return;
-        }
         this.customerManagement.selectCustomer(newSelection);
     }
 

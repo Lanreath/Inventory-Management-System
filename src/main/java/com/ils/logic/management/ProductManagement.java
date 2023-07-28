@@ -22,13 +22,11 @@ import javafx.collections.transformation.SortedList;
 
 public class ProductManagement {
     private Filters filters;
-    private ObjectProperty<Product> selectedProduct;
     private FilteredList<Product> productFilteredList;
     private SortedList<Product> productSortedList;
 
     public ProductManagement(Filters filters) {
         this.filters = filters;
-        this.selectedProduct = new SimpleObjectProperty<>(null);
         this.productFilteredList = ProductDAO.getProducts();
         this.productSortedList = new SortedList<>(productFilteredList);
         productFilteredList.predicateProperty()
@@ -55,14 +53,6 @@ public class ProductManagement {
             return;
         }
         filters.filterProductByName(name);
-    }
-
-    public ObjectProperty<Product> getSelectedProduct() {
-        return selectedProduct;
-    }
-
-    public void setSelectedProduct(Product product) {
-        selectedProduct.set(product);
     }
 
     public void addProduct(String name, Customer customer) {

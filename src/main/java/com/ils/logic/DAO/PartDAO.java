@@ -64,7 +64,7 @@ public class PartDAO {
                     continue;
                 }
                 int nextid = rs.getInt(nextPartIdColumn);
-                if (rs.wasNull()) {
+                if (nextid == 0) {
                     parts.add(new Part(
                         rs.getString(nameColumn),
                         LocalDateTime.parse(rs.getString(creationDateTimeColumn)),

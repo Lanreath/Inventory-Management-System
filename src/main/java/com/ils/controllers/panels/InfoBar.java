@@ -1,12 +1,14 @@
 package com.ils.controllers.panels;
 
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -14,6 +16,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+
+import java.util.logging.Logger;
 
 import com.ils.controllers.Component;
 import com.ils.controllers.tables.CustomerTable;
@@ -161,18 +165,15 @@ public class InfoBar extends Component<HBox> {
     }
 
     private void initListeners() {
-        cust.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            removeCustomerInfo();
-            if (oldValue == null || !oldValue.equals(newValue)) {
-                updateCustomerInfo();
-            }
+        cust.selectedItemProperty().addListener(this::updateCustomerInfo);
+        prpt.selectedItemProperty().addListener(this::updateProductInfo);
+        Quantities.getFrom().addListener((observable, oldValue, newValue) ->  {
+            updateCustomerInfo(cust.selectedItemProperty(), null, cust.getSelectedItem());
+            updateProductInfo(prpt.selectedItemProperty(), null, prpt.getSelectedItem());
         });
-        prpt.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            removeProductInfo();
-            if (oldValue == null || !oldValue.equals(newValue)) {
-                updateProductInfo();
-                updateProductNotes();
-            }
+        Quantities.getTo().addListener((observable, oldValue, newValue) -> {
+            updateCustomerInfo(cust.selectedItemProperty(), null, cust.getSelectedItem());
+            updateProductInfo(prpt.selectedItemProperty(), null, prpt.getSelectedItem());
         });
         productNotes.visibleProperty().bind(prpt.selectedItemProperty().isNotNull());
         productNotes.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -223,12 +224,16 @@ public class InfoBar extends Component<HBox> {
         });
     }
 
-    private void updateCustomerInfo() {
-        if (cust.getSelectedItem() == null) {
+    private void updateCustomerInfo(ObservableValue<? extends Customer> observable, Customer oldValue, Customer newValue) {
+        this.customerQuantities.getChildren().clear();
+
+        if (oldValue != null && oldValue.equals(newValue) || newValue == null) {
             return;
         }
-        Integer opening = Quantities.getOpeningBalByCustomer(cust.getSelectedItem());
-        Integer closing = Quantities.getClosingBalByCustomer(cust.getSelectedItem());
+
+        Integer opening = Quantities.getOpeningBalByCustomer(newValue);
+        Integer closing = Quantities.getClosingBalByCustomer(newValue);
+
         customerOpeningBal.setText(Integer.toString(opening) + "\n");
         customerClosingBal.setText(Integer.toString(closing) + "\n");
         customerChangeBal.setText(Integer.toString(closing - opening));
@@ -236,7 +241,15 @@ public class InfoBar extends Component<HBox> {
                 customerClosingBal, customerChangeDesc, customerChangeBal);
     }
 
-    private void updateProductInfo() {
+    private void updateProductInfo(ObservableValue<? extends TreeItem<Object>> observable, TreeItem<Object> oldValue, TreeItem<Object> newValue) {
+        this.productQuantities.getChildren().clear();
+        this.transferQuantities1.getChildren().clear();
+        this.transferQuantities2.getChildren().clear();
+
+        if (oldValue != null && oldValue.equals(newValue) || newValue == null) {
+            return;
+        }
+
         Product product;
         Part part;
         Integer opening;
@@ -248,11 +261,9 @@ public class InfoBar extends Component<HBox> {
         Integer rejectDaily;
         Integer rejectRenewal;
         Integer rejectProject;
-        if (prpt.getSelectedItem() == null) {
-            return;
-        }
-        if (prpt.getSelectedItem().getValue() instanceof Product) {
-            product = (Product) prpt.getSelectedItem().getValue();
+
+        if (newValue.getValue() instanceof Product) {
+            product = (Product) newValue.getValue();
             opening = Quantities.getOpeningBalByProduct(product);
             closing = Quantities.getClosingBalByProduct(product);
             received = Quantities.getReceivedTransferSumByProduct(product);
@@ -262,8 +273,9 @@ public class InfoBar extends Component<HBox> {
             rejectDaily = Quantities.getRejectDailyTransferSumByProduct(product);
             rejectRenewal = Quantities.getRejectRenewalTransferSumByProduct(product);
             rejectProject = Quantities.getRejectProjectTransferSumByProduct(product);
-        } else if (prpt.getSelectedItem().getValue() instanceof Part) {
-            part = (Part) prpt.getSelectedItem().getValue();
+            productNotes.setText(product.getProductNotes());
+        } else if (newValue.getValue() instanceof Part) {
+            part = (Part) newValue.getValue();
             opening = Quantities.getOpeningBalByPart(part);
             closing = Quantities.getClosingBalByPart(part);
             received = Quantities.getReceivedTransferSumByPart(part);
@@ -273,16 +285,17 @@ public class InfoBar extends Component<HBox> {
             rejectDaily = Quantities.getRejectDailyTransferSumByPart(part);
             rejectRenewal = Quantities.getRejectRenewalTransferSumByPart(part);
             rejectProject = Quantities.getRejectProjectTransferSumByPart(part);
+            productNotes.setText(part.getPartNotes());
         } else {
             throw new RuntimeException("Invalid selection type for Product/Part table");
         }
 
         productOpeningBal.setText(Integer.toString(opening) + "\n");
         productClosingBal.setText(Integer.toString(closing) + "\n");
-        productChangeBal.setText(Integer.toString(opening - closing));
+        productChangeBal.setText(Integer.toString(closing - opening));
         this.productQuantities.getChildren().addAll(productOpeningDesc, productOpeningBal, productClosingDesc,
                 productClosingBal, productChangeDesc, productChangeBal);
-
+        
         productReceiveBal.setText(Integer.toString(received) + "\n");
         productDailyBal.setText(Integer.toString(daily) + "\n");
         productRenewalBal.setText(Integer.toString(renewal));
@@ -294,28 +307,5 @@ public class InfoBar extends Component<HBox> {
                 productDailyBal, productRenewalDesc, productRenewalBal);
         this.transferQuantities2.getChildren().addAll(productSampleDesc, productSampleBal, productRejectDailyDesc,
                 productRejectDailyBal, productRejectRenewalDesc, productRejectRenewalBal);
-    }
-
-    private void updateProductNotes() {
-        if (prpt.getSelectedItem() == null) {
-            return;
-        }
-        if (prpt.getSelectedItem().getValue() instanceof Product) {
-            Product product = (Product) prpt.getSelectedItem().getValue();
-            productNotes.setText(product.getProductNotes());
-        } else {
-            Part part = (Part) prpt.getSelectedItem().getValue();
-            productNotes.setText(part.getPartNotes());
-        }
-    }
-
-    private void removeCustomerInfo() {
-        this.customerQuantities.getChildren().clear();
-    }
-
-    private void removeProductInfo() {
-        this.productQuantities.getChildren().clear();
-        this.transferQuantities1.getChildren().clear();
-        this.transferQuantities2.getChildren().clear();
     }
 }

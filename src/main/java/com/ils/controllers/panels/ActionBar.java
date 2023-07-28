@@ -10,6 +10,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.logging.Level;
@@ -139,8 +140,8 @@ public class ActionBar extends Component<Region> {
 
     private void initDates() {
         syncDate.setValue(LocalDate.now());
-        startDatePicker.setValue(Quantities.getFrom());
-        endDatePicker.setValue(Quantities.getTo());
+        startDatePicker.setValue(Quantities.getFrom().getValue());
+        endDatePicker.setValue(Quantities.getTo().getValue());
         startDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.isAfter(endDatePicker.getValue())) {
                 startDatePicker.setValue(endDatePicker.getValue());
@@ -172,29 +173,41 @@ public class ActionBar extends Component<Region> {
     private EventHandler<ActionEvent> addTransferHandler = (event) -> {
         inputBar.addTransfer();
     };
- 
+
     private EventHandler<ActionEvent> deleteEntryHandler = (event) -> {
         inputBar.deleteEntry();
     };
 
     private EventHandler<ActionEvent> syncEventHandler = (event) -> {
-            status.setText("Syncing...");
-            status.setStyle("-fx-text-fill: #000000;");
-            try {
-                DataSync.syncData(syncDate.getValue());
-                status.setText("Synced!");
-                status.setStyle("-fx-text-fill: #00ff00;");
-            } catch (IllegalStateException e) {
-                Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": IllegalStateException from database " + e.getMessage());
-                status.setText("Sync failed!");
-                status.setStyle("-fx-text-fill: #ff0000;");
-            } catch (IllegalArgumentException e) {
-                status.setText("Invalid username or password!");
-                status.setStyle("-fx-text-fill: #ff0000;");
-            }
+        status.setText("Syncing...");
+        status.setStyle("-fx-text-fill: #000000;");
+        try {
+            DataSync.syncData(syncDate.getValue());
+            status.setText("Synced!");
+            status.setStyle("-fx-text-fill: #00ff00;");
+        } catch (IllegalStateException e) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
+                    LocalDateTime.now() + ": IllegalStateException from database " + e.getMessage());
+            status.setText("Sync failed!");
+            status.setStyle("-fx-text-fill: #ff0000;");
+        } catch (IllegalArgumentException e) {
+            status.setText("Invalid username or password!");
+            status.setStyle("-fx-text-fill: #ff0000;");
+        }
     };
 
     private EventHandler<ActionEvent> exportEventHandler = (event) -> {
-        ExportUtil.exportMonthlyReport();
+        status.setText("Exporting...");
+        status.setStyle("-fx-text-fill: #000000;");
+        try {
+            ExportUtil.exportMonthlyReport();
+            status.setText("Exported!");
+            status.setStyle("-fx-text-fill: #00ff00;");
+        } catch (IOException e) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
+                    LocalDateTime.now() + ": Could not close CSVPrinter: " + e.getMessage());
+            status.setText("Export failed!");
+            status.setStyle("-fx-text-fill: #ff0000;");
+        }
     };
 }
