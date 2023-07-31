@@ -25,7 +25,7 @@ import com.ils.models.Transfer;
 
 public class InputBar extends Component<ToolBar> {
     private static final String FXML = "InputBar.fxml";
-    
+
     private CustomerManagement customerManagement;
     private ProductManagement productManagement;
     private PartManagement partManagement;
@@ -46,7 +46,9 @@ public class InputBar extends Component<ToolBar> {
 
     private Button cancelBtn;
 
-    public InputBar(CustomerManagement customerManagement, ProductManagement productManagement, PartManagement partManagement, TransferManagement transferManagement, SelectionModel<Customer> cust, TreeTableViewSelectionModel<Object> prpt, SelectionModel<Transfer> xact) {
+    public InputBar(CustomerManagement customerManagement, ProductManagement productManagement,
+            PartManagement partManagement, TransferManagement transferManagement, SelectionModel<Customer> cust,
+            TreeTableViewSelectionModel<Object> prpt, SelectionModel<Transfer> xact) {
         super(FXML);
         this.customerManagement = customerManagement;
         this.productManagement = productManagement;
@@ -117,7 +119,8 @@ public class InputBar extends Component<ToolBar> {
             displayMsg("Please enter a quantity.");
             return;
         }
-        partManagement.addPart(nameInput.getText(), Integer.parseInt(qtyInput.getText()), (Product) prpt.getSelectedItem().getValue());
+        partManagement.addPart(nameInput.getText(), Integer.parseInt(qtyInput.getText()),
+                (Product) prpt.getSelectedItem().getValue());
         nameInput.setText("");
         qtyInput.clear();
         getRoot().getItems().clear();
@@ -132,7 +135,8 @@ public class InputBar extends Component<ToolBar> {
             displayMsg("Please select an action.");
             return;
         }
-        transferManagement.addTransfer((Part) prpt.getSelectedItem().getValue(), Integer.parseInt(qtyInput.getText()), actionInput.getValue());
+        transferManagement.addTransfer((Part) prpt.getSelectedItem().getValue(), Integer.parseInt(qtyInput.getText()),
+                actionInput.getValue());
         qtyInput.clear();
         getRoot().getItems().clear();
     };
@@ -257,18 +261,20 @@ public class InputBar extends Component<ToolBar> {
     private void deleteProductPart() {
         if (prpt.getSelectedItem().getValue() instanceof Product) {
             Product product = (Product) prpt.getSelectedItem().getValue();
-            displayDelete("product and its parts/transfers? " + product.getDBName() + " by " + product.getCustomer().getCustomerName());
+            displayDelete("product and its parts/transfers? " + product.getDBName() + " by "
+                    + product.getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 productManagement.deleteProduct(product);
                 getRoot().getItems().clear();
             });
         } else {
             Part part = (Part) prpt.getSelectedItem().getValue();
-            displayDelete("part and its transfers? " + part.getPartName() + " from " + part.getProduct().getDBName() + " by " + part.getProduct().getCustomer().getCustomerName());
+            displayDelete("part and its transfers? " + part.getPartName() + " from " + part.getProduct().getDBName()
+                    + " by " + part.getProduct().getCustomer().getCustomerName());
             confirmBtn.setOnAction(e -> {
                 getRoot().getItems().clear();
                 if (partManagement.getProductParts(part.getProduct()).count() == 1) {
-                    displayMsg("Unable to delete part. Product must have at least one part.");     
+                    displayMsg("Unable to delete part. Product must have at least one part.");
                     return;
                 }
                 partManagement.deletePart(part);
@@ -278,7 +284,9 @@ public class InputBar extends Component<ToolBar> {
 
     private void deleteTransfer() {
         Transfer transfer = xact.getSelectedItem();
-        displayDelete("transfer? " + transfer.getTransferDateTime() + " Qty: " + transfer.getTransferQuantity() + " from " + transfer.getPart().getPartName() + " from " + transfer.getPart().getProduct().getDBName() + " by " + transfer.getPart().getProduct().getCustomer().getCustomerName());
+        displayDelete("transfer? " + transfer.getTransferDateTime() + " Qty: " + transfer.getTransferQuantity()
+                + " from " + transfer.getPart().getPartName() + " from " + transfer.getPart().getProduct().getDBName()
+                + " by " + transfer.getPart().getProduct().getCustomer().getCustomerName());
         confirmBtn.setOnAction(e -> {
             transferManagement.deleteTransfer(transfer);
             getRoot().getItems().clear();

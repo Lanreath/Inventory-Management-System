@@ -1,13 +1,10 @@
 package com.ils.controllers.tables;
 
 import com.ils.controllers.Component;
-import com.ils.logic.management.CustomerManagement;
 import com.ils.logic.management.PartManagement;
 import com.ils.logic.management.ProductManagement;
-import com.ils.logic.management.TransferManagement;
 import com.ils.models.Part;
 import com.ils.models.Product;
-import com.ils.models.Transfer;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,13 +27,10 @@ import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ProductPartTable extends Component<Region> {
-    private CustomerManagement customerManagement;
     private ProductManagement productManagement;
     private PartManagement partManagement;
-    private TransferManagement transferManagement;
 
     @FXML
     TreeTableView<Object> treeTable;
@@ -56,13 +50,11 @@ public class ProductPartTable extends Component<Region> {
     @FXML
     private TreeTableColumn<Object, Integer> quantityColumn;
 
-    public ProductPartTable(CustomerManagement customerManagement, ProductManagement productManagement,
-            PartManagement partManagement, TransferManagement transferManagement) {
+    public ProductPartTable(ProductManagement productManagement,
+            PartManagement partManagement) {
         super("ProductPartTable.fxml");
-        this.customerManagement = customerManagement;
         this.productManagement = productManagement;
         this.partManagement = partManagement;
-        this.transferManagement = transferManagement;
         initTable();
         initListeners();
         initProductColumn();
@@ -78,25 +70,6 @@ public class ProductPartTable extends Component<Region> {
         treeTable.setEditable(true);
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
-        // Row factory to highlight the default part corresponding to the first child of every product
-        // treeTable.setRowFactory(tv -> {
-        //     TreeTableRow<Object> row = new TreeTableRow<>();
-        //     row.treeItemProperty().addListener((obs, oldTreeItem, newTreeItem) -> {
-        //         if (newTreeItem != null && newTreeItem.getValue() instanceof Product) {
-        //             row.getStyleClass().add("product");
-        //         } else if (newTreeItem != null && newTreeItem.getValue() instanceof Part) {
-        //             Part part = (Part) newTreeItem.getValue();
-        //             if (part.equals(part.getProduct().getDefaultPart())) {
-        //                 row.getStyleClass().add("default-part");
-        //             } else {
-        //                 row.getStyleClass().add("part");
-        //             }
-        //         } else if (newTreeItem != null) {
-        //             throw new RuntimeException("Unknown row item type");
-        //         }
-        //     });
-        //     return row;
-        // });
     }
 
     private void initListeners() {
@@ -113,19 +86,12 @@ public class ProductPartTable extends Component<Region> {
                 rebuild();
             }
         });
-        // this.transferManagement.getTransfers().addListener(new ListChangeListener<Transfer>() {
-        //     @Override
-        //     public void onChanged(Change<? extends Transfer> c) {
-        //         rebuild();
-        //     }
-        // });
         this.productManagement.getProductCustomerFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
         this.productManagement.getDBNameFilter().addListener((observable, oldValue, newValue) -> {
             rebuild();
         });
-        // this.productManagement.getSelectedProduct().addListener(this::handleForcedSelection);
     }
 
     private void initProductColumn() {
@@ -266,12 +232,6 @@ public class ProductPartTable extends Component<Region> {
                 productItem.getChildren().add(partItem);
                 start = start.getNextPart();
             }
-            // Add remaining parts
-            // Stream<Part> parts = this.partManagement.getProductParts(product);
-            // parts.filter(part -> !linkedParts.contains(part.getId())).forEach(part -> {
-            //     TreeItem<Object> partItem = new TreeItem<>(part);
-            //     productItem.getChildren().add(partItem);
-            // });
         }
         // Hack to ensure products cells are updated
         treeTable.refresh();

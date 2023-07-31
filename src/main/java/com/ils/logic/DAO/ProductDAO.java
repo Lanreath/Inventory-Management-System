@@ -74,8 +74,6 @@ public class ProductDAO {
     };
 
     protected static void updateDefaultParts() {
-        // ConcurrentModificationException
-        // Store products to be updated in a list and update them after the loop
         ObservableList<Product> copyProducts = FXCollections.observableArrayList(products);
         copyProducts.forEach((product) -> {
             Optional<Part> defaultPart = PartDAO.getPart(product.getDefaultPart().getId());

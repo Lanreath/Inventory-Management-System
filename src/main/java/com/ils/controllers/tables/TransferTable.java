@@ -6,9 +6,6 @@ import com.ils.controllers.Component;
 import com.ils.logic.management.CustomerManagement;
 import com.ils.logic.management.ProductManagement;
 import com.ils.logic.management.TransferManagement;
-import com.ils.models.Customer;
-import com.ils.models.Part;
-import com.ils.models.Product;
 import com.ils.models.Transfer;
 
 import javafx.beans.value.ObservableValue;
@@ -25,8 +22,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Region;
 
 public class TransferTable extends Component<Region> {
-    private CustomerManagement customerManagement;
-    private ProductManagement productManagement;
     private TransferManagement transferManagement;
 
     @FXML
@@ -47,10 +42,8 @@ public class TransferTable extends Component<Region> {
     @FXML
     private TableColumn<Transfer, Transfer.Action> transferTypeColumn;
 
-    public TransferTable(CustomerManagement customerManagement, ProductManagement productManagement, TransferManagement transferManagement) {
+    public TransferTable(TransferManagement transferManagement) {
         super("TransferTable.fxml");
-        this.customerManagement = customerManagement;
-        this.productManagement = productManagement;
         this.transferManagement = transferManagement;
         initTable();
         initCol();

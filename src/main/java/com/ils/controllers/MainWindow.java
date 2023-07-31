@@ -72,12 +72,12 @@ public class MainWindow extends Component<Stage> {
     }
 
     private void fillProductPartTable() {
-        productPartTable = new ProductPartTable(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getPartManagement(), Logic.getTransferManagement());
+        productPartTable = new ProductPartTable(Logic.getProductManagement(), Logic.getPartManagement());
         productPartTablePlaceholder.getChildren().add(productPartTable.getRoot());
     }
 
     private void fillTransferTable() {
-        transferTable = new TransferTable(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getTransferManagement());
+        transferTable = new TransferTable(Logic.getTransferManagement());
         transferTablePlaceholder.getChildren().add(transferTable.getRoot());
     }
 

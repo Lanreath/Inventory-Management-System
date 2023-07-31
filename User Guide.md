@@ -22,10 +22,10 @@ title: User Guide
   - [Filtering customers by name](#filtering-customers-by-name)
   - [Filtering products/parts by name](#filtering-productsparts-by-name)
   - [Filtering transfers by type](#filtering-transfers-by-type)
-  - [Data Synchronization](#data-synchronization)
-  - [Export CSV File](#export-csv-file)
-  - [Customer Statistics](#customer-statistics)
-  - [Product/Part Statistics](#productpart-statistics)
+  - [Data synchronization](#data-synchronization)
+  - [Export CSV file](#export-csv-file)
+  - [Customer statistics](#customer-statistics)
+  - [Product/Part statistics](#productpart-statistics)
   - [Setting default part for a product](#setting-default-part-for-a-product)
   - [Editing product/part notes](#editing-productpart-notes)
 
@@ -205,7 +205,7 @@ The table will be updated to show only transfers of the selected type.
 
 To clear the filter, click on the `Clear` button next to the dropdown box.
 
-### Data Synchronization
+### Data synchronization
 
 The application synchronizes its database with the company's JMS database. This is done by comparing the data in the application's database with the data in the company's database. The application then updates its database with the latest data from the company's database.
 
@@ -213,7 +213,7 @@ To synchronize the application's database with the company's database, select a 
 
 ![SyncButton](images/syncbutton.png)
 
-### Export CSV File
+### Export CSV file
 
 The data can be exported a CSV file to a user-defined location, recording parts along with transfer quantities and total balances. The date range of requested information can also be set with the date pickers.
 
@@ -221,7 +221,7 @@ To export the relevant data, simply click on the `Export` button on the action b
 
 ![ExportButton](images/exportbutton.png)
 
-### Customer Statistics
+### Customer statistics
 
 The application displays statistics for the selected customer. The statistics are displayed below the table and includes data from within the date range given in the action bar. The section is highlighted in the image below:
 
@@ -229,7 +229,7 @@ The application displays statistics for the selected customer. The statistics ar
 
 The statistics are updated whenever a customer is selected.
 
-### Product/Part Statistics
+### Product/Part statistics
 
 The application displays statistics for the selected product/part. The statistics are displayed below the table and includes data from within the date range given in the action bar. The statistics are displayed below the table. The section is highlighted in the image below:
 

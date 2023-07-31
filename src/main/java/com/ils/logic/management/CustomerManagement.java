@@ -9,8 +9,6 @@ import com.ils.models.Product;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 

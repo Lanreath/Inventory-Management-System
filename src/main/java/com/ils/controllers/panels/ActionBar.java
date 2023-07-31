@@ -76,7 +76,7 @@ public class ActionBar extends Component<Region> {
     }
 
     private void initCustBtn() {
-        ImageView cust = new ImageView("/images/customer-v2.png");
+        ImageView cust = new ImageView("/images/customer.png");
         cust.setPreserveRatio(true);
         cust.setFitHeight(24);
         addCustomerBtn.setGraphic(cust);
@@ -85,7 +85,7 @@ public class ActionBar extends Component<Region> {
     }
 
     private void initProdBtn() {
-        ImageView prod = new ImageView("/images/product-v2.png");
+        ImageView prod = new ImageView("/images/product.png");
         prod.setPreserveRatio(true);
         prod.setFitHeight(24);
         addProductBtn.setGraphic(prod);
@@ -94,7 +94,7 @@ public class ActionBar extends Component<Region> {
     }
 
     private void initPartBtn() {
-        ImageView part = new ImageView("/images/part-v2.png");
+        ImageView part = new ImageView("/images/part.png");
         part.setPreserveRatio(true);
         part.setFitHeight(24);
         addPartBtn.setGraphic(part);
@@ -103,7 +103,7 @@ public class ActionBar extends Component<Region> {
     }
 
     private void initXactBtn() {
-        ImageView xact = new ImageView("/images/transfer-v2.png");
+        ImageView xact = new ImageView("/images/transfer.png");
         xact.setPreserveRatio(true);
         xact.setFitHeight(24);
         addTransferBtn.setGraphic(xact);
@@ -121,7 +121,7 @@ public class ActionBar extends Component<Region> {
     }
 
     private void initSyncBtn() {
-        ImageView sync = new ImageView("/images/sync-icon.png");
+        ImageView sync = new ImageView("/images/sync.png");
         sync.setPreserveRatio(true);
         sync.setFitHeight(24);
         syncBtn.setGraphic(sync);

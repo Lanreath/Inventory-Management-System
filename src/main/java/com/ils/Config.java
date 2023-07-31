@@ -18,7 +18,7 @@ public abstract class Config {
     public static void init() {
         try {
             prop = new Properties();
-            ip = new FileInputStream("database/database.properties");
+            ip = new FileInputStream("database.properties");
             prop.load(ip);
 
             logger = Logger.getLogger(MainApp.class.getName());

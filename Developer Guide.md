@@ -42,11 +42,15 @@ title: Developer Guide
 
 - Java 8 (Use any suitable JDK version)
 - Gradle (Use any suitable build tool e.g. Maven)
-- JDBC drivers (Oracle and SQLite)
+- JDBC drivers
+  - org.xerial:sqlite-jdbc:3.42.0.0
+  - com.oracle.database.jdbc:ojdbc8:23.2.0.0
+- Apache Commons CSV
+  - org.apache.commons:commons-csv:1.10.0
 
 ### Configuration
 
-- Database connection details (found in `database/oracle.properties`)
+- Database connection details (found in `oracle.properties`)
   - `oracle.username`: Oracle database username
   - `oracle.password`: Oracle database password
   - `oracle.url`: Oracle database URL
@@ -60,7 +64,7 @@ title: Developer Guide
 
 The diagram below shows the architecture of the application.
 
-![Architecture](images/architecture.png)
+![Architecture](images/diagram.png)
 
 The application is split into 4 main components: databases, models, logic, and UI.
 
@@ -144,6 +148,8 @@ When initialised, the `Logic` creates and stores every sublogic class, comprisin
 4. PartManagement
 5. TransferManagement
 
+Data access objects, data synchronization, quantities, and export are statically accessible.
+
 #### Data Synchronization
 
 The `DataSync` class is used to synchronize data between the Oracle and SQLite databases. It uses the `Oracle` and `Database` classes to connect to the databases and the `ReadUtil` and `CRUDUtil` classes to read and write data to the databases.
@@ -156,8 +162,9 @@ Synchronisation is separated into 3 main methods: `syncCustomers`, `syncDailyTra
 
 The `CustomerDAO`, `ProductDAO`, `PartDAO`, and `TransferDAO` classes are used to handle CRUD operations for each data model mentioned above. They use the `CRUDUtil` class to connect to the SQLite database and execute queries. They are responsible for reading and writing data to the SQLite database.
 
-Each data access object contains a list of the corresponding data model. The list is used to store the data retrieved from the SQLite database. The list is also used to store the data retrieved from the Oracle database during data synchronization. The getter methods allow the `Logic` class to pass filtered data to the UI.
+Each data access object contains a list of the corresponding data model. The list is used to store the data retrieved from the SQLite database. The list is also used to store the data retrieved from the Oracle database during data synchronization. The list is then used to update the SQLite database during data synchronization.
 
+These data object objects are mostly utilised by the management classes to handle user operations. They are also used in the data synchronization and export processes.
 
 #### Filters
 
@@ -169,11 +176,32 @@ Each filter has a setter method and a clear method e.g. `filterCustomerByName()`
 
 The `CustomerManagement`, `ProductManagement`, `PartManagement`, and `TransferManagement` classes are used to handle any user operations which involve CRUD and filtering operations. These classes interact with DAO and filters while ensuring relationships between the models are maintained.
 
-Each management object is initialised
+Each management object is initialised with the relevant data access object and filter. The management objects are then referenced by the `Logic` class to handle user operations.
 
 #### Quantities
 
+The `Quantities` class is used to handle quantity operations for each data model mentioned above. It is used to calculate the total quantity of parts and transfers for each product given a date range.
+
+Since each method makes use of the `TransferDAO` class and stream operations, the amount of transfers may increase the time taken for calculations linearly. However, the time taken is still negligible for the current amount of data. A possible future solution is to cache the results of the calculations.
+
 #### Export Util
+
+The `ExportUtil` class is used to export data from the SQLite database to a CSV file. It uses the Apache Commons CSV library to write data to the CSV file.
+
+The following columns are exported:
+
+1. Customer Name
+2. Product Name
+3. Part Name
+4. Opening Balnce
+5. Sample
+6. Received
+7. Daily (Output) 
+8. Daily (Reject)
+9. Renewal (Output)
+10. Renewal (Reject)
+11. Project (Reject)
+12. Closing Balance
 
 ### UI
 
@@ -191,9 +219,11 @@ The `MainWindow` class is used to initialize the UI. It uses the `Logic` class t
 
 The `ActionBar` is used to handle user CRUD and synchronization operations. It uses the `Logic` class to handle the operations and the `InputBar` component to retrieve user text input.
 
-It consists of the following buttons: `addCustomerButton`, `addProductButton`, `addPartButton`, `addTransferButton`, `syncButton`, `deleteButton` and a synchronisation date picker `syncDate`.
+It consists of the following buttons: `addCustomerButton`, `addProductButton`, `addPartButton`, `addTransferButton`, `syncButton`, `deleteButton`, synchronisation date picker `syncDate`, transfer date range pickers `startDatePicker`, `endDatePicker`, and `exportButton`.
 
 The `addCustomerButton`, `addProductButton`, `addPartButton`, `addTransferButton` buttons are used to add a new customer, product, part, and transfer respectively. The `syncButton` button is used to synchronize data between the Oracle and SQLite databases given a user input date. The `deleteButton` button is used to delete a customer, product, part, or transfer. The `syncDate` date picker is used to select a date for data synchronization.
+
+The 'startDatePicker' and 'endDatePicker' date pickers are used to select a date range for filtering transfers and displaying the total quantity of transfers in the date range. The `exportButton` button is used to export the data in the table views to a CSV file according to the indicated date range.
 
 #### Tables
 
@@ -217,4 +247,4 @@ Each of these user operations are triggered with the `ActionBar` and handled by 
 
 The `InfoBar` component is used to display information to the user. It consists of the following components: `customerInfo`, `productDetails`, `startDatePicker`, `endDatePicker`.
 
-The `customerInfo` is used to display the selected customer's opening/closing balances and inventory change. The `productDetails` is used to display the selected product/part's opening/closing balances and transfer totals. The `startDatePicker` and `endDatePicker` are used to select a date range for the summary report.
+The `customerInfo` is used to display the selected customer's opening/closing balances and inventory change. The `productDetails` is used to display the selected product/part's opening/closing balances and transfer totals.
