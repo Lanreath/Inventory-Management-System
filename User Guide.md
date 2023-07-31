@@ -33,9 +33,18 @@ title: User Guide
 
 1. Ensure you have Java 8 or below installed. Check by running `java -version` in the command line.
 
-2. Download the latest release of the application.
+2. Download the latest release of the application and the relevant jar files.
 
-3. Create a folder `/database` in the same directory as the application.
+3. Create a `database.properties` file in the same directory as the application. The file should contain the following lines:
+
+```
+oracle.username= ********
+oracle.password= ********
+oracle.url= @ip:port:SID
+sqlite.location= database.db
+export.location= export.csv
+enable_offline= true/false
+```
 
 4. Open the application by double-clicking on it or running `java -jar ILS.jar` in the command line. You should see the following window:
 

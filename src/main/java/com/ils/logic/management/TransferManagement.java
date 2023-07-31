@@ -95,7 +95,7 @@ public class TransferManagement {
                 throw new RuntimeException("Updated part not found");
             }
             ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
-                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getId()));
+                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getProductName(), part.getProduct().getProductNotes(), part.getProduct().getId()));
         }
         TransferDAO.insertTransfer(part, quantity, action, date);
     }
@@ -142,7 +142,7 @@ public class TransferManagement {
                 throw new RuntimeException("Updated part not found");
             }
             ProductDAO.updateProduct(new Product(transfer.getPart().getProduct().getDBName(), transfer.getPart().getProduct().getCreationDateTime(),
-                    transfer.getPart().getProduct().getCustomer(), newDefault.get(), transfer.getPart().getProduct().getId()));
+                    transfer.getPart().getProduct().getCustomer(), newDefault.get(),transfer.getPart().getProduct().getProductName(), transfer.getPart().getProduct().getProductNotes(), transfer.getPart().getProduct().getId()));
         }
     }
 
