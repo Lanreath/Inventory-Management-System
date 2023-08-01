@@ -30,6 +30,10 @@
     -fx-background-color: -primary-action;
     -fx-background-insets: 0, 1, 2;
 }
+.tree-table-row-cell:default-part {
+    -fx-background: -highlight;
+    -fx-background-color: -highlight;
+}
 .button {
     -fx-border-radius: 5;
     -fx-background-radius: 5;
@@ -44,7 +48,3 @@
 .error {
     -fx-text-fill: -error;
 }
-/* .default-part {
-    -fx-background: -highlight;
-    -fx-background-color: -highlight;
-} */

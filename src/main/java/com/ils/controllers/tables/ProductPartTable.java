@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -17,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
@@ -70,6 +72,19 @@ public class ProductPartTable extends Component<Region> {
         treeTable.setEditable(true);
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
+        final PseudoClass defaultPart = PseudoClass.getPseudoClass("default-part");
+        treeTable.setRowFactory(e -> {
+            final TreeTableRow<Object> row = new TreeTableRow<>();
+            row.treeItemProperty().addListener((o, oldValue, newValue) -> {
+                boolean def = false;
+                if (newValue != null && newValue.getValue() instanceof Part) {
+                    Part part = (Part) newValue.getValue();
+                    def = part.getProduct().getDefaultPart().equals(part);
+                }
+                row.pseudoClassStateChanged(defaultPart, def);
+            });
+            return row;
+        });
     }
 
     private void initListeners() {
