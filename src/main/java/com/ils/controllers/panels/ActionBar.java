@@ -21,10 +21,13 @@ import com.ils.controllers.Component;
 import com.ils.logic.DataSync;
 import com.ils.logic.ExportUtil;
 import com.ils.logic.Filters;
+import com.ils.logic.Logic;
 import com.ils.logic.Quantities;
+import com.ils.logic.management.CustomerManagement;
 
 public class ActionBar extends Component<Region> {
     private static final String FXML = "ActionBar.fxml";
+    private CustomerManagement customerManagement;
     private Filters filters;
     private InputBar inputBar;
 
@@ -61,8 +64,9 @@ public class ActionBar extends Component<Region> {
     @FXML
     Button exportBtn;
 
-    public ActionBar(Filters filters, InputBar inputBar) {
+    public ActionBar(CustomerManagement customerManagement, Filters filters, InputBar inputBar) {
         super(FXML);
+        this.customerManagement = customerManagement;
         this.filters = filters;
         this.inputBar = inputBar;
         initCustBtn();
@@ -199,10 +203,15 @@ public class ActionBar extends Component<Region> {
     };
 
     private EventHandler<ActionEvent> exportEventHandler = (event) -> {
+        if (customerManagement.getSelectedCustomer() == null) {
+            status.setText("No customer selected!");
+            status.setStyle("-fx-text-fill: #ff0000;");
+            return;
+        }
         status.setText("Exporting...");
         status.setStyle("-fx-text-fill: #000000;");
         try {
-            ExportUtil.exportMonthlyReport();
+            ExportUtil.exportMonthlyReport(customerManagement.getSelectedCustomer());
             status.setText("Exported!");
             status.setStyle("-fx-text-fill: #00ff00;");
         } catch (IOException e) {

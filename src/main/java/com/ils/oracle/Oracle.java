@@ -11,8 +11,6 @@ import com.ils.Config;
 import com.ils.MainApp;
 
 public abstract class Oracle {
-    private static final String location = "@10.151.40.55:1521:PCMS";
-
     private static boolean checkDrivers() {
         try {
             DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
@@ -33,7 +31,7 @@ public abstract class Oracle {
             connection = DriverManager.getConnection("jdbc:oracle:thin:" + dbURL, username, password);
         } catch (SQLException e) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
-                    LocalDateTime.now() + ": Could not connect to Oracle database at " + location);
+                    LocalDateTime.now() + ": Could not connect to Oracle database at " + dbURL);
             return null;
         }
         return connection;

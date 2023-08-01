@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import com.ils.MainApp;
+import com.ils.models.Customer;
 import com.ils.models.Part;
 import com.ils.models.Product;
 import com.ils.sqlite.CRUDUtil;
@@ -122,6 +123,10 @@ public class PartDAO {
 
     public static Stream<Part> getPartsByProduct(Product product) {
         return parts.stream().filter(part -> part.getProduct().equals(product));
+    }
+
+    public static Stream<Part> getPartsByCustomer(Customer customer) {
+        return parts.stream().filter(part -> part.getProduct().getCustomer().equals(customer));
     }
 
     public static int insertPart(String partName, int quantity, Product product) {

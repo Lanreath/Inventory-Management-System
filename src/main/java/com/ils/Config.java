@@ -21,8 +21,9 @@ public abstract class Config {
             ip = new FileInputStream("database.properties");
             prop.load(ip);
 
+            String loglocation = prop.getProperty("logfile.location");
             logger = Logger.getLogger(MainApp.class.getName());
-            fh = new FileHandler("database/ILSLogs.log", true);
+            fh = new FileHandler(loglocation, true);
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
             logger.addHandler(fh);

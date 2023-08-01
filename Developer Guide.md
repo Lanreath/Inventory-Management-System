@@ -56,6 +56,7 @@ title: Developer Guide
   - `oracle.url`: Oracle database URL
   - `sqlite.location`: SQLite database location
   - `export.location`: Exported CSV file location
+  - `logfile.location`: Log file location
   - `enable_offline`: Enable offline mode (true/false)
 
 ## Design
@@ -81,6 +82,8 @@ Its class methods are used to validate the connection upon data synchronization.
 The class `ReadUtil` contains methods to read data from the Oracle database. It uses the `Oracle` class to connect to the database and execute queries.
 
 #### SQLite
+
+![ERD](images/erd.png)
 
 The class `Database` is used to connect to the SQLite database. It uses the JDBC driver to connect to the database. The class `Database` is a singleton class, which means that there is only one instance of the class. This is to ensure that there is only one connection to the database at any time.
 

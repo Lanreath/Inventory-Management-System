@@ -12,7 +12,7 @@ import org.apache.commons.csv.CSVPrinter;
 import com.ils.Config;
 import com.ils.MainApp;
 import com.ils.logic.DAO.PartDAO;
-import com.ils.models.Part;
+import com.ils.models.Customer;
 
 public class ExportUtil {
     private static final CSVFormat format = CSVFormat.EXCEL;
@@ -36,14 +36,19 @@ public class ExportUtil {
         }
     }
 
-    public static void exportMonthlyReport() throws IOException {
+    public static void exportMonthlyReport(Customer cust) throws IOException {
+        if (cust == null) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
+                    LocalDateTime.now() + ": Could not export monthly report: Customer is null");
+            return;
+        }
         // Print headers
-        exportArray(new String[] { "Customer", "Product", "Part", "Opening Balance", "Sample", "Received",
-                "Daily (Output)", "Daily (Reject)", "Renewal (Output)", "Renewal (Reject)", "Project (Reject)",
+        exportArray(new String[] { "Customer", "Card Type", "Item O Code", "Opening Balance", "Sample", "Received",
+                "Daily (Output)", "Daily (Reject)", "Renewal (Output)", "Renewal (Reject)", "Project (Output)" ,"Project (Reject)",
                 "Closing Balance" });
-        // Get all parts and their quantities
-        for (Part p : PartDAO.getAllParts()) {
-            Object[] row = new String[12];
+        // Get customer's parts and their quantities
+        PartDAO.getPartsByCustomer(cust).forEach(p -> {
+            Object[] row = new String[13];
             row[0] = p.getProduct().getCustomer().getCustomerName();
             row[1] = p.getProduct().getProductName();
             row[2] = p.getPartName();
@@ -54,10 +59,11 @@ public class ExportUtil {
             row[7] = Integer.toString(Quantities.getRejectDailyTransferSumByPart(p));
             row[8] = Integer.toString(Quantities.getRenewalTransferSumByPart(p));
             row[9] = Integer.toString(Quantities.getRejectRenewalTransferSumByPart(p));
-            row[10] = Integer.toString(Quantities.getRejectProjectTransferSumByPart(p));
-            row[11] = Integer.toString(Quantities.getClosingBalByPart(p));
+            row[10] = Integer.toString(Quantities.getProjectTransferSumByPart(p));
+            row[11] = Integer.toString(Quantities.getRejectProjectTransferSumByPart(p));
+            row[12] = Integer.toString(Quantities.getClosingBalByPart(p));
             exportArray(row);
-        }
+        });
         printer.close();
         Logger.getLogger(MainApp.class.getName()).log(Level.INFO,
                 LocalDateTime.now() + ": Monthly report exported to " + Config.getValue("export.location"));

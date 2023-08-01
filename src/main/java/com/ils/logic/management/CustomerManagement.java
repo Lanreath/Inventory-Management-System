@@ -16,6 +16,7 @@ public class CustomerManagement {
     private Filters filters;
     private FilteredList<Customer> customerFilteredList;
     private SortedList<Customer> customerSortedList;
+    private Customer selectedCustomer;
 
     public CustomerManagement(Filters filters) {
         this.filters = filters;
@@ -52,10 +53,12 @@ public class CustomerManagement {
 
     public void selectCustomer(Customer customer) {
         if (customer == null) {
+            this.selectedCustomer = null;
             filters.clearProductCustomerFilter();
             filters.clearTransferCustomerFilter();
             return;
         }
+        this.selectedCustomer = customer;
         filters.filterProductByCustomer(customer);
         filters.filterTransferByCustomer(customer);
     }
@@ -66,5 +69,9 @@ public class CustomerManagement {
             return;
         }
         filters.filterCustomerByName(name);
+    }
+
+    public Customer getSelectedCustomer() {
+        return this.selectedCustomer;
     }
 }

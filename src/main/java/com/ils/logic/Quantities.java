@@ -136,6 +136,26 @@ public abstract class Quantities {
                 .mapToInt(t -> t.getTransferQuantity()).sum();
     }
 
+    public static Integer getProjectTransferSumByProduct(Product prod) {
+        return TransferDAO.getTransfersByProduct(prod)
+                .filter(t -> t.getTransferDateTime().toLocalDate().isAfter(from.getValue())
+                        || t.getTransferDateTime().toLocalDate().isEqual(from.getValue()))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isBefore(to.getValue())
+                        || t.getTransferDateTime().toLocalDate().isEqual(to.getValue()))
+                .filter(t -> t.getTransferType() == Transfer.Action.PROJECT)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
+    public static Integer getProjectTransferSumByPart(Part part) {
+        return TransferDAO.getTransfersByPart(part)
+                .filter(t -> t.getTransferDateTime().toLocalDate().isAfter(from.getValue())
+                        || t.getTransferDateTime().toLocalDate().isEqual(from.getValue()))
+                .filter(t -> t.getTransferDateTime().toLocalDate().isBefore(to.getValue())
+                        || t.getTransferDateTime().toLocalDate().isEqual(to.getValue()))
+                .filter(t -> t.getTransferType() == Transfer.Action.PROJECT)
+                .mapToInt(t -> t.getTransferQuantity()).sum();
+    }
+
     public static Integer getRejectDailyTransferSumByProduct(Product prod) {
         return TransferDAO.getTransfersByProduct(prod)
                 .filter(t -> t.getTransferDateTime().toLocalDate().isAfter(from.getValue())
