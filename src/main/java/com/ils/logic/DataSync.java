@@ -4,12 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ils.MainApp;
@@ -34,7 +32,7 @@ public abstract class DataSync {
         if (Database.isOK() && Oracle.isOK()) {
             return;
         }
-        throw new IllegalArgumentException("Could not connect to database, please check your properties file at database/oracle.properties");
+        throw new IllegalArgumentException("Could not connect to database, please check your properties file at database.properties");
     }
 
     private static void syncCustomers() {
@@ -48,6 +46,10 @@ public abstract class DataSync {
                     CustomerDAO.insertCustomer(curr);
                 }
             }
+            // Hack to insert an aliased customer
+            if(!CustomerDAO.getCustomer("UOB VN").isPresent()){
+                CustomerDAO.insertCustomer("UOB VN");
+            }
             Logger.getLogger(MainApp.class.getName()).log(Level.INFO, "All customers inserted");
         } catch (SQLException e) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Customers from database " + e.getMessage());
@@ -60,10 +62,6 @@ public abstract class DataSync {
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
         Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
-            // Hack to insert an aliased customer
-            if(!CustomerDAO.getCustomer("UOB VN").isPresent()){
-                CustomerDAO.insertCustomer("UOB VN");
-            }
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
                 String product = transfers.getString("VAULTNAME");
@@ -101,44 +99,41 @@ public abstract class DataSync {
                     // Check if part has enough quantity
                     while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
-                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
+                        Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY, date);
                         quantity -= part.getPartQuantity();
                         part = part.getNextPart();
                     } 
                     Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
                 } else {
                     // Transfer already exists, but quantity might be different
-                    List<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY).collect(Collectors.toList());
-                    int total = 0;
-                    for (Transfer t : ts) {
-                        total += t.getTransferQuantity();
-                    }
+                    Stream<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY);
+                    int total = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY).mapToInt(Transfer::getTransferQuantity).sum();
                     quantity -= total;
-                    Part copyPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getId());
-                    Transfer transfer = null;
-                    for (Transfer t : ts) {
-                        if (t.getPart().equals(copyPart)) {
-                            transfer = t;
-                            break;
-                        }
+                    while (part.getPartQuantity() <= 0 && part.getNextPart() != null) {
+                        part = part.getNextPart();
                     }
-                    if (transfer == null) {
-                        throw new IllegalStateException("Could not find matching transfer for part in database");
-                    }
-                    while (quantity >= 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
-                        // Deduct and check again
-                        if (part.equals(transfer.getPart())){
-                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()), total);
+                    while (quantity > 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
+                        Part copyPart = part;
+                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                            //Update transfer
+                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
                         } else {
+                            // Add transfer
                             Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY, date);
                         }
                         quantity -= part.getPartQuantity();
-                        part = part.getNextPart();
                     }
-                    if (part.equals(transfer.getPart())){
-                        Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()), total);
-                    } else {
-                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
+                    if (quantity > 0) {
+                        Part copyPart = part;
+                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                            //Update transfer
+                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
+                        } else {
+                            // Add transfer
+                            Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
+                        }
                     }
                 }
             }
@@ -152,10 +147,6 @@ public abstract class DataSync {
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
         Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
-            // Hack to insert an aliased customer
-            if(!CustomerDAO.getCustomer("UOB VN").isPresent()){
-                CustomerDAO.insertCustomer("UOB VN");
-            }
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
                 String product = transfers.getString("VAULTNAME");
@@ -192,44 +183,41 @@ public abstract class DataSync {
                     // Check if part has enough quantity
                     while (part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         // Deduct and check again
-                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
+                        Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.RENEWAL, date);
                         quantity -= part.getPartQuantity();
                         part = part.getNextPart();
                     } 
                     Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
                 } else {
                     // Transfer already exists, but quantity might be different
-                    List<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL).collect(Collectors.toList());
-                    int total = 0;
-                    for (Transfer t : ts) {
-                        total += t.getTransferQuantity();
-                    }
+                    Stream<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL);
+                    int total = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL).mapToInt(Transfer::getTransferQuantity).sum();
                     quantity -= total;
-                    Part copyPart = new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(), part.getId());
-                    Transfer transfer = null;
-                    for (Transfer t : ts) {
-                        if (t.getPart().equals(copyPart)) {
-                            transfer = t;
-                            break;
-                        }
+                    while (part.getPartQuantity() <= 0 && part.getNextPart() != null) {
+                        part = part.getNextPart();
                     }
-                    if (transfer == null) {
-                        throw new IllegalStateException("Could not find matching transfer for part in database");
-                    }
-                    while (quantity >= 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
-                        // Deduct and check again
-                        if (part.equals(transfer.getPart())){
-                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()), total);
+                    while (quantity > 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
+                        Part copyPart = part;
+                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                            //Update transfer
+                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
                         } else {
+                            // Add transfer
                             Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.RENEWAL, date);
                         }
                         quantity -= part.getPartQuantity();
-                        part = part.getNextPart();
                     }
-                    if (part.equals(transfer.getPart())){
-                        Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()), total);
-                    } else {
-                        Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
+                    if (quantity > 0) {
+                        Part copyPart = part;
+                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                            //Update transfer
+                            Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
+                        } else {
+                            // Add transfer
+                            Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
+                        }
                     }
                 }
             }

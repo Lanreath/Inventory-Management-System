@@ -93,8 +93,7 @@ public class PartManagement {
         }
         Part curr = part.getProduct().getDefaultPart();
         // Check if the part to be deleted is the default part
-        if (curr.equals(part)) {
-            assert curr.getNextPart() != null;
+        if (curr.equals(part) && curr.getNextPart() != null) {
             List<Part> affectedParts = PartDAO.getPartsByProduct(curr.getProduct()).collect(Collectors.toList());
             // Update the next part of the part to be deleted to be the new default part
             // Logic.getProductManagement().updateDefaultPart(curr.getNextPart());

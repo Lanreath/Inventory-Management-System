@@ -100,7 +100,7 @@ public class TransferManagement {
         TransferDAO.insertTransfer(part, quantity, action, date);
     }
 
-    public void updateTransfer(Transfer transfer, int prevQty) {
+    public void updateTransfer(Transfer transfer) {
         TransferDAO.updateTransfer(transfer);
         switch (transfer.getTransferType()) {
             case DAILY:
@@ -120,7 +120,7 @@ public class TransferManagement {
                             t.getId()));
                 }
                 Logic.getPartManagement().updatePartQuantity(transfer.getPart(),
-                        transfer.getPart().getPartQuantity() - transfer.getTransferQuantity() + prevQty);
+                        transfer.getPart().getPartQuantity() - transfer.getTransferQuantity());
                 break;
             case RECEIVED:
                 for (Transfer t : TransferDAO.getTransfersByPart(transfer.getPart())
@@ -132,7 +132,7 @@ public class TransferManagement {
                             t.getId()));
                 }
                 Logic.getPartManagement().updatePartQuantity(transfer.getPart(),
-                        transfer.getPart().getPartQuantity() + transfer.getTransferQuantity() - prevQty);
+                        transfer.getPart().getPartQuantity() + transfer.getTransferQuantity());
                 break;
         }
         // Check for default part change

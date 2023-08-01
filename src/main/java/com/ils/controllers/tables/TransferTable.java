@@ -3,8 +3,6 @@ package com.ils.controllers.tables;
 import java.time.LocalDateTime;
 
 import com.ils.controllers.Component;
-import com.ils.logic.management.CustomerManagement;
-import com.ils.logic.management.ProductManagement;
 import com.ils.logic.management.TransferManagement;
 import com.ils.models.Transfer;
 

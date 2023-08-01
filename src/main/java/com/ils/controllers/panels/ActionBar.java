@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ils.Config;
 import com.ils.MainApp;
 import com.ils.controllers.Component;
 import com.ils.logic.DataSync;
 import com.ils.logic.ExportUtil;
 import com.ils.logic.Filters;
-import com.ils.logic.Logic;
 import com.ils.logic.Quantities;
 import com.ils.logic.management.CustomerManagement;
 
@@ -185,6 +185,11 @@ public class ActionBar extends Component<Region> {
     };
 
     private EventHandler<ActionEvent> syncEventHandler = (event) -> {
+        if (Config.getValue("enable_offline").equals("true")) {
+            status.setText("Currently set to offline mode");
+            status.setStyle("-fx-text-fill: #ff0000;");
+            return;
+        }
         status.setText("Syncing...");
         status.setStyle("-fx-text-fill: #000000;");
         try {
