@@ -24,7 +24,6 @@ import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,19 +70,6 @@ public class ProductPartTable extends Component<Region> {
         treeTable.setEditable(true);
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
-        // final PseudoClass defaultPart = PseudoClass.getPseudoClass("default-part");
-        // treeTable.setRowFactory(e -> {
-        // final TreeTableRow<Object> row = new TreeTableRow<>();
-        // row.treeItemProperty().addListener((o, oldValue, newValue) -> {
-        // boolean def = false;
-        // if (newValue != null && newValue.getValue() instanceof Part) {
-        // Part part = (Part) newValue.getValue();
-        // def = part.getProduct().getDefaultPart().equals(part);
-        // }
-        // row.pseudoClassStateChanged(defaultPart, def);
-        // });
-        // return row;
-        // });
     }
 
     private void initListeners() {
@@ -123,6 +109,7 @@ public class ProductPartTable extends Component<Region> {
     private void initPartColumn() {
         final PseudoClass defaultPart = PseudoClass.getPseudoClass("default-part");
 
+        defaultPartColumn.setSortable(false);
         defaultPartColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
@@ -143,6 +130,7 @@ public class ProductPartTable extends Component<Region> {
             return new TextFieldTreeTableCell<Object, String>() {
                 @Override
                 public void updateItem(String item, boolean empty) {
+                    boolean def = false;
                     super.updateItem(item, empty);
                     if (empty || item == null) {
                         setText(null);
@@ -150,13 +138,12 @@ public class ProductPartTable extends Component<Region> {
                     } else {
                         setText(item.toString());
                         Object curr = getTreeTableView().getTreeItem(getIndex()).getValue();
-                        boolean def = false;
                         if (curr instanceof Part) {
                             Part pt = (Part) curr;
                             def = pt.getProduct().getDefaultPart().equals(pt);
                         }
-                        pseudoClassStateChanged(defaultPart, def);
                     }
+                    pseudoClassStateChanged(defaultPart, def);
                 }
             };
         });
@@ -176,6 +163,7 @@ public class ProductPartTable extends Component<Region> {
     }
 
     private void initQuantityColumn() {
+        quantityColumn.setSortable(false);
         quantityColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
