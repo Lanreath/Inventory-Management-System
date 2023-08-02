@@ -103,7 +103,7 @@ public class ReadUtil {
             "and pr.productkey1 = pt.productkey1\r\n" + //
             "and pr.configurationid = pt.configurationid\r\n" + //
             "and wo.workorderiddisplay = wo.workorderid\r\n" + //
-            "and wo.status <> 700\r\n" + //
+            // "and wo.status <> 700\r\n" + //
             "and wo.splitflag <> 1\r\n" + //
             "and wo.testflag <> 1\r\n" + //
             "and wo.customerorderid = co.customerorderid " + //

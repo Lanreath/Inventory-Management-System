@@ -60,7 +60,7 @@ public abstract class DataSync {
         ResultSet transfers = ReadUtil.readDailyTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
-        Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
+        Stream<Transfer> savedTransfers = TransferDAO.getTransfersByDate(date);
         try {
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
@@ -92,7 +92,7 @@ public abstract class DataSync {
                     ProductDAO.updateProduct(part.getProduct());
                     
                 }
-                if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
+                if (savedTransfers.noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.DAILY)) {
@@ -106,7 +106,7 @@ public abstract class DataSync {
                     Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
                 } else {
                     // Transfer already exists, but quantity might be different
-                    Stream<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY);
+                    Supplier<Stream<Transfer>> ts = () -> TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY);
                     int total = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY).mapToInt(Transfer::getTransferQuantity).sum();
                     quantity -= total;
                     while (part.getPartQuantity() <= 0 && part.getNextPart() != null) {
@@ -114,8 +114,8 @@ public abstract class DataSync {
                     }
                     while (quantity > 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         Part copyPart = part;
-                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
                             //Update transfer
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
                         } else {
@@ -126,8 +126,8 @@ public abstract class DataSync {
                     }
                     if (quantity > 0) {
                         Part copyPart = part;
-                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
                             //Update transfer
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
                         } else {
@@ -145,7 +145,7 @@ public abstract class DataSync {
         ResultSet transfers = ReadUtil.readRenewalTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
-        Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
+        Stream<Transfer> savedTransfers = TransferDAO.getTransfersByDate(date);
         try {
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
@@ -176,7 +176,7 @@ public abstract class DataSync {
                     part.getProduct().setDefaultPart(part);
                     ProductDAO.updateProduct(part.getProduct());
                 }
-                if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
+                if (savedTransfers.noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.RENEWAL)) {
@@ -190,7 +190,7 @@ public abstract class DataSync {
                     Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
                 } else {
                     // Transfer already exists, but quantity might be different
-                    Stream<Transfer> ts = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL);
+                    Supplier<Stream<Transfer>> ts = () -> TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL);
                     int total = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL).mapToInt(Transfer::getTransferQuantity).sum();
                     quantity -= total;
                     while (part.getPartQuantity() <= 0 && part.getNextPart() != null) {
@@ -198,8 +198,8 @@ public abstract class DataSync {
                     }
                     while (quantity > 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         Part copyPart = part;
-                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
                             //Update transfer
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
                         } else {
@@ -210,8 +210,8 @@ public abstract class DataSync {
                     }
                     if (quantity > 0) {
                         Part copyPart = part;
-                        if (ts.anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
+                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
                             //Update transfer
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
                         } else {

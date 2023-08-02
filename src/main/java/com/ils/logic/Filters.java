@@ -123,7 +123,7 @@ public class Filters {
     }
 
     public void filterTransferByToDate(LocalDate to) {
-        transferFromFilter.set(transfer -> transfer.getTransferDateTime().toLocalDate().isEqual(to) || transfer.getTransferDateTime().toLocalDate().isBefore(to));
+        transferToFilter.set(transfer -> transfer.getTransferDateTime().toLocalDate().isEqual(to) || transfer.getTransferDateTime().toLocalDate().isBefore(to));
     }
 
     public void filterTransferByAction(Transfer.Action action) {
