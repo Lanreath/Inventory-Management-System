@@ -30,7 +30,7 @@
     -fx-background-color: -primary-action;
     -fx-background-insets: 0, 1, 2;
 }
-.tree-table-row-cell:default-part {
+.tree-table-cell:default-part {
     -fx-background: -highlight;
     -fx-background-color: -highlight;
 }

@@ -18,7 +18,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.TreeTableView.TreeTableViewSelectionModel;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
@@ -72,19 +71,19 @@ public class ProductPartTable extends Component<Region> {
         treeTable.setEditable(true);
         TreeItem<Object> root = new TreeItem<>();
         treeTable.setRoot(root);
-        final PseudoClass defaultPart = PseudoClass.getPseudoClass("default-part");
-        treeTable.setRowFactory(e -> {
-            final TreeTableRow<Object> row = new TreeTableRow<>();
-            row.treeItemProperty().addListener((o, oldValue, newValue) -> {
-                boolean def = false;
-                if (newValue != null && newValue.getValue() instanceof Part) {
-                    Part part = (Part) newValue.getValue();
-                    def = part.getProduct().getDefaultPart().equals(part);
-                }
-                row.pseudoClassStateChanged(defaultPart, def);
-            });
-            return row;
-        });
+        // final PseudoClass defaultPart = PseudoClass.getPseudoClass("default-part");
+        // treeTable.setRowFactory(e -> {
+        // final TreeTableRow<Object> row = new TreeTableRow<>();
+        // row.treeItemProperty().addListener((o, oldValue, newValue) -> {
+        // boolean def = false;
+        // if (newValue != null && newValue.getValue() instanceof Part) {
+        // Part part = (Part) newValue.getValue();
+        // def = part.getProduct().getDefaultPart().equals(part);
+        // }
+        // row.pseudoClassStateChanged(defaultPart, def);
+        // });
+        // return row;
+        // });
     }
 
     private void initListeners() {
@@ -122,6 +121,8 @@ public class ProductPartTable extends Component<Region> {
     }
 
     private void initPartColumn() {
+        final PseudoClass defaultPart = PseudoClass.getPseudoClass("default-part");
+
         defaultPartColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
@@ -139,7 +140,25 @@ public class ProductPartTable extends Component<Region> {
             }
         });
         defaultPartColumn.setCellFactory(c -> {
-            return new TextFieldTreeTableCell<Object, String>(new DefaultStringConverter());
+            return new TextFieldTreeTableCell<Object, String>() {
+                @Override
+                public void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        setText(item.toString());
+                        Object curr = getTreeTableView().getTreeItem(getIndex()).getValue();
+                        boolean def = false;
+                        if (curr instanceof Part) {
+                            Part pt = (Part) curr;
+                            def = pt.getProduct().getDefaultPart().equals(pt);
+                        }
+                        pseudoClassStateChanged(defaultPart, def);
+                    }
+                }
+            };
         });
         defaultPartColumn.setOnEditCommit((TreeTableColumn.CellEditEvent<Object, String> event) -> {
             Object prpt = event.getTreeTableView().getTreeItem(event.getTreeTablePosition().getRow()).getValue();
@@ -209,27 +228,29 @@ public class ProductPartTable extends Component<Region> {
         rebuild();
     }
 
-    // private void handleForcedSelection(ObservableValue<? extends Product> observable, Product oldValue,
-    //         Product newValue) {
-    //     if (newValue == null) {
-    //         treeTable.getSelectionModel().clearSelection();
-    //         return;
-    //     }
-    //     // Check for product in treetable
-    //     Optional<TreeItem<Object>> prod = treeTable.getRoot().getChildren().stream().filter(item -> {
-    //         if (item.getValue() instanceof Product) {
-    //             Product product = (Product) item.getValue();
-    //             return product.equals(newValue);
-    //         } else {
-    //             return false;
-    //         }
-    //     }).findFirst();
-    //     if (!prod.isPresent()) {
-    //         // Product not found
-    //         throw new RuntimeException("Product not found in treetable");
-    //     }
-    //     // Select product
-    //     treeTable.getSelectionModel().select(prod.get());
+    // private void handleForcedSelection(ObservableValue<? extends Product>
+    // observable, Product oldValue,
+    // Product newValue) {
+    // if (newValue == null) {
+    // treeTable.getSelectionModel().clearSelection();
+    // return;
+    // }
+    // // Check for product in treetable
+    // Optional<TreeItem<Object>> prod =
+    // treeTable.getRoot().getChildren().stream().filter(item -> {
+    // if (item.getValue() instanceof Product) {
+    // Product product = (Product) item.getValue();
+    // return product.equals(newValue);
+    // } else {
+    // return false;
+    // }
+    // }).findFirst();
+    // if (!prod.isPresent()) {
+    // // Product not found
+    // throw new RuntimeException("Product not found in treetable");
+    // }
+    // // Select product
+    // treeTable.getSelectionModel().select(prod.get());
     // }
 
     private void rebuild() {
