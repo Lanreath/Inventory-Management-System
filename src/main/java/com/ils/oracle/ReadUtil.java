@@ -36,7 +36,14 @@ public class ReadUtil {
         "    when SUBSTR(get_token(pr.productname,1,'_'),9,8) = 'MetVBUP1' then 'PLAT_UAE'\r\n" + //
         "    else SUBSTR(get_token(pr.productname,1,'_'),9,8)\r\n" + //
         "    end\r\n" + //
-        "when co.customername IN ('AMXSG', 'BOASG') then pr.productkey1\r\n" + //
+        "when co.customername IN ('AMXSG', 'BOASG') then\r\n" + //
+        "  case\r\n" + //
+        "  when pr.productkey1 IN ('SGP', 'SGPLOGO')\r\n" + //
+        "  then 'SGP/SGPLOGO'\r\n" + //
+        "  when pr.productkey1 IN ('HKP', 'HKPLOGO')\r\n" + //
+        "  then 'HKP/HKPLOGO'\r\n" + //
+        "  else pr.productkey1\r\n" + //
+        "  end\r\n" + //
         "when co.customername IN ('SCBSG','SCBBR') then\r\n" + //
         "  case\r\n" + //
         "  when INSTR(get_token(co.externalcustomerorderid,1,'.'), 'SCB') > 0\r\n" + //
@@ -103,7 +110,7 @@ public class ReadUtil {
             "and pr.productkey1 = pt.productkey1\r\n" + //
             "and pr.configurationid = pt.configurationid\r\n" + //
             "and wo.workorderiddisplay = wo.workorderid\r\n" + //
-            // "and wo.status <> 700\r\n" + //
+            "and wo.status <> 700\r\n" + //
             "and wo.splitflag <> 1\r\n" + //
             "and wo.testflag <> 1\r\n" + //
             "and wo.customerorderid = co.customerorderid " + //

@@ -60,7 +60,7 @@ public abstract class DataSync {
         ResultSet transfers = ReadUtil.readDailyTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
-        Stream<Transfer> savedTransfers = TransferDAO.getTransfersByDate(date);
+        Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
@@ -90,9 +90,8 @@ public abstract class DataSync {
                     part = dflt.get();
                     part.getProduct().setDefaultPart(part);
                     ProductDAO.updateProduct(part.getProduct());
-                    
                 }
-                if (savedTransfers.noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
+                if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.DAILY)) {
@@ -106,7 +105,6 @@ public abstract class DataSync {
                     Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.DAILY, date);
                 } else {
                     // Transfer already exists, but quantity might be different
-                    Supplier<Stream<Transfer>> ts = () -> TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY);
                     int total = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.DAILY).mapToInt(Transfer::getTransferQuantity).sum();
                     quantity -= total;
                     while (part.getPartQuantity() <= 0 && part.getNextPart() != null) {
@@ -114,8 +112,10 @@ public abstract class DataSync {
                     }
                     while (quantity > 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         Part copyPart = part;
-                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        Stream<Transfer> found =  TransferDAO.getTransfersByProductAndDate(prod, date).filter(t -> t.getTransferType() == Transfer.Action.DAILY).filter(t -> t.getPart().equals(copyPart)).sorted((t1, t2) -> t1.getTransferDateTime().compareTo(t2.getTransferDateTime()));
+                        Optional<Transfer> match = found.findFirst();
+                        if (match.isPresent()) {
+                            Transfer transfer = match.get();
                             //Update transfer
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
                         } else {
@@ -123,11 +123,13 @@ public abstract class DataSync {
                             Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.DAILY, date);
                         }
                         quantity -= part.getPartQuantity();
+                        part = part.getNextPart();
                     }
                     if (quantity > 0) {
                         Part copyPart = part;
-                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        Optional<Transfer> match =  TransferDAO.getTransfersByProductAndDate(prod, date).filter(t -> t.getTransferType() == Transfer.Action.DAILY).filter(t -> t.getPart().equals(copyPart)).sorted((t1, t2) -> t1.getTransferDateTime().compareTo(t2.getTransferDateTime())).findFirst();
+                        if (match.isPresent()) {
+                            Transfer transfer = match.get();
                             //Update transfer
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
                         } else {
@@ -145,7 +147,7 @@ public abstract class DataSync {
         ResultSet transfers = ReadUtil.readRenewalTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
         Supplier<Stream<Part>> savedParts = () -> PartDAO.getParts().stream();
-        Stream<Transfer> savedTransfers = TransferDAO.getTransfersByDate(date);
+        Supplier<Stream<Transfer>> savedTransfers = () -> TransferDAO.getTransfersByDate(date);
         try {
             while (transfers.next()) {
                 String customer = transfers.getString("CUSTOMER");
@@ -176,7 +178,7 @@ public abstract class DataSync {
                     part.getProduct().setDefaultPart(part);
                     ProductDAO.updateProduct(part.getProduct());
                 }
-                if (savedTransfers.noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
+                if (savedTransfers.get().noneMatch((t) -> t.getPart().getProduct().getCustomer().getCustomerName().equals(customer) &&
                     t.getPart().getProduct().getDBName().equals(product) &&
                     t.getTransferDateTime().toLocalDate().isEqual(date) &&
                     t.getTransferType() == Transfer.Action.RENEWAL)) {
@@ -190,7 +192,6 @@ public abstract class DataSync {
                     Logic.getTransferManagement().addTransfer(part, quantity, Transfer.Action.RENEWAL, date);
                 } else {
                     // Transfer already exists, but quantity might be different
-                    Supplier<Stream<Transfer>> ts = () -> TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL);
                     int total = TransferDAO.getTransfersByProductAndDate(prod, date).filter((t) -> t.getTransferType() == Transfer.Action.RENEWAL).mapToInt(Transfer::getTransferQuantity).sum();
                     quantity -= total;
                     while (part.getPartQuantity() <= 0 && part.getNextPart() != null) {
@@ -198,20 +199,24 @@ public abstract class DataSync {
                     }
                     while (quantity > 0 && part.getPartQuantity() < quantity && part.getNextPart() != null) {
                         Part copyPart = part;
-                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        Stream<Transfer> found =  TransferDAO.getTransfersByProductAndDate(prod, date).filter(t -> t.getTransferType() == Transfer.Action.RENEWAL).filter(t -> t.getPart().equals(copyPart)).sorted((t1, t2) -> t1.getTransferDateTime().compareTo(t2.getTransferDateTime()));
+                        Optional<Transfer> match = found.findFirst();
+                        if (match.isPresent()) {
                             //Update transfer
+                            Transfer transfer = match.get();
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + part.getPartQuantity(), transfer.getTransferType(), transfer.getId()));
                         } else {
                             // Add transfer
                             Logic.getTransferManagement().addTransfer(part, part.getPartQuantity(), Transfer.Action.RENEWAL, date);
                         }
                         quantity -= part.getPartQuantity();
+                        part = part.getNextPart();
                     }
                     if (quantity > 0) {
                         Part copyPart = part;
-                        if (ts.get().anyMatch((t) -> t.getPart().equals(copyPart))) {
-                            Transfer transfer = ts.get().filter((t) -> t.getPart().equals(copyPart)).findFirst().get();
+                        Optional<Transfer> match =  TransferDAO.getTransfersByProductAndDate(prod, date).filter(t -> t.getTransferType() == Transfer.Action.RENEWAL).filter(t -> t.getPart().equals(copyPart)).findFirst();
+                        if (match.isPresent()) {
+                            Transfer transfer = match.get();
                             //Update transfer
                             Logic.getTransferManagement().updateTransfer(new Transfer(transfer.getTransferDateTime(), transfer.getPart(), transfer.getPrevPartQuantity(), transfer.getTransferQuantity() + quantity, transfer.getTransferType(), transfer.getId()));
                         } else {

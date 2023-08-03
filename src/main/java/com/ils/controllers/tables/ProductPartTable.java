@@ -24,6 +24,7 @@ import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.converter.DefaultStringConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +128,7 @@ public class ProductPartTable extends Component<Region> {
             }
         });
         defaultPartColumn.setCellFactory(c -> {
-            return new TextFieldTreeTableCell<Object, String>() {
+            return new TextFieldTreeTableCell<Object, String>(new DefaultStringConverter()) {
                 @Override
                 public void updateItem(String item, boolean empty) {
                     boolean def = false;
@@ -137,9 +138,9 @@ public class ProductPartTable extends Component<Region> {
                         setGraphic(null);
                     } else {
                         setText(item.toString());
-                        Object curr = getTreeTableView().getTreeItem(getIndex()).getValue();
-                        if (curr instanceof Part) {
-                            Part pt = (Part) curr;
+                        TreeItem<Object> curr = getTreeTableView().getTreeItem(getIndex());
+                        if (curr != null && curr.getValue() instanceof Part) {
+                            Part pt = (Part) curr.getValue();
                             def = pt.getProduct().getDefaultPart().equals(pt);
                         }
                     }

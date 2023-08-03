@@ -26,7 +26,7 @@ title: User Guide
   - [Export CSV file](#export-csv-file)
   - [Customer statistics](#customer-statistics)
   - [Product/Part statistics](#productpart-statistics)
-  - [Setting default part for a product](#setting-default-part-for-a-product)
+  - [Setting active part for a product](#setting-active-part-for-a-product)
   - [Editing product/part notes](#editing-productpart-notes)
 
 ## Quick Start
@@ -88,7 +88,7 @@ An input box will appear. Enter the product's name and click on the `Save` butto
 
 Note that a customer must be selected before a product can be added.
 
-A new product will be added to the table along with a default part.
+A new product will be added to the table along with a active part.
 
 ![AddProductTable](images/addproducttable.png)
 
@@ -146,7 +146,7 @@ To delete a customer, select the customer in the table and click on the `Delete`
 
 ![DeleteCustomerButton](images/deletebutton.png)
 
-A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
+A confirmation box will appear. Click on the `Confirm` button to confirm the deletion. The section is highlighted in the image below:
 
 ![DeleteCustomerConfirmation](images/deletecustomerconfirmation.png)
 
@@ -158,7 +158,7 @@ To delete a product, select the product in the table and click on the `Delete` b
 
 ![DeleteProductButton](images/deletebutton.png)
 
-A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
+A confirmation box will appear. Click on the `Confirm` button to confirm the deletion. The section is highlighted in the image below:
 
 ![DeleteProductConfirmation](images/deleteproductconfirmation.png)
 
@@ -170,7 +170,7 @@ To delete a part, select the part in the table and click on the `Delete` button 
 
 ![DeletePartButton](images/deletebutton.png)
 
-A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
+A confirmation box will appear. Click on the `Confirm` button to confirm the deletion. The section is highlighted in the image below:
 
 ![DeletePartConfirmation](images/deletepartconfirmation.png)
 
@@ -180,7 +180,7 @@ To delete a transfer, select the transfer in the table and click on the `Delete`
 
 ![DeleteTransferButton](images/deletebutton.png)
 
-A confirmation box will appear. Click on the `Yes` button to confirm the deletion. The section is highlighted in the image below:
+A confirmation box will appear. Click on the `Confirm` button to confirm the deletion. The section is highlighted in the image below:
 
 ![DeleteTransferConfirmation](images/deletetransferconfirmation.png)
 
@@ -248,13 +248,13 @@ The application displays statistics for the selected product/part. The statistic
 
 The statistics are updated whenever a product/part is selected.
 
-### Setting default part for a product
+### Setting active part for a product
 
-To set the default part for a product, select the part in the table and click on the `Set Default Part` at the bottom bar. The section is highlighted in the image below:
+To set the active part for a product, select the part in the table and click on the `Set Active Part` at the bottom bar. The section is highlighted in the image below:
 
 ![SetDefaultPartButton](images/setdefaultpartbutton.png)
 
-The part will be set as the default part for the product and the previous default part will be changed to the next available part.
+The part will be set as the active part for the product and the previous active part will be changed to the next available part.
 
 ### Editing product/part notes
 

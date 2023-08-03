@@ -20,7 +20,7 @@ public class ExportUtil {
 
     static {
         try {
-            printer = new CSVPrinter(new FileWriter(Config.getValue("export.location")), format);
+            printer = new CSVPrinter(new FileWriter(Config.getValue("export.location"), false), format);
         } catch (Exception e) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
                     LocalDateTime.now() + ": Could not create CSVPrinter: " + e.getMessage());
