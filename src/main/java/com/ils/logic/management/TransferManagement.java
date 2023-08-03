@@ -68,7 +68,7 @@ public class TransferManagement {
                 throw new RuntimeException("Updated part not found");
             }
             ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
-                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getId()));
+                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getProductName(), part.getProduct().getProductNotes(), part.getProduct().getId()));
         }
     }
 
@@ -96,7 +96,7 @@ public class TransferManagement {
                 throw new RuntimeException("Updated part not found");
             }
             ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
-                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getId()));
+                    part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getProductName(), part.getProduct().getProductNotes(), part.getProduct().getId()));
         }
     }
 
