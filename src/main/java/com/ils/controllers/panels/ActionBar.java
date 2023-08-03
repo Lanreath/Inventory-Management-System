@@ -144,11 +144,9 @@ public class ActionBar extends Component<Region> {
 
     private void initDates() {
         syncDate.setValue(LocalDate.now());
-        startDatePicker.setValue(Quantities.getFrom().getValue());
-        endDatePicker.setValue(Quantities.getTo().getValue());
         startDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             LocalDate from;
-            if (newValue.isAfter(endDatePicker.getValue())) {
+            if (endDatePicker.getValue() != null && newValue.isAfter(endDatePicker.getValue())) {
                 startDatePicker.setValue(endDatePicker.getValue());
                 from = endDatePicker.getValue();
             } else {
@@ -159,7 +157,7 @@ public class ActionBar extends Component<Region> {
         });
         endDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             LocalDate to;
-            if (newValue.isBefore(startDatePicker.getValue())) {
+            if (startDatePicker.getValue() != null && newValue.isBefore(startDatePicker.getValue())) {
                 endDatePicker.setValue(startDatePicker.getValue());
                 to = startDatePicker.getValue();
             } else {
@@ -168,6 +166,8 @@ public class ActionBar extends Component<Region> {
             Quantities.setTo(to);
             filters.filterTransferByToDate(to);
         });
+        startDatePicker.setValue(Quantities.getFrom().getValue());
+        endDatePicker.setValue(Quantities.getTo().getValue());
     }
 
     private EventHandler<ActionEvent> addCustomerHandler = (event) -> {
