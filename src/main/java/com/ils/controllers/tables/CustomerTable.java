@@ -33,6 +33,10 @@ public class CustomerTable extends Component<Region> {
     @FXML
     private TableColumn<Customer, String> customerNameColumn;
 
+    /**
+     * Constructor.
+     * @param customerManagement
+     */
     public CustomerTable(CustomerManagement customerManagement) {
         super("CustomerTable.fxml");
         this.customerManagement = customerManagement;
@@ -41,19 +45,27 @@ public class CustomerTable extends Component<Region> {
         initFilter();
     }
 
+    /**
+     * Initialize the table and set the items.
+     */
     private void initTable() {
         customerTable.setPrefWidth(100);
         customerTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         customerTable.setItems(this.customerManagement.getCustomers());
         customerTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         this.customerManagement.getCustomers().comparatorProperty().bind(customerTable.comparatorProperty());
-        // this.customerManagement.getSelectedCustomer().addListener(this::handleForcedSelection);
     }
 
+    /**
+     * Initialize the columns.
+     */
     private void initCol() {
         customerNameColumn.setCellValueFactory(new PropertyValueFactory<>("customerName"));
     }
 
+    /**
+     * Initialize the name filter and clear button.
+     */
     private void initFilter() {
         customerNameSearchField.setPromptText("Filter by customer name");
         customerNameSearchField.textProperty().addListener(this::handleNameFilter);
@@ -62,37 +74,40 @@ public class CustomerTable extends Component<Region> {
         clearBtn.setOnAction(clearFilterHandler);
     }
 
+    /**
+     * Get the selection model
+     * @return SelectionModel<Customer> for getting user input
+     */
     public SelectionModel<Customer> getSelectionModel() {
         return customerTable.getSelectionModel();
     }
 
+    /**
+     * Clear the filter and selection.
+     */
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         customerTable.getSelectionModel().clearSelection();
         customerNameSearchField.clear();
     };
 
+    /**
+     * Handle the selection of a customer.
+     * @param observable
+     * @param oldSelection
+     * @param newSelection
+     */
     private void handleSelection(ObservableValue<? extends Customer> observable, Customer oldSelection,
             Customer newSelection) {
         this.customerManagement.selectCustomer(newSelection);
     }
 
+    /**
+     * Handle the name filter.
+     * @param observable
+     * @param oldValue
+     * @param newValue
+     */
     private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         this.customerManagement.setCustomerNameFilter(newValue);
     }
-
-    // private void handleForcedSelection(ObservableValue<? extends Customer> observable, Customer oldSelection,
-    //         Customer newSelection) {
-    //     if (newSelection == null) {
-    //         customerTable.getSelectionModel().clearSelection();
-    //         return;
-    //     }
-    //     // Check for customer tableitem
-    //     Optional<Customer> customer = customerTable.getItems().stream().filter(c -> c.equals(newSelection)).findFirst();
-    //     if (!customer.isPresent()) {
-    //         // Customer not found in table
-    //         throw new RuntimeException("Customer not found in table");
-    //     }
-    //     // Select customer
-    //     customerTable.getSelectionModel().select(customer.get());
-    // }
 }

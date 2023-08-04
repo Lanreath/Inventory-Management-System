@@ -15,11 +15,13 @@ import com.ils.logic.DAO.PartDAO;
 import com.ils.models.Customer;
 
 public class ExportUtil {
+    // Define the CSV format.
     private static final CSVFormat format = CSVFormat.EXCEL;
     private static CSVPrinter printer;
 
     static {
         try {
+            // Create a new CSVPrinter and set the file location.
             printer = new CSVPrinter(new FileWriter(Config.getValue("export.location"), false), format);
         } catch (Exception e) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
@@ -27,6 +29,10 @@ public class ExportUtil {
         }
     }
 
+    /**
+     * Export an array of objects to CSV.
+     * @param list
+     */
     private static void exportArray(Object[] list) {
         try {
             printer.printRecord(list);
@@ -36,7 +42,13 @@ public class ExportUtil {
         }
     }
 
+    /**
+     * Export a monthly report for a customer.
+     * @param cust
+     * @throws IOException
+     */
     public static void exportMonthlyReport(Customer cust) throws IOException {
+        // Check if customer is null
         if (cust == null) {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE,
                     LocalDateTime.now() + ": Could not export monthly report: Customer is null");
@@ -62,6 +74,7 @@ public class ExportUtil {
             row[10] = Integer.toString(Quantities.getProjectTransferSumByPart(p));
             row[11] = Integer.toString(Quantities.getRejectProjectTransferSumByPart(p));
             row[12] = Integer.toString(Quantities.getClosingBalByPart(p));
+            // Export the row
             exportArray(row);
         });
         printer.close();

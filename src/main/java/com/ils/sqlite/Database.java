@@ -16,9 +16,13 @@ import com.ils.MainApp;
 import com.ils.models.Model;
 
 public abstract class Database {
-
+    // Class variables
     private static final Class<?>[] requiredTables = Model.getModels().toArray(Class[]::new);
 
+    /**
+     * Check if the SQLite drivers are available.
+     * @return boolean
+     */
     private static boolean checkDrivers() {
         try {
             DriverManager.registerDriver(new org.sqlite.JDBC());
@@ -29,6 +33,10 @@ public abstract class Database {
         }
     }
 
+    /**
+     * Connects to the SQLite database.
+     * @return Connection
+     */
     public static Connection connect() {
         String location = Config.getValue("sqlite.location");
         try {
@@ -45,11 +53,18 @@ public abstract class Database {
         }
     }
 
+    /**
+     * Check if the SQLite connection is available.
+     * @return boolean 
+     */
     private static boolean checkConnection() {
         Connection connection = connect();
         return connection != null;
     }
 
+    /**
+     * Check if the SQLite schemas match the current models.
+     */
     private static void checkTables() {
         String checkTables = "SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%'";
         try (Connection connection = Database.connect()) {
@@ -86,6 +101,10 @@ public abstract class Database {
         }
     }
 
+    /**
+     * Check if the database is ready to be used.
+     * @return boolean
+     */
     public static boolean isOK() {
         if (!checkDrivers()) {
             return false;

@@ -51,6 +51,11 @@ public class ProductPartTable extends Component<Region> {
     @FXML
     private TreeTableColumn<Object, Integer> quantityColumn;
 
+    /**
+     * Constructor.
+     * @param productManagement
+     * @param partManagement
+     */
     public ProductPartTable(ProductManagement productManagement,
             PartManagement partManagement) {
         super("ProductPartTable.fxml");
@@ -65,6 +70,9 @@ public class ProductPartTable extends Component<Region> {
         initFilters();
     }
 
+    /**
+     * Initialize the table and set the items.
+     */
     private void initTable() {
         treeTable.setColumnResizePolicy(TreeTableView.CONSTRAINED_RESIZE_POLICY);
         treeTable.setShowRoot(false);
@@ -73,6 +81,9 @@ public class ProductPartTable extends Component<Region> {
         treeTable.setRoot(root);
     }
 
+    /**
+     * Initialize the listeners for selection, filter, product and part changes.
+     */
     private void initListeners() {
         treeTable.getSelectionModel().selectedItemProperty().addListener(this::handleSelection);
         this.productManagement.getProducts().addListener(new ListChangeListener<Product>() {
@@ -95,7 +106,11 @@ public class ProductPartTable extends Component<Region> {
         });
     }
 
+    /**
+     * Initialise product column
+     */
     private void initProductColumn() {
+        // Show product database names and not parts
         dbNameColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
@@ -107,10 +122,13 @@ public class ProductPartTable extends Component<Region> {
         });
     }
 
+    /**
+     * Initialise part column
+     */
     private void initPartColumn() {
         final PseudoClass defaultPart = PseudoClass.getPseudoClass("default-part");
-
         defaultPartColumn.setSortable(false);
+        // Show product names and part names
         defaultPartColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
@@ -127,6 +145,7 @@ public class ProductPartTable extends Component<Region> {
                 throw new RuntimeException("Unknown row item type");
             }
         });
+        // Highlight default parts
         defaultPartColumn.setCellFactory(c -> {
             return new TextFieldTreeTableCell<Object, String>(new DefaultStringConverter()) {
                 @Override
@@ -148,6 +167,7 @@ public class ProductPartTable extends Component<Region> {
                 }
             };
         });
+        // Enable part name editing
         defaultPartColumn.setOnEditCommit((TreeTableColumn.CellEditEvent<Object, String> event) -> {
             Object prpt = event.getTreeTableView().getTreeItem(event.getTreeTablePosition().getRow()).getValue();
             if (prpt instanceof Part) {
@@ -163,8 +183,12 @@ public class ProductPartTable extends Component<Region> {
         });
     }
 
+    /**
+     * Intialise quantity column
+     */
     private void initQuantityColumn() {
         quantityColumn.setSortable(false);
+        // Show product quantities and part quantities
         quantityColumn.setCellValueFactory(cellData -> {
             TreeItem<Object> rowItem = cellData.getValue();
             if (rowItem != null && rowItem.getValue() instanceof Product) {
@@ -179,6 +203,9 @@ public class ProductPartTable extends Component<Region> {
         });
     }
 
+    /**
+     * Initialise the name filter and clear button.
+     */
     private void initFilters() {
         dbNameSearchField.setPromptText("Filter by product name");
         dbNameSearchField.textProperty().addListener(this::handleNameFilter);
@@ -187,15 +214,28 @@ public class ProductPartTable extends Component<Region> {
         clearBtn.setOnAction(clearFilterHandler);
     }
 
+    /**
+     * Get the selection model
+     * @return TreeTableViewSelectionModel<Object> for getting user input
+     */
     public TreeTableViewSelectionModel<Object> getSelectionModel() {
         return treeTable.getSelectionModel();
     }
 
+    /**
+     * Clear the filter and selection
+     */
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         treeTable.getSelectionModel().clearSelection();
         dbNameSearchField.clear();
     };
 
+    /**
+     * Handle selection of product/part
+     * @param observable
+     * @param oldSelection
+     * @param newSelection
+     */
     private void handleSelection(ObservableValue<? extends TreeItem<Object>> observable, TreeItem<Object> oldSelection,
             TreeItem<Object> newSelection) {
         if (newSelection != null && newSelection.getValue() instanceof Product) {
@@ -212,46 +252,33 @@ public class ProductPartTable extends Component<Region> {
         }
     }
 
+    /**
+     * Handle the name filter
+     * @param observable
+     * @param oldValue
+     * @param newValue
+     */
     private void handleNameFilter(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         this.productManagement.setProductNameFilter(newValue);
         rebuild();
     }
-
-    // private void handleForcedSelection(ObservableValue<? extends Product>
-    // observable, Product oldValue,
-    // Product newValue) {
-    // if (newValue == null) {
-    // treeTable.getSelectionModel().clearSelection();
-    // return;
-    // }
-    // // Check for product in treetable
-    // Optional<TreeItem<Object>> prod =
-    // treeTable.getRoot().getChildren().stream().filter(item -> {
-    // if (item.getValue() instanceof Product) {
-    // Product product = (Product) item.getValue();
-    // return product.equals(newValue);
-    // } else {
-    // return false;
-    // }
-    // }).findFirst();
-    // if (!prod.isPresent()) {
-    // // Product not found
-    // throw new RuntimeException("Product not found in treetable");
-    // }
-    // // Select product
-    // treeTable.getSelectionModel().select(prod.get());
-    // }
-
+    
+    /**
+     * Rebuild the tree view
+     */
     private void rebuild() {
         TreeItem<Object> root = treeTable.getRoot();
         root.getChildren().clear();
+        // Iterate through all products
         for (Product product : this.productManagement.getProducts()) {
+            // Product
             TreeItem<Object> productItem = new TreeItem<>(product);
             root.getChildren().add(productItem);
             // List of linked parts
             List<Integer> linkedParts = new ArrayList<>();
             Part start = product.getDefaultPart();
             while (start != null) {
+                // Add parts as product children
                 linkedParts.add(start.getId());
                 TreeItem<Object> partItem = new TreeItem<>(start);
                 productItem.getChildren().add(partItem);

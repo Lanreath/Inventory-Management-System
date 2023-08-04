@@ -23,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 
 public class PartDAO {
+    // Database table name and column names
     private static final String tableName = "PART";
     private static final String nameColumn = "PARTNAME";
     private static final String creationDateTimeColumn = "CREATIONDATETIME";
@@ -34,6 +35,7 @@ public class PartDAO {
 
     private static final ObservableList<Part> parts;
 
+    // Update the parts list and proudct default parts from the database then update the next parts
     static {
         parts = FXCollections.observableArrayList();
         updatePartsFromDB();
@@ -41,14 +43,26 @@ public class PartDAO {
         updateNextParts();
     }
 
+    /**
+     * Get a list of all parts.
+     * @return ObservableList<Part> 
+     */
     public static ObservableList<Part> getAllParts() {
         return FXCollections.observableArrayList(parts);
     }
 
+    /**
+     * Get a filter wrapper around the parts list.
+     * @return FilteredList<Part> using parts list as source
+     */
     public static FilteredList<Part> getParts() {
         return new FilteredList<>(parts);
     }
 
+    /**
+     * Update the parts list from the database.
+     * @throws SQLException
+     */
     private static void updatePartsFromDB() {
         String query = "SELECT * FROM " + tableName;
         try (Connection connection = Database.connect()) {
@@ -96,6 +110,9 @@ public class PartDAO {
         }
     }
 
+    /**
+     * Update the next parts of all parts in the parts list.
+     */
     private static void updateNextParts() {
         ObservableList<Part> copy = FXCollections.observableArrayList(parts);
         copy.forEach(part -> {
@@ -113,22 +130,50 @@ public class PartDAO {
         });
     }
 
+    /**
+     * Get a part by id.
+     * @param id
+     * @return Optional<Part>
+     */
     public static Optional<Part> getPart(int id) {
         return parts.stream().filter(part -> part.getId() == id).findFirst();
     }
 
+    /**
+     * Get a part by name and product.
+     * @param partName
+     * @param product
+     * @return Optional<Part>
+     */
     public static Optional<Part> getPartByNameAndProduct(String partName, Product product) {
         return parts.stream().filter(part -> part.getPartName().equals(partName) && part.getProduct().equals(product)).findFirst();
     }
 
+    /**
+     * Get a stream of parts by product.
+     * @param product
+     * @return Stream<Part>
+     */
     public static Stream<Part> getPartsByProduct(Product product) {
         return parts.stream().filter(part -> part.getProduct().equals(product));
     }
 
+    /**
+     * Get a stream of parts by customer.
+     * @param customer
+     * @return Stream<Part>
+     */
     public static Stream<Part> getPartsByCustomer(Customer customer) {
         return parts.stream().filter(part -> part.getProduct().getCustomer().equals(customer));
     }
 
+    /**
+     * Insert a new part into the database and parts list.
+     * @param partName
+     * @param quantity
+     * @param product
+     * @return int id
+     */
     public static int insertPart(String partName, int quantity, Product product) {
         LocalDateTime now = LocalDateTime.now();
         int id = (int) CRUDUtil.create(
@@ -140,6 +185,10 @@ public class PartDAO {
         return id;
     }
 
+    /**
+     * Update a part in the database and parts list.
+     * @param newPart
+     */
     public static void updatePart(Part newPart) {
         int rows;
         if (newPart.getNextPart() != null) {
@@ -178,6 +227,10 @@ public class PartDAO {
         });
     }
 
+    /**
+     * Delete a part from the database and parts list.
+     * @param id
+     */
     public static void deletePart(int id) {
         CRUDUtil.delete(tableName, id);
         Optional<Part> part = getPart(id);

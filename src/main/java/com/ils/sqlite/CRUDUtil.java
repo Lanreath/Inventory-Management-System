@@ -15,8 +15,19 @@ import java.util.logging.Logger;
 import com.ils.MainApp;
 
 public abstract class CRUDUtil {
+    // Columns that are optional
     private static final List<String> nullableColumns = Arrays.asList("defaultPart", "productName", "nextPart", "productNotes", "partNotes");
 
+    /**
+     * Read a value from the SQLite database.
+     * @param tableName
+     * @param fieldName
+     * @param fieldDataType
+     * @param indexFieldName
+     * @param indexDataType
+     * @param index
+     * @return object that was read
+     */
     public static Object read(String tableName, String fieldName, int fieldDataType,
             String indexFieldName, int indexDataType, Object index) {
         StringBuilder queryBuilder = new StringBuilder("Select ");
@@ -50,6 +61,17 @@ public abstract class CRUDUtil {
         }
     }
 
+    /**
+     * Update a value in the SQLite database.
+     * @param tableName
+     * @param columns
+     * @param values
+     * @param types
+     * @param indexFieldName
+     * @param indexDataType
+     * @param index
+     * @return id of the updated row
+     */
     public static int update(String tableName, String[] columns, Object[] values, int[] types,
             String indexFieldName, int indexDataType, Object index) {
 
@@ -78,6 +100,14 @@ public abstract class CRUDUtil {
         }
     }
 
+    /**
+     * Insert a value into the SQLite database.
+     * @param tableName
+     * @param columns
+     * @param values
+     * @param types
+     * @return id of the inserted row
+     */
     public static long create(String tableName, String[] columns, Object[] values, int[] types) {
         int number = Math.min(Math.min(columns.length, values.length), types.length);
 
@@ -134,6 +164,12 @@ public abstract class CRUDUtil {
         return -1;
     }
 
+    /**
+     * Delete a value from the SQLite database.
+     * @param tableName
+     * @param id
+     * @return number of affected rows
+     */
     public static int delete(String tableName, int id) {
         String sql = "DELETE FROM " + tableName + " WHERE " + tableName + "ID = ?";
 
@@ -151,6 +187,10 @@ public abstract class CRUDUtil {
         }
     }
 
+    /**
+     * Create a table in the SQLite database.
+     * @param model
+     */
     public static void createTable(Class<?> model) {
         Field[] fields = model.getDeclaredFields();
         StringBuilder queryBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
@@ -203,6 +243,12 @@ public abstract class CRUDUtil {
         }
     }
 
+    /**
+     * Convert an object to a SQL field.
+     * @param value
+     * @param type
+     * @return SQL field
+     */
     private static String convertObjectToSQLField(Object value, int type) {
         StringBuilder queryBuilder = new StringBuilder();
         switch (type) {

@@ -13,6 +13,7 @@ public class Logic {
 	private static TransferManagement transferManagement;
 
 	static {
+		// Initialize the logic.
 		filters = new Filters();
 		customerManagement = new CustomerManagement(filters);
 		productManagement = new ProductManagement(filters);
@@ -20,22 +21,42 @@ public class Logic {
 		transferManagement = new TransferManagement(filters);
 	}
 
+	/**
+	 * Get the customer management.
+	 * @return CustomerManagement
+	 */
 	public static CustomerManagement getCustomerManagement() {
 		return customerManagement;
 	}
 
+	/**
+	 * Get the product management.
+	 * @return ProductManagement
+	 */
 	public static ProductManagement getProductManagement() {
 		return productManagement;
 	}
 
+	/**
+	 * Get the part management.
+	 * @return PartManagement
+	 */
 	public static PartManagement getPartManagement() {
 		return partManagement;
 	}
 
+	/**
+	 * Get the transfer management.
+	 * @return TransferManagement
+	 */
 	public static TransferManagement getTransferManagement() {
 		return transferManagement;
 	}
 
+	/**
+	 * Get the filters.
+	 * @return Filters
+	 */
 	public static Filters getFilters() {
 		return filters;
 	}

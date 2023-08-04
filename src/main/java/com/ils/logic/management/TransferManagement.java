@@ -20,6 +20,10 @@ public class TransferManagement {
     private FilteredList<Transfer> transferFilteredList;
     private SortedList<Transfer> transferSortedList;
 
+    /**
+     * Create a new TransferManagement object.
+     * @param filters
+     */
     public TransferManagement(Filters filters) {
         this.filters = filters;
         this.transferFilteredList = TransferDAO.getTransfers();
@@ -32,10 +36,18 @@ public class TransferManagement {
                 filters.getTransferProductFilter(), filters.getTransferPartFilter()));
     }
 
+    /**
+     * Get a sorted list of transfers.
+     * @return SortedList<Transfer> using transferFilteredList as source
+     */
     public SortedList<Transfer> getTransfers() {
         return this.transferSortedList;
     }
 
+    /**
+     * Set the transfer type filter
+     * @param type
+     */
     public void setTransferActionFilter(Transfer.Action type) {
         if (type == null) {
             filters.clearTransferActionFilter();
@@ -44,8 +56,16 @@ public class TransferManagement {
         filters.filterTransferByAction(type);
     }
 
+    /**
+     * Add a transfer to the database.
+     * @param part
+     * @param quantity
+     * @param action
+     */
     public void addTransfer(Part part, int quantity, Transfer.Action action) {
+        // Insert transfer
         TransferDAO.insertTransfer(part, quantity, action);
+        // Update part quantity
         switch (action) {
             case DAILY:
             case DESTRUCT:
@@ -67,13 +87,22 @@ public class TransferManagement {
             if (!newDefault.isPresent()) {
                 throw new RuntimeException("Updated part not found");
             }
+            // Update default
             ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
                     part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getProductName(), part.getProduct().getProductNotes(), part.getProduct().getId()));
         }
     }
 
+    /**
+     * Add a transfer to the database.
+     * @param part
+     * @param quantity
+     * @param action
+     * @param date
+     */
     public void addTransfer(Part part, int quantity, Transfer.Action action, LocalDate date) {
         TransferDAO.insertTransfer(part, quantity, action, date);
+        // Update part quantity
         switch (action) {
             case DAILY:
             case DESTRUCT:
@@ -95,13 +124,19 @@ public class TransferManagement {
             if (!newDefault.isPresent()) {
                 throw new RuntimeException("Updated part not found");
             }
+            // Update default
             ProductDAO.updateProduct(new Product(part.getProduct().getDBName(), part.getProduct().getCreationDateTime(),
                     part.getProduct().getCustomer(), newDefault.get(), part.getProduct().getProductName(), part.getProduct().getProductNotes(), part.getProduct().getId()));
         }
     }
 
+    /**
+     * Update a transfer in the database.
+     * @param transfer
+     */
     public void updateTransfer(Transfer transfer) {
         TransferDAO.updateTransfer(transfer);
+        // Update part quantity and transfer previous quantity
         switch (transfer.getTransferType()) {
             case DAILY:
             case DESTRUCT:
@@ -146,7 +181,12 @@ public class TransferManagement {
         }
     }
 
+    /**
+     * Delete a transfer from the database.
+     * @param transfer
+     */
     public void deleteTransfer(Transfer transfer) {
+        // Update part quantity and transfer previous quantity
         switch (transfer.getTransferType()) {
             case DAILY:
             case DESTRUCT:
@@ -180,6 +220,7 @@ public class TransferManagement {
                         transfer.getPart().getPartQuantity() - transfer.getTransferQuantity());
                 break;
         }
+        // Delete transfer
         TransferDAO.deleteTransfer(transfer.getId());
     }
 }

@@ -24,6 +24,10 @@ public class ProductManagement {
     private FilteredList<Product> productFilteredList;
     private SortedList<Product> productSortedList;
 
+    /**
+     * Create a new ProductManagement object.
+     * @param filters
+     */
     public ProductManagement(Filters filters) {
         this.filters = filters;
         this.productFilteredList = ProductDAO.getProducts();
@@ -34,18 +38,34 @@ public class ProductManagement {
                         filters.getDBNameFilter(), filters.getProductCustomerFilter()));
     }
 
+    /**
+     * Get a sorted list of products.
+     * @return SortedList<Product> using productFilteredList as source
+     */
     public SortedList<Product> getProducts() {
         return this.productSortedList;
     }
 
+    /**
+     * Get the database name filter.
+     * @return ObjectProperty<Predicate<Product>>
+     */
     public ObjectProperty<Predicate<Product>> getDBNameFilter() {
         return filters.getDBNameFilter();
     }
 
+    /**
+     * Get the customer filter.
+     * @return ObjectProperty<Predicate<Product>>
+     */
     public ObjectProperty<Predicate<Product>> getProductCustomerFilter() {
         return filters.getProductCustomerFilter();
     }
 
+    /**
+     * Set the product name filter.
+     * @param name
+     */
     public void setProductNameFilter(String name) {
         if (name == null) {
             filters.clearDBNameFilter();
@@ -54,18 +74,22 @@ public class ProductManagement {
         filters.filterProductByName(name);
     }
 
+    /**
+     * Insert a new product into the database.
+     * @param name
+     * @param customer
+     */
     public void addProduct(String name, Customer customer) {
         ProductDAO.insertProduct(name, customer);
         Optional<Product> prod = ProductDAO.getProductByDBName(name);
         Logic.getPartManagement().addPart("Default", 0, prod.get());
-        // Not needed because addPart already sets the default part
-        // Optional<Part> part = PartDAO.getPartByNameAndProduct("Default", prod.get());
-        // Product updatedProd = new Product(prod.get().getDBName(), prod.get().getCreationDateTime(),
-        //         prod.get().getCustomer(), part.get(), prod.get().getId());
-        // ProductDAO.updateProduct(updatedProd);
-        // part.get().getProduct().setDefaultPart(part.get());
     }
 
+    /**
+     * Update a product's name in the database.
+     * @param product
+     * @param name
+     */
     public void updateProductName(Product product, String name) {
         Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(),
                 product.getDefaultPart(), name, product.getProductNotes(), product.getId());
@@ -93,9 +117,14 @@ public class ProductManagement {
                 TransferDAO.updateTransfer(newTransfer);
             }
         }
+        // Update with new product
         ProductDAO.updateProduct(newProd);
     }
 
+    /**
+     * Delete a product from the database.
+     * @param product
+     */
     public void deleteProduct(Product product) {
         List<Part> list = PartDAO.getPartsByProduct(product).collect(Collectors.toList());
         for (Part part : list) {
@@ -104,6 +133,10 @@ public class ProductManagement {
         ProductDAO.deleteProduct(product.getId());
     }
 
+    /**
+     * Set the transfer product filter.
+     * @param product
+     */
     public void selectProduct(Product product) {
         if (product == null) {
             filters.clearTransferProductFilter();
@@ -112,6 +145,11 @@ public class ProductManagement {
         filters.filterTransferByProduct(product);
     }
 
+    /**
+     * Update a product's notes in the database.
+     * @param product
+     * @param notes
+     */
     public void updateProductNotes(Product product, String notes) {
         Product newProd = new Product(product.getDBName(), product.getCreationDateTime(), product.getCustomer(),
                 product.getDefaultPart(), product.getProductName(), notes, product.getId());
@@ -140,6 +178,10 @@ public class ProductManagement {
         ProductDAO.updateProduct(newProd);
     }
 
+    /**
+     * Update a product's default part in the database.
+     * @param newDefault
+     */
     public void updateDefaultPart(Part newDefault) {
         if (newDefault.getProduct().getDefaultPart() != null && newDefault.getProduct().getDefaultPart().equals(newDefault)) {
             return;

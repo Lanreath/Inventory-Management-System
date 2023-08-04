@@ -40,6 +40,10 @@ public class TransferTable extends Component<Region> {
     @FXML
     private TableColumn<Transfer, Transfer.Action> transferTypeColumn;
 
+    /**
+     * Constructor.
+     * @param transferManagement
+     */
     public TransferTable(TransferManagement transferManagement) {
         super("TransferTable.fxml");
         this.transferManagement = transferManagement;
@@ -48,6 +52,9 @@ public class TransferTable extends Component<Region> {
         initFilters();
     }
 
+    /**
+     * Initialise the table and set the items.
+     */
     private void initTable() {
         transferTable.setPrefWidth(300);
         transferTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -55,11 +62,15 @@ public class TransferTable extends Component<Region> {
         this.transferManagement.getTransfers().comparatorProperty().bind(transferTable.comparatorProperty());
     }
 
+    /**
+     * Initialise the columns.
+     */
     private void initCol() {
         transferDateTimeColumn.setCellValueFactory(new PropertyValueFactory<>("transferDateTime"));
         transferQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("transferQuantity"));
         transferTypeColumn.setCellValueFactory(new PropertyValueFactory<>("transferType"));
         transferDateTimeColumn.setCellFactory(column -> new TableCell<Transfer, LocalDateTime>(){
+            // DateTime formatting
             @Override
             protected void updateItem(LocalDateTime item, boolean empty) {
                 super.updateItem(item, empty);
@@ -72,6 +83,9 @@ public class TransferTable extends Component<Region> {
         });
     }
 
+    /**
+     * Initialise the transfer type filter and clear button
+     */
     private void initFilters() {
         transferTypeComboBox.getItems().addAll(Transfer.Action.values());
         transferTypeComboBox.getSelectionModel().selectedItemProperty().addListener(this::handleTypeFilter);
@@ -81,15 +95,28 @@ public class TransferTable extends Component<Region> {
         clearBtn.setOnAction(clearFilterHandler);
     }
 
+    /**
+     * Get the selection model
+     * @return SelectionModel<Transfer> for getting user input
+     */
     public SelectionModel<Transfer> getSelectionModel() {
         return transferTable.getSelectionModel();
     }
 
+    /**
+     * Clear the filter and selection
+     */
     private EventHandler<ActionEvent> clearFilterHandler = (event) -> {
         transferTable.getSelectionModel().clearSelection();
         transferTypeComboBox.getSelectionModel().clearSelection();
     };
 
+    /**
+     * Handle the transfer type filter
+     * @param observable
+     * @param oldValue
+     * @param newValue
+     */
     private void handleTypeFilter(ObservableValue<? extends Transfer.Action> observable, Transfer.Action oldValue, Transfer.Action newValue) {
         transferManagement.setTransferActionFilter(newValue);
     }

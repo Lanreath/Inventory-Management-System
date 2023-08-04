@@ -18,6 +18,10 @@ public class CustomerManagement {
     private SortedList<Customer> customerSortedList;
     private Customer selectedCustomer;
 
+    /**
+     * Create a new CustomerManagement object.
+     * @param filters
+     */
     public CustomerManagement(Filters filters) {
         this.filters = filters;
         this.customerFilteredList = CustomerDAO.getCustomers();
@@ -25,14 +29,27 @@ public class CustomerManagement {
         customerFilteredList.predicateProperty().bind(filters.getCustomerNameFilter());
     }
 
+    /**
+     * Get a sorted list of customers.
+     * @return SortedList<Customer> using customerFilteredList as source
+     */
     public SortedList<Customer> getCustomers() {
         return this.customerSortedList;
     }
 
+    /**
+     * Add a new customer to the database.
+     * @param name
+     */
     public void addCustomer(String name) {
         CustomerDAO.insertCustomer(name);
     }
 
+    /**
+     * Update a customer in the database.
+     * @param customer
+     * @param name
+     */
     public void updateCustomer(Customer customer, String name) {
         CustomerDAO.updateCustomer(new Customer(name, customer.getCreationDateTime(), customer.getId()));
         Customer cust = CustomerDAO.getCustomer(customer.getId()).get();
@@ -42,6 +59,10 @@ public class CustomerManagement {
         }
     }
 
+    /**
+     * Delete a customer from the database.
+     * @param customer
+     */
     public void deleteCustomer(Customer customer) {
         List<Product> list = ProductDAO.getProducts().stream().filter(p -> p.getCustomer().equals(customer))
                 .collect(Collectors.toList());
@@ -51,6 +72,10 @@ public class CustomerManagement {
         CustomerDAO.deleteCustomer(customer.getId());
     }
 
+    /**
+     * Select a customer for filtering.
+     * @param customer
+     */
     public void selectCustomer(Customer customer) {
         if (customer == null) {
             this.selectedCustomer = null;
@@ -63,6 +88,10 @@ public class CustomerManagement {
         filters.filterTransferByCustomer(customer);
     }
 
+    /**
+     * Set the customer name filter.
+     * @param name
+     */
     public void setCustomerNameFilter(String name) {
         if (name == null) {
             filters.clearCustomerNameFilter();
@@ -71,6 +100,10 @@ public class CustomerManagement {
         filters.filterCustomerByName(name);
     }
 
+    /**
+     * Get the selected customer.
+     * @return Customer
+     */
     public Customer getSelectedCustomer() {
         return this.selectedCustomer;
     }

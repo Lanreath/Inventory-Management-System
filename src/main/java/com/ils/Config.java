@@ -15,6 +15,9 @@ public abstract class Config {
     private static Logger logger;
     private static FileHandler fh;
 
+    /**
+     * Load the database properties file and initialize the logger.
+     */
     public static void init() {
         try {
             prop = new Properties();
@@ -36,6 +39,11 @@ public abstract class Config {
         logger.info("Starting ILS...");
     }
 
+    /**
+     * Get the value of a property from the database properties file.
+     * @param property
+     * @return String of the property value
+     */
     public static String getValue(String property) {
         return prop.getProperty(property);
     }

@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 
 public class CustomerDAO {
+    // Database table name and column names
     private static final String tableName = "CUSTOMER";
     private static final String nameColumn = "CUSTOMERNAME";
     private static final String creationDateTimeColumn = "CREATIONDATETIME";
@@ -32,10 +33,18 @@ public class CustomerDAO {
         updateCustomersFromDB();
     }
 
+    /** 
+     * Get a filter wrapper around the customers list.
+     * @return FilteredList<Customer> using customers list as source
+     */
     public static FilteredList<Customer> getCustomers() {
         return new FilteredList<Customer>(customers);
     }
 
+    /**
+     * Update the customers list from the database.
+     * @throws SQLException
+     */
     private static void updateCustomersFromDB() {
         String query = "SELECT * FROM " + tableName;
         try (Connection connection = Database.connect()) {
@@ -58,6 +67,12 @@ public class CustomerDAO {
         }
     }
 
+    
+    /** 
+     * Get a customer by id.
+     * @param id
+     * @return Optional<Customer>
+     */
     public static Optional<Customer> getCustomer(int id) {
         for (Customer customer : customers) {
             if (customer.getId() == id) {
@@ -66,7 +81,12 @@ public class CustomerDAO {
         }
         return Optional.empty();
     }
-
+    
+    /** 
+     * Get a customer by name.
+     * @param customerName
+     * @return Optional<Customer>
+     */
     public static Optional<Customer> getCustomer(String customerName) {
         for (Customer customer : customers) {
             if (customer.getCustomerName().equals(customerName)) {
@@ -76,12 +96,20 @@ public class CustomerDAO {
         return Optional.empty();
     }
 
+    /**
+     * Insert a new customer into the database and update the customers list.
+     * @param customerName
+     */
     public static void insertCustomer(String customerName) {
         LocalDateTime now = LocalDateTime.now();
         int id = (int) CRUDUtil.create(tableName, new String[]{nameColumn, creationDateTimeColumn}, new Object[]{customerName, now}, new int[]{Types.VARCHAR, Types.TIMESTAMP});
         customers.add(new Customer(customerName, now, id));
     }
 
+    /**
+     * Update a customer in the database and update the customers list.
+     * @param newCustomer
+     */
     public static void updateCustomer(Customer newCustomer) {
         int rows = CRUDUtil.update(
             tableName,
@@ -107,6 +135,10 @@ public class CustomerDAO {
         });
     }
 
+    /**
+     * Delete a customer from the database and update the customers list.
+     * @param id
+     */
     public static void deleteCustomer(int id) {
         CRUDUtil.delete(tableName, id);
 

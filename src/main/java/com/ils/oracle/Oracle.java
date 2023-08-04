@@ -11,6 +11,10 @@ import com.ils.Config;
 import com.ils.MainApp;
 
 public abstract class Oracle {
+    /**
+     *  Check if the Oracle drivers are available.
+     * @return boolean
+     */
     private static boolean checkDrivers() {
         try {
             DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
@@ -22,6 +26,10 @@ public abstract class Oracle {
         }
     }
 
+    /**
+     * Connect to the Oracle database.
+     * @return Connection
+     */
     protected static Connection connect() {
         String username = Config.getValue("oracle.username");
         String password = Config.getValue("oracle.password");
@@ -37,6 +45,10 @@ public abstract class Oracle {
         return connection;
     }
 
+    /**
+     * Check if the Oracle connection is available.
+     * @return boolean
+     */
     private static boolean checkConnection() {
         try (Connection connection = connect()) {
             return connection != null;
@@ -47,6 +59,10 @@ public abstract class Oracle {
         }
     }
 
+    /**
+     * Check if Oracle is available.
+     * @return boolean
+     */
     public static boolean isOK() {
         String offline = Config.getValue("enable_offline");
         if (offline.equals("true")) {

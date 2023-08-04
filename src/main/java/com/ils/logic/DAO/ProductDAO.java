@@ -23,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 
 public class ProductDAO {
+    // Database table name and column names
     private static final String tableName = "PRODUCT";
     private static final String dbNameColumn = "DBNAME";
     private static final String creationDateTimeColumn = "CREATIONDATETIME";
@@ -39,10 +40,17 @@ public class ProductDAO {
         updateProductsFromDB();
     }
 
+    /**
+     * Get a filter wrapper around the products list.
+     * @return FilteredList<Product> using products list as source
+     */
     public static FilteredList<Product> getProducts() {
         return new FilteredList<>(products);
     }
 
+    /**
+     * Update the products list from the database.
+     */
     private static void updateProductsFromDB() {
         String query = "SELECT * FROM " + tableName;
         try (Connection connection = Database.connect()) {
@@ -73,6 +81,9 @@ public class ProductDAO {
         }
     };
 
+    /**
+     * Update the database with the default part id for each product.
+     */
     protected static void updateDefaultParts() {
         ObservableList<Product> copyProducts = FXCollections.observableArrayList(products);
         copyProducts.forEach((product) -> {
@@ -86,24 +97,48 @@ public class ProductDAO {
         });
     }
 
+    /**
+     * Get a product by id.
+     * @param id
+     * @return Optional<Product>
+     */
     public static Optional<Product> getProduct(int id) {
         return products.stream().filter((product) -> product.getId() == id).findFirst();
     }
 
+    /**
+     * Get a product by database name.
+     * @param name
+     * @return Optional<Product>
+     */
     public static Optional<Product> getProductByDBName(String name) {
         return products.stream().filter((product) -> product.getDBName().equals(name)).findFirst();
     }
 
+    /**
+     * Get a stream of products by customer.
+     * @param customer
+     * @return Stream<Product>
+     */
     public static Stream<Product> getProductsByCustomer(Customer customer) {
         return products.stream().filter((product) -> product.getCustomer().equals(customer));
     }
 
+    /**
+     * Insert a new product into the database.
+     * @param dbName
+     * @param customer
+     */
     public static void insertProduct(String dbName, Customer customer) {
         LocalDateTime now = LocalDateTime.now();
         int id = (int) CRUDUtil.create(tableName, new String[]{dbNameColumn, creationDateTimeColumn, customerIdColumn}, new Object[]{dbName, now, customer.getId()}, new int[]{Types.VARCHAR, Types.TIMESTAMP, Types.INTEGER});
         products.add(new Product(dbName, now, customer, id));
     }
 
+    /**
+     * Update a product in the database.
+     * @param newProduct
+     */
     public static void updateProduct(Product newProduct) {
         int rows;
         if (newProduct.getDefaultPart() != null) {
@@ -142,6 +177,10 @@ public class ProductDAO {
         });
     }
 
+    /**
+     * Delete a product from the database.
+     * @param id
+     */
     public static void deleteProduct(int id) {
         CRUDUtil.delete(tableName, id);
 

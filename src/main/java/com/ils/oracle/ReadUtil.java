@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import com.ils.MainApp;
 
 public class ReadUtil {
+    // CTE
     private static final String cte = "WITH summary AS (\r\n";
     private static final String customerName = "case\r\n" + //
         "when co.customername = 'CCL_APAC'\r\n" + //
@@ -119,7 +120,7 @@ public class ReadUtil {
     private static final String join2 = ", 'DD/MM/YY')\r\n";
     private static final String daily = "and get_token(pr.productname, 5,'_') != 'RNW'\r\n";
     private static final String renewal = "and get_token(pr.productname, 5,'_') = 'RNW'\r\n";
-
+    // Union
     private static final String union1 = "SELECT\r\n" + //
         "customer, vaultname, SUM(qty) AS qty\r\n" + //
         "FROM (\r\n" + //
@@ -136,6 +137,10 @@ public class ReadUtil {
         "GROUP BY customer, vaultname\r\n";
     private static final String order = "ORDER BY customer, vaultname";
 
+    /**
+     * Queries the Oracle database for all customers.
+     * @return ResultSet of all customers.
+     */
     public static ResultSet readCustomers() {
         Connection conn;
         String query = "SELECT * FROM CUSTOMER";
@@ -149,6 +154,11 @@ public class ReadUtil {
         }
     }
 
+    /**
+     * Queries the Oracle database for all daily transfers given a date
+     * @param date
+     * @return ResultSet of all daily transfers
+     */
     public static ResultSet readDailyTransfersByDate(LocalDate date) {
         Connection conn;
         String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards2 + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + daily + ")\r\n";
@@ -162,6 +172,12 @@ public class ReadUtil {
             return null;
         }
     }
+
+    /**
+     * Queries the Oracle database for all renewal transfers given a date
+     * @param date
+     * @return ResultSet of all renewal transfers
+     */
     public static ResultSet readRenewalTransfersByDate(LocalDate date) {
         Connection conn;
         String subquery = cte + "SELECT\r\n" + customerName + dbNameMap + woId + qty + tableNames + cards2 + join1 + "'" + date.format(DateTimeFormatter.ofPattern("dd/MM/yy")) + "'" + join2 + renewal + ")\r\n";

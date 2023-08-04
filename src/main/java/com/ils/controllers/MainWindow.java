@@ -41,17 +41,27 @@ public class MainWindow extends Component<Stage> {
     @FXML
     private StackPane transferTablePlaceholder;
 
+    /**
+     * Constructor.
+     * @param stage
+     */
     public MainWindow(Stage stage){
         super(FXML, stage);
         this.stage = stage;
     };
 
+    /**
+     * Show the stage and set the minimum size.
+     */
     public void show() {
         this.stage.show();
         this.stage.setMinHeight(800);
         this.stage.setMinWidth(1200);
     }
 
+    /**
+     * Fill the inner components.
+     */
     public void fillInnerComponents() {
         fillCustomerTable();
         fillProductPartTable();
@@ -61,31 +71,49 @@ public class MainWindow extends Component<Stage> {
         fillActionBar();
     }
 
+    /**
+     * Fill the action bar and add it to the placeholder.
+     */
     private void fillActionBar() {
         actionBar = new ActionBar(Logic.getCustomerManagement(), Logic.getFilters(), inputBar);
         actionBarPlaceholder.getChildren().add(actionBar.getRoot());
     }
 
+    /**
+     * Fill the customer table and add it to the placeholder.
+     */
     private void fillCustomerTable() {
         customerTable = new CustomerTable(Logic.getCustomerManagement());
         customerTablePlaceholder.getChildren().add(customerTable.getRoot());
     }
 
+    /**
+     * Fill the product part table and add it to the placeholder.
+     */
     private void fillProductPartTable() {
         productPartTable = new ProductPartTable(Logic.getProductManagement(), Logic.getPartManagement());
         productPartTablePlaceholder.getChildren().add(productPartTable.getRoot());
     }
 
+    /**
+     * Fill the transfer table and add it to the placeholder.
+     */
     private void fillTransferTable() {
         transferTable = new TransferTable(Logic.getTransferManagement());
         transferTablePlaceholder.getChildren().add(transferTable.getRoot());
     }
 
+    /**
+     * Fill the input bar and add it to the placeholder.
+     */
     private void fillInputBar() {
         inputBar = new InputBar(Logic.getCustomerManagement(), Logic.getProductManagement(), Logic.getPartManagement(), Logic.getTransferManagement(), customerTable.getSelectionModel(), productPartTable.getSelectionModel(), transferTable.getSelectionModel());
         inputBarPlaceholder.getChildren().add(inputBar.getRoot());
     }
 
+    /**
+     * Fill the info bar and add it to the placeholder.
+     */
     private void fillInfoBar() {
         infoBar = new InfoBar(Logic.getProductManagement(), Logic.getPartManagement(), customerTable, productPartTable, transferTable);
         infoBarPlaceholder.getChildren().add(infoBar.getRoot());

@@ -28,6 +28,10 @@ public abstract class DataSync {
         init();
     }
 
+    /**
+     * Checks both database connections
+     * @throws IllegalArgumentException
+     */
     private static void init() {
         if (Database.isOK() && Oracle.isOK()) {
             return;
@@ -35,6 +39,9 @@ public abstract class DataSync {
         throw new IllegalArgumentException("Could not connect to database, please check your properties file at database.properties");
     }
 
+    /**
+     * Syncs the customers from Oracle to SQLite
+     */
     private static void syncCustomers() {
         ResultSet customers = ReadUtil.readCustomers();
         Supplier<Stream<String>> savedCustomers = () -> CustomerDAO.getCustomers().stream().map(Customer::getCustomerName);
@@ -56,6 +63,11 @@ public abstract class DataSync {
         }
     }
     
+    /**
+     * Syncs the daily transfers from Oracle to SQLite, updates the products and parts
+     * @param date
+     * @throws IllegalStateException
+     */
     private static void syncDailyTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readDailyTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
@@ -143,6 +155,12 @@ public abstract class DataSync {
             Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, LocalDateTime.now() + ": Could not sync Daily Transfers from database " + e.getMessage());
         }
     }
+
+    /**
+     * Syncs the renewal transfers from Oracle to SQLite, updates the parts and products
+     * @param date
+     * @throws IllegalStateException
+     */
     private static void syncRenewalTransfers(LocalDate date) {
         ResultSet transfers = ReadUtil.readRenewalTransfersByDate(date);
         Supplier<Stream<String>> savedProducts = () -> ProductDAO.getProducts().stream().map(Product::getDBName);
@@ -231,6 +249,10 @@ public abstract class DataSync {
         }
     }
 
+    /**
+     * Syncs all data from Oracle to SQLite
+     * @param date
+     */
     public static void syncData(LocalDate date) {
         syncCustomers();
         syncDailyTransfers(date);

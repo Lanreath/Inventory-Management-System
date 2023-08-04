@@ -19,20 +19,38 @@ public class PartManagement {
     private Filters filters;
     private FilteredList<Part> partFilteredList;
 
+    /**
+     * Create a new PartManagement object.
+     * @param filters
+     */
     public PartManagement(Filters filters) {
         this.partFilteredList = PartDAO.getParts();
         this.filters = filters;
     }
 
+    /**
+     * Get a filtered list of parts.
+     * @return FilteredList<Part>
+     */
     public FilteredList<Part> getParts() {
         return this.partFilteredList;
     }
 
+    /**
+     * Get a stream of parts that belong to a product.
+     * @param product
+     * @return Stream<Part>
+     */
     public Stream<Part> getProductParts(Product product) {
         return this.partFilteredList.stream()
                 .filter(part -> part.getProduct().equals(product));
     }
 
+    /**
+     * Get the quantity of a product.
+     * @param product
+     * @return Integer
+     */
     public Integer getProductQuantity(Product product) {
         Integer sum = this.partFilteredList.stream()
                 .filter(part -> part.getProduct().equals(product))
@@ -41,6 +59,12 @@ public class PartManagement {
         return sum;
     }
 
+    /**
+     * Add a part to a product.
+     * @param name
+     * @param quantity
+     * @param product
+     */
     public void addPart(String name, int quantity, Product product) {
         int id = PartDAO.insertPart(name, quantity, product);
         Optional<Part> newPart = PartDAO.getPart(id);
@@ -60,6 +84,11 @@ public class PartManagement {
         PartDAO.updatePart(curr);
     }
 
+    /**
+     * Update a part's name.
+     * @param part
+     * @param name
+     */
     public void updatePartName(Part part, String name) {
         PartDAO.updatePart(new Part(name, part.getCreationDateTime(), part.getPartQuantity(), part.getProduct(),
                 part.getNextPart(), part.getPartNotes(), part.getId()));
@@ -85,6 +114,10 @@ public class PartManagement {
         }        
     }
 
+    /**
+     * Delete a part.
+     * @param part
+     */
     public void deletePart(Part part) {
         // Delete all transfers associated with the part
         List<Transfer> list = TransferDAO.getTransfersByPart(part).collect(Collectors.toList());
@@ -116,6 +149,10 @@ public class PartManagement {
         PartDAO.deletePart(part.getId());
     }
 
+    /**
+     * Set the transfer part filter
+     * @param part
+     */
     public void selectPart(Part part) {
         if (part == null) {
             filters.clearTransferPartFilter();
@@ -124,6 +161,11 @@ public class PartManagement {
         filters.filterTransferByPart(part);
     }
 
+    /**
+     * Update a part's quantity.
+     * @param part
+     * @param quantity
+     */
     public void updatePartQuantity(Part part, int quantity) {
         PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), quantity, part.getProduct(),
                 part.getNextPart(), part.getPartNotes(), part.getId()));
@@ -147,6 +189,11 @@ public class PartManagement {
         }
     }
 
+    /**
+     * Update a part's notes.
+     * @param part
+     * @param notes
+     */
     public void updatePartNotes(Part part, String notes) {
         PartDAO.updatePart(new Part(part.getPartName(), part.getCreationDateTime(), part.getPartQuantity(),
                 part.getProduct(), part.getNextPart(), notes, part.getId()));

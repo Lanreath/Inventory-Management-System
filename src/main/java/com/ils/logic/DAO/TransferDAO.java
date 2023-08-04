@@ -25,6 +25,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 
 public class TransferDAO {
+    // Database columns and table name
     private static final String tableName = "TRANSFER";
     private static final String transferTimeColumn = "TRANSFERDATETIME";
     private static final String partIdColumn = "PARTID";
@@ -40,10 +41,18 @@ public class TransferDAO {
         updateTransfersFromDB();
     }
 
+    /**
+     * Get a filter wrapper around the transfers list.
+     * @return FilteredList<Transfer> using transfers list as source
+     */
     public static FilteredList<Transfer> getTransfers() {
         return new FilteredList<>(transfers);
     }
 
+    /**
+     * Update the transfers list from the database.
+     * @throws SQLException 
+     */
     private static void updateTransfersFromDB() {
         String query = "SELECT * FROM " + tableName;
         try (Connection connection = Database.connect()) {
@@ -72,34 +81,77 @@ public class TransferDAO {
         }
     }
 
+    /**
+     * Get a transfer by id.
+     * @param id
+     * @return Optional<Transfer>
+     */
     public static Optional<Transfer> getTransfer(int id) {
         return transfers.stream().filter(t -> t.getId() == id).findFirst();
     }
 
+    /**
+     * Get a transfer by part and date.
+     * @param part
+     * @param date
+     * @return Optional<Transfer>
+     */
     public static Optional<Transfer> getTransferByPartAndDate(Part part, LocalDate date) {
         return transfers.stream().filter(t -> t.getPart().equals(part) && t.getTransferDateTime().toLocalDate().equals(date)).findFirst();
     }
 
+    /**
+     * Get a stream of transfers by customer.
+     * @param cust
+     * @return Stream<Transfer>
+     */
     public static Stream<Transfer> getTransfersByCustomer(Customer cust) {
         return transfers.stream().filter(t -> t.getPart().getProduct().getCustomer().equals(cust));
     }
 
+    /**
+     * Get a stream of transfers by product.
+     * @param product
+     * @return Stream<Transfer>
+     */
     public static Stream<Transfer> getTransfersByProduct(Product product) {
         return transfers.stream().filter(t -> t.getPart().getProduct().equals(product));
     }
 
+    /**
+     * Get a stream of transfers by product and date.
+     * @param prod
+     * @param date
+     * @return Stream<Transfer>
+     */
     public static Stream<Transfer> getTransfersByProductAndDate(Product prod, LocalDate date) {
         return transfers.stream().filter(t -> t.getPart().getProduct().equals(prod) && t.getTransferDateTime().toLocalDate().equals(date));
     }
 
+    /**
+     * Get a stream of transfers by part.
+     * @param part
+     * @return
+     */
     public static Stream<Transfer> getTransfersByPart(Part part) {
         return transfers.stream().filter(t -> t.getPart().equals(part));
     }
 
+    /**
+     * Get a stream of transfers by date.
+     * @param date
+     * @return Stream<Transfer>
+     */
     public static Stream<Transfer> getTransfersByDate(LocalDate date) {
         return transfers.stream().filter(t -> t.getTransferDateTime().toLocalDate().equals(date));
     }
 
+    /**
+     * Insert a transfer into the database.
+     * @param part
+     * @param quantity
+     * @param transferType
+     */
     public static void insertTransfer(Part part, int quantity, Transfer.Action transferType) {
         LocalDateTime transferDateTime = LocalDateTime.now();
         int id = (int) CRUDUtil.create(
@@ -111,6 +163,13 @@ public class TransferDAO {
         transfers.add(new Transfer(transferDateTime, part, part.getPartQuantity(), quantity, transferType, id));
     }
 
+    /**
+     * Insert a transfer into the database with a specified date.
+     * @param part
+     * @param quantity
+     * @param transferType
+     * @param date
+     */
     public static void insertTransfer(Part part, int quantity, Transfer.Action transferType, LocalDate date) {
         int id = (int) CRUDUtil.create(
             tableName,
@@ -121,6 +180,11 @@ public class TransferDAO {
         transfers.add(new Transfer(date.atStartOfDay(), part, part.getPartQuantity(), quantity, transferType, id));
     }
 
+    /**
+     * Update a transfer in the database.
+     * @param newTransfer
+     * @throws IllegalStateException
+     */
     public static void updateTransfer(Transfer newTransfer) {
         int rows = CRUDUtil.update(
             tableName,
@@ -145,6 +209,10 @@ public class TransferDAO {
         });
     }
 
+    /**
+     * Delete a transfer from the database.
+     * @param id
+     */
     public static void deleteTransfer(int id) {
         CRUDUtil.delete(tableName, id);
 
